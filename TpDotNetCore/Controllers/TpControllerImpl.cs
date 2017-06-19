@@ -192,7 +192,7 @@ namespace TpDotNetCore.Controllers
             var dt = DateTime.Now;
             var weekPunches = _appDbContext.Punches
                 .Where(p => p.User.Id == user.Id)
-                .Where(p => p.WeekPunch.Week == 5)/*_timeService.GetWeekNumber(dt)) */
+                .Where(p => p.WeekPunch.Week == _timeService.GetWeekNumber(dt))
                 .Where(p => p.YearPunch.Year == dt.Year)
                 .GroupBy(p => p.DayPunch.Day)
                 .ToList();
@@ -201,7 +201,7 @@ namespace TpDotNetCore.Controllers
             weekResponse.Status = new OpResult { Success = true };
             weekResponse.Punches = new WeekPunchesVm();
             weekResponse.Punches.User = user.Id;
-            weekResponse.Punches.Week = dt.Month;
+            weekResponse.Punches.Week = _timeService.GetWeekNumber(dt);
             weekResponse.Punches.Year = dt.Year;
             weekResponse.Punches.DayPunches = new List<Controllers.DayPunchesVm>();
             foreach (var dayPunches in weekPunches)
@@ -226,7 +226,46 @@ namespace TpDotNetCore.Controllers
 
         Task<SwaggerResponse<MonthResponse>> ITpController.GetThisMonthAsync()
         {
-            throw new NotImplementedException();
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = _userManager.FindByNameAsync(userId).Result;
+            if (user == null)
+                return Task<SwaggerResponse<MonthResponse>>.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status400BadRequest, headers, null, "User not found"));
+
+            var dt = DateTime.Now;
+            var monthPunches = _appDbContext.Punches
+                .Where(p => p.User.Id == user.Id)
+                .Where(p => p.MonthPunch.Month == dt.Month)
+                .Where(p => p.YearPunch.Year == dt.Year)
+                .GroupBy(p => p.DayPunch.Day)
+                .ToList();
+
+            var monthResponse = new MonthResponse();
+            var weekResponse = new WeekResponse();
+            monthResponse.Status = new OpResult { Success = true };
+            monthResponse.Punches = new MonthPunchesVm();
+            monthResponse.Punches.User = user.Id;
+            monthResponse.Punches.Month = dt.Month;
+            monthResponse.Punches.Year = dt.Year;
+            monthResponse.Punches.Punches = new List<Controllers.DayPunchesVm>();
+            foreach (var dayPunches in monthPunches)
+            {
+                var dayPunch = new DayPunchesVm();
+                weekResponse.Punches.DayPunches.Add(dayPunch);
+                dayPunch.Punches = new List<Controllers.Punch>();
+                foreach (var punch in dayPunches)
+                {
+                    var p1 = new Controllers.Punch();
+                    p1.Created = punch.Created;
+                    p1.Direction = punch.Direction;
+                    p1.Punchid = punch.Id;
+                    p1.Time = punch.PunchTime;
+                    p1.Timedec = (double)punch.TimeDec;
+                    p1.Updated = punch.Updated;
+                    dayPunch.Punches.Add(p1);
+                }
+            }
+            return Task<SwaggerResponse<MonthResponse>>.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, monthResponse));
         }
 
         Task<SwaggerResponse<YearResponse>> ITpController.GetThisYearAsync()
