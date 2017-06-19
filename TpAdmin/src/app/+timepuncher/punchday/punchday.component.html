@@ -1,0 +1,23 @@
+<md-grid-list cols="7" rowHeight="30px">
+  <md-grid-tile>
+    <div>{{day.day}}</div>
+  </md-grid-tile>
+  <md-grid-tile [style.background]="'lightblue'">
+    <app-punch [value]="day.p1"></app-punch>
+  </md-grid-tile>
+  <md-grid-tile [style.background]="'lightblue'">
+    <app-punch [value]="day.p2"></app-punch>
+  </md-grid-tile>
+  <md-grid-tile [style.background]="'lightblue'">
+    <app-punch [value]="day.p3"></app-punch>
+  </md-grid-tile>
+  <md-grid-tile [style.background]="'lightblue'">
+    <app-punch [value]="day.p4"></app-punch>
+  </md-grid-tile>
+  <md-grid-tile [style.background]="'lightblue'">
+    <app-punch [value]="day.p5"></app-punch>
+  </md-grid-tile>
+  <md-grid-tile [style.background]="'lightblue'">
+    <app-punch [value]="day.p6"></app-punch>
+  </md-grid-tile>
+</md-grid-list>

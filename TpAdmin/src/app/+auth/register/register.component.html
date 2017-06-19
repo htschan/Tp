@@ -1,0 +1,62 @@
+<div class="md-content" layout="row" layout-align="center start" layout-fill layout-margin>
+  <div layout="column" flex flex-md="50" flex-lg="50" flex-gt-lg="33" class="md-whiteframe-z2" layout-fill>
+    <md-toolbar class="md-primary" color="primary">
+      Registrieren
+    </md-toolbar>
+  </div>
+  <div class="containerX">
+    <div fxLayout="row" class="colored box">
+      <div fxFlex="20"></div>
+      <div fxFlex="60">
+        <md-card>
+          <md-card-title>
+            <p class="md-body-2"> Registrieren mit Benutzername</p>
+          </md-card-title>
+          <md-card-content>
+            <div layout="column" layout-margin layout-padding>
+              <form [formGroup]="signupForm" #f="ngForm" (ngSubmit)="register($event)" layout="column" layout-fill layout-padding layout-margin>
+                <md-input-container>
+                  <input mdInput formControlName="firstName" placeholder="Vorname">
+                </md-input-container>
+                <md-input-container>
+                  <input mdInput formControlName="name" placeholder="Name">
+                </md-input-container>
+                <div formGroupName="account">
+                  <md-input-container>
+                    <input mdInput formControlName="email" type="email" placeholder="E-Mail">
+                  </md-input-container>
+                  <md-input-container>
+                    <input mdInput formControlName="username" type="text" placeholder="Benutzername">
+                  </md-input-container>
+                  <md-input-container>
+                    <input mdInput type="password" formControlName="password" placeholder="Passwort">
+                  </md-input-container>
+                  <md-input-container>
+                    <input mdInput type="password" formControlName="confirmPassword" placeholder="Passwort Bestätigung">
+                  </md-input-container>
+                </div>
+                <button md-raised-button class="md-primary" type="submit" aria-label="login">Registrieren</button>
+              </form>
+            </div>
+          </md-card-content>
+          <md-card-actions>
+            <a md-button [routerLink]="['/auth/login']">Schon registriert ?</a>
+          </md-card-actions>
+          <md-card-footer>
+            <div [hidden]="error == ''">
+              <md-toolbar class="md-warn" layout="row" layout-fill layout-padding layout-margin>
+                <p class="md-body-1">{{ error }}</p>
+              </md-toolbar>
+            </div>
+          </md-card-footer>
+        </md-card>
+      </div>
+      <div fxFlex></div>
+    </div>
+  </div>
+</div>
+<!--<md-card>
+    <p>Form: {{signupForm.value | json}}</p>
+    <p>Form.Status: {{signupForm.status | json}}</p>
+    <p>Account status {{signupForm.get('account').errors | json}}</p>
+  </md-card>-->

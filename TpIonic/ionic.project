@@ -1,0 +1,11 @@
+{
+  "name": "tp",
+  "email": "",
+  "app_id": "",
+  "proxies": [
+    {
+      "path": "/api/v1",
+      "proxyUrl": "http://localhost:5000/api/v1"
+    }
+  ]
+}

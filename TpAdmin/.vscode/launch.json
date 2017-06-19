@@ -1,0 +1,54 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Surface: Launch Chrome against localhost, with sourcemaps",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200",
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}",
+            // the next 2 options is to create a new chrome instance without warnings
+            "runtimeArgs": [
+                "--disable-session-crashed-bubble",
+                "--disable-infobars",
+                "--disable-application-cache",
+                "--media-cache-size=1",
+                "--disk-cache-size=1"
+            ],
+            "userDataDir": "${workspaceRoot}\\chromeDummyDir",
+            "sourceMapPathOverrides": {
+                "webpack:///D:*": "D:/*"
+            },
+            "skipFiles": [
+                "vendor.bundle.js"
+            ]
+        },
+        {
+            "name": "Ricardo.ch: Launch Chrome against localhost, with sourcemaps",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200",
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}",
+            "userDataDir": "${workspaceRoot}\\chromeDummyDir",
+            "sourceMapPathOverrides": {
+                "webpack:///D:*": "D:/*"
+            }
+        },
+        {
+            // For this to work, start chrome using
+            // google-chrome --remote-debugging-port=9222 http://localhost:4200 --new-window
+            // and do not use its developer tools simultaneously.
+            "name": "Attach to Chrome, with sourcemaps",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}",
+            "sourceMapPathOverrides": {
+                "webpack:///*": "/*"
+            }
+        }
+    ]
+}

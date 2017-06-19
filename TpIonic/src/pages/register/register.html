@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-navbar color="dark">
+    <button ion-button menuToggle><ion-icon name="menu"></ion-icon></button>
+    <ion-title>{{title}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="login-content" padding>
+  <div class="login-box">
+
+    <form (ngSubmit)="register()" #registerForm="ngForm">
+      <ion-row>
+        <ion-col>
+          <ion-list inset>
+            <ion-item>
+              <ion-input type="text" placeholder="Vorname" name="firstName" [(ngModel)]="registerCredentials.firstName" required></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input type="text" placeholder="Nachname" name="lastName" [(ngModel)]="registerCredentials.lastName" required></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input type="text" placeholder="Ort" name="location" [(ngModel)]="registerCredentials.location" required></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input type="text" placeholder="Email" name="email" [(ngModel)]="registerCredentials.email" required></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input type="password" placeholder="PassworT" name="password" [(ngModel)]="registerCredentials.password" required></ion-input>
+            </ion-item>
+
+          </ion-list>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col class="signup-col">
+          <button ion-button class="submit-btn" full type="submit" [disabled]="!registerForm.form.valid">Register</button>
+        </ion-col>
+      </ion-row>
+
+    </form>
+  </div>
+</ion-content>

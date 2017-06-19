@@ -1,0 +1,45 @@
+<md-card>
+  <md-card-title>
+    Time Puncher Administration !
+  </md-card-title>
+  <md-card-content>
+    <div>{{authService.userProfile | json}}</div>
+  </md-card-content>
+</md-card>
+<md-tab-group>
+  <md-tab label="Heute">
+    <h1>Heute</h1>
+    <a md-raised-button (click)="punchIn()">Kommen</a>
+    <a md-raised-button (click)="punchOut()">Gehen</a>
+    <div>
+      <!--<ngx-datatable [rows]="rows" [columns]="columns">
+      </ngx-datatable>-->
+    </div>
+    <md-grid-list cols="2" rowHeight="30px">
+      <md-grid-tile>
+        <div>Kommen</div>
+      </md-grid-tile>
+      <md-grid-tile>
+        <div>Gehen</div>
+      </md-grid-tile>
+      <div *ngFor="let d of today">
+        <md-grid-tile>
+          <div *ngIf="d.direction === true">{{d.timedec}} {{d.direction}}</div>
+        </md-grid-tile>
+        <md-grid-tile>
+          <div *ngIf="d.direction === false">{{d.timedec}} {{d.direction}}</div>
+        </md-grid-tile>
+      </div>
+    </md-grid-list>
+    <p>{{today | json}}</p>
+    <!--<p>{{tpService.getTodayPunches() | async}}</p>-->
+  </md-tab>
+  <md-tab label="Monat">
+    <h1>Monat</h1>
+    <p>...</p>
+  </md-tab>
+  <md-tab label="Übersicht">
+    <h1>Übersicht</h1>
+    <p>...</p>
+  </md-tab>
+</md-tab-group>

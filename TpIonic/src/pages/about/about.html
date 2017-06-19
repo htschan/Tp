@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle><ion-icon name="menu"></ion-icon></button>
+    <ion-title>{{title}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding class="about-content">
+  <ion-card>
+    <ion-item>
+      Uuid: {{device?.uuid}}
+    </ion-item>
+    <ion-item>
+      Model: {{device?.model}}
+    </ion-item>
+    <ion-item>
+      Cordova: {{device?.cordova}}
+    </ion-item>
+    <ion-item>
+      Manufacturer: {{device?.manufacturer}}
+    </ion-item>
+    <ion-item>
+      Platform: {{device?.platform}}
+    </ion-item>
+    <ion-item>
+      Serial: {{device?.serial}}
+    </ion-item>
+    <ion-item>
+      Version: {{device?.version}}
+    </ion-item>
+  </ion-card>
+</ion-content>

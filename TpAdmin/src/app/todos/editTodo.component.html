@@ -1,0 +1,79 @@
+<style>
+
+.containerX {
+  margin-top: 45px;
+  /*border: solid 1px #b6b6b6;*/
+  box-sizing: content-box !important;
+}
+.hideBox {
+  margin-top: 1px;
+}
+</style>
+<md-card>
+    <h3>Todo bearbeiten</h3>
+    <form novalidate [formGroup]="form" (submit)="save()">
+        <div class="containerX">
+            <div class="container">
+                <div>
+                    <md-input-container style="width: 100%">
+                        <input md-input placeholder="Titel" formControlName="title" #spy>
+                    </md-input-container>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <md-input-container width="100%">
+                        <textarea md-input cols="100" placeholder="Kommentar" value="Das ist der Kommentar" formControlName="comment"></textarea>
+                    </md-input-container>
+                </div>
+            </div>
+            <div>
+                <div [fxLayout]="row">
+                    <div>
+                        <md-input-container width="100%">
+                            <input md-input placeholder="Wer" formControlName="owner">
+                        </md-input-container>
+                    </div>
+                    <div fxFlex="40">
+                        <div [fxLayout]="row">
+                            <md-radio-group [(ngModel)]="chosenOption" formControlName="finished">
+                                <div fxFlex="40">
+                                    <md-radio-button *ngFor="let o of options" [value]="o.value">
+                                        {{o.label}}
+                                    </md-radio-button>
+                                </div>
+                            </md-radio-group>
+                        </div>
+                    </div>
+                    <div fxFlex="20">
+                        <md-input-container width="100%">
+                            <input md-input type="number" placeholder="Priorität" formControlName="prio">
+                        </md-input-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div><p>Form: {{form.value | json}}</p></div>
+        <div><p>Form: {{form.status | json}}</p></div>
+        <div>
+            <button md-button (click)="resetForm()">Zurücksetzn</button>
+            <button type="submit" md-button >Save</button>
+        </div>
+    </form>
+</md-card>
+
+<br>TODO: remove this: {{spy.className}}
+<p style="margin-top: 50px"> </p>
+<div fxLayout='column' class="zero">
+
+  <div fxFlex="33" class="one" >aaaaaaaa aaa aaaaaaaaaaa aaaaaaaaaaa aaaaaaaaaaaaaaa</div>
+  <div fxFlex="33%" [fxLayout]="direction" class="two">
+
+    <div fxFlex="22%"    class="two_one">bbbbbbbb</div>
+    <div fxFlex="205px"  class="two_two">cccccccccccc</div>
+    <div fxFlex="30"     class="two_three">dddddddddddddd</div>
+
+  </div>
+  <div fxFlex class="three">eeeeeeeeee eeeeeeeeee eeeeeeeee eeeeeeeeeeeee eeeeeeeeee eeeeeee</div>
+
+</div>

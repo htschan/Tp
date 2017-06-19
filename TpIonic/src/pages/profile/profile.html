@@ -1,0 +1,42 @@
+<!-- src/pages/profile/profile.html -->
+
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle><ion-icon name="menu"></ion-icon></button>
+    <ion-title>&nbsp;</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding class="profile-content" *ngIf="auth.authenticated()">
+
+  <ion-card>
+    <ion-item>
+      First Name: {{profile?.f}}
+    </ion-item>
+    <ion-item>
+      Name: {{profile?.n}}
+    </ion-item>
+    <ion-item>
+      Username: {{profile?.u}}
+    </ion-item>
+    <ion-item>
+      E-Mail: {{profile?.e}}
+    </ion-item>
+    <ion-item>
+      Role: {{profile?.r}}
+    </ion-item>
+  </ion-card>
+
+  <ion-card>
+
+    <ion-item *ngIf="auth.userProfile">
+      <ion-avatar item-left>
+        <!--<img src="{{ auth.userProfile.picture }}">-->
+      </ion-avatar>
+      <h2>{{ profile?.u }}</h2>
+      <p>{{ profile?.e }}</p>
+    </ion-item>
+
+  </ion-card>
+
+</ion-content>

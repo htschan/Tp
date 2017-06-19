@@ -1,0 +1,19 @@
+<md-dialog-title>Neues Todo</md-dialog-title>
+<md-dialog-content>
+    <form>
+        <p>
+            <md-input-container width="100%">
+                <input md-input placeholder="Titel" #title>
+            </md-input-container>
+        </p>
+        <p>
+            <md-input-container width="100%">
+                <textarea md-input placeholder="Beschreibung" #comment></textarea>
+            </md-input-container>
+        </p>
+    </form>
+</md-dialog-content>
+<md-dialog-actions>
+    <button md-button (click)="dialogRef.close({title: title.value, comment: comment.value})">Speichern</button>
+    <button md-button md-dialog-close>Abbrechen</button>
+</md-dialog-actions>

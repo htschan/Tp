@@ -1,0 +1,29 @@
+<h2>User's Month</h2>
+
+<div class="flex-container" fxLayout="row" fxLayoutAlign="space-between">
+    <div class="flex-item">
+        <form>
+            <md-select placeholder="Jahr" [(ngModel)]="selectedYear" name="year">
+                <md-option *ngFor="let year of years" [value]="year.value">
+                    {{year.viewValue}}
+                </md-option>
+            </md-select>
+        </form>
+    </div>
+    <div class="flex-item">
+        <form>
+            <md-select placeholder="Monat" [(ngModel)]="selectedMonth" name="month">
+                <md-option *ngFor="let month of months" [value]="month.value">
+                    {{month.viewValue}}
+                </md-option>
+            </md-select>
+        </form>
+    </div>
+    <div class="flex-item">
+        <button md-raised-button (click)="getPunches()">Punches</button>
+    </div>
+</div>
+<div *ngFor="let day of punches | async">
+    <app-punchday [day]="day"></app-punchday>
+</div>
+<!--<div>{{punches | async | json}}</div>-->

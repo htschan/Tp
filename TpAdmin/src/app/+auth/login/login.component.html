@@ -1,0 +1,44 @@
+<div class="md-content" layout="row" layout-align="center start" layout-fill layout-margin>
+    <div layout="column" flex flex-md="50" flex-lg="50" flex-gt-lg="33" class="md-whiteframe-z2" layout-fill>
+        <md-toolbar class="md-primary" color="primary">
+            Anmelden
+        </md-toolbar>
+    </div>
+    <div class="containerX">
+        <div fxLayout="row" class="colored box">
+            <div fxFlex="20"></div>
+            <div fxFlex="60">
+                <md-card>
+                    <md-card-title>
+                        <p class="md-body-2"> Anmelden mit Benutzername</p>
+                    </md-card-title>
+                    <md-card-content>
+                        <div layout="column" layout-margin layout-padding>
+                            <form [formGroup]="loginForm" #f="ngForm" (ngSubmit)="login()" layout="column" layout-fill layout-padding layout-margin>
+                                <md-input-container>
+                                    <input mdInput formControlName="username" type="text" placeholder="Benutzername">
+                                </md-input-container>
+                                <md-input-container>
+                                    <input mdInput formControlName="password" type="password" placeholder="Passwort">
+                                </md-input-container>
+                                <button md-raised-button class="md-primary" type="submit" aria-label="login">Anmelden</button>
+                            </form>
+                        </div>
+                    </md-card-content>
+                    <md-card-actions>
+                        <a md-button [routerLink]="['/auth/forgot-password']">Passwort vergessen</a>
+                        <a md-button [routerLink]="['/auth/register']">Neues Konto erstellen</a>
+                    </md-card-actions>
+                    <md-footer>
+                        <div [hidden]="error == ''">
+                            <md-toolbar class="md-warn" layout="row" layout-fill layout-padding layout-margin>
+                                <p class="md-body-1">{{ error }}</p>
+                            </md-toolbar>
+                        </div>
+                    </md-footer>
+                </md-card>
+            </div>
+            <div fxFlex></div>
+        </div>
+    </div>
+</div>

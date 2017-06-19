@@ -1,0 +1,37 @@
+<md-toolbar color="primary">
+  <span>Time Puncher Admin</span>
+  <span class="app-toolbar-filler"></span>
+  <div *ngIf="!authService.authenticated()"><small>Nicht angemeldet</small></div>
+  <div *ngIf="authService.authenticated()"><small>Grüezi {{ authService.userProfile?.u === null ? authService.userProfile?.e : authService.userProfile?.u }} !&nbsp;</small></div>
+  <img width="30" *ngIf="authService.authenticated() && authService?.userProfile?.picture !== null" src="{{ authService.userProfile.picture }}">
+  <button md-icon-button [md-menu-trigger-for]="menu">
+    <md-icon>more_vert</md-icon>
+  </button>
+  <md-menu #menu="mdMenu" x-position="before">
+    <button md-menu-item (click)="logout()" [disabled]="!authService.authenticated()">Logout</button>
+    <button md-menu-item (click)="refresh()" > Refresh </button>
+    <button md-menu-item [disabled]="!authService.authenticated()"> Settings </button>
+    <button md-menu-item> Help </button>
+    <button md-menu-item (click)="isDarkTheme = !isDarkTheme">TOGGLE DARK THEME</button>
+  </md-menu>
+</md-toolbar>
+
+<md-sidenav-container [class.m2app-dark]="isDarkTheme">
+  <md-sidenav #start (open)="closeStartButton.focus()" [opened]="true" mode="side">
+    <md-nav-list>
+      <md-list-item><a title="Home" routerLink="/home" md-button><span>{{'Home' | i18n}}</span></a></md-list-item>
+      <md-list-item routerLinkActive="active"><a routerLink="/todos" md-button>{{'Todos' | i18n}}</a></md-list-item>
+      <md-list-item routerLinkActive="active"><a routerLink="/timepuncher" md-button>{{'Timepuncher' | i18n}}</a></md-list-item>
+      <md-list-item *ngIf="adminService.isAdmin()" routerLinkActive="active"><a routerLink="/groups" md-button>{{'Groups' | i18n}}</a></md-list-item>
+      <md-list-item *ngIf="authService.isAdmin()" routerLinkActive="active"><a routerLink="/administration" md-button>{{'Admin' | i18n}}</a></md-list-item>
+    </md-nav-list>
+  </md-sidenav>
+
+  <div class="app-content" style="height: 1000px">
+    <router-outlet></router-outlet>
+  </div>
+</md-sidenav-container>
+
+<span *ngIf="fab1Show" class="app-action" [class.m2app-dark]="isDarkTheme">
+  <button md-fab (click)="fab1Clicked()"><md-icon>{{fab1Icon}}</md-icon></button>
+</span>
