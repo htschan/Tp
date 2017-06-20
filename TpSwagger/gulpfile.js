@@ -15,7 +15,7 @@ gulp.task('watch', ['transpile'], () => {
 gulp.task('default', ['watch']);
 
 gulp.task('generate', (cb) => {
-	runExe('..\\NSwag\\src\\NSwag.Console\\bin\\Debug\\NSwag.exe run swagger.nswag', (err, stdout, stderr) =>{
+	runExe('..\\..\\NSwag\\src\\NSwag.Console\\bin\\Debug\\NSwag.exe run swagger.nswag', (err, stdout, stderr) =>{
 		console.log(stdout);
 		console.log(stderr);
 		cb(err);

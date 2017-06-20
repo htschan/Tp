@@ -81,17 +81,22 @@ paths:
           schema:
             $ref: '#/definitions/OpResult'
   /confirm:
-    post:
+    get:
       description:
         Diese Methode wird durch den Bestätigungslink aufgerufen.
       summary: Eine Benutzerregistrierung bestätigen [AllowAnonymous]
       operationId: confirmRegister
       parameters:
-        - name: confirmToken
+        - name: id
           in: query
           type: string
           required: true
-          description: Registrierungsbestätigung
+          description: Userid
+        - name: cnf
+          in: query
+          type: string
+          required: true
+          description: Confirmationtoken
       tags:
         - Authentication
       responses:
@@ -607,10 +612,10 @@ definitions:
     properties:
       user:
         type: string
-      month:
-        type: string
+        description: Boid of user
       year:
-        type: string
+        type: integer
+        description: The year expressed as 1 to 9999
       punches:
         type: array
         items:
@@ -620,10 +625,13 @@ definitions:
     properties:
       user:
         type: string
+        description: Boid of user
       month:
-        type: string
+        type: integer
+        description: The month expressed as value between 1 and 12
       year:
-        type: string
+        type: integer
+        description: The year expressed as 1 to 9999
       punches:
         type: array
         items:
@@ -633,11 +641,14 @@ definitions:
     properties:
       user:
         type: string
+        description: Boid of user
       week:
-        type: string
+        type: integer
+        description: The week expressed as 1 to 53
       year:
-        type: string
-      punches:
+        type: integer
+        description: The year expressed as 1 to 9999
+      dayPunches:
         type: array
         items:
           $ref: '#/definitions/DayPunchesVm'
@@ -653,12 +664,16 @@ definitions:
     properties:
       userboid:
         type: string
+        description: Boid of user
       day:
-        type: number
+        type: integer
+        description: The day expressed as value betwenn 1 and 31
       month:
-        type: number
+        type: integer
+        description: The month expressed as value between 1 and 12
       year:
-        type: number
+        type: integer
+        description: The year expressed as 1 to 9999
       punches:
         type: array
         items:
@@ -671,13 +686,13 @@ definitions:
     properties:
       time:
         type: string
-        format: Date
+        format: date-time
       timedec:
         type: number
         format: float
       direction:
         type: boolean
-        description: True means enter work, Fals means leave work.
+        description: True means enter work, False means leave work.
       created:
         type: string
         format: date-time
@@ -687,7 +702,7 @@ definitions:
         format: date-time
         description: The timestamp of the last update of this value.
       punchid:
-        type: number
+        type: string
   OpResult:
     type: object
     properties:

@@ -1504,8 +1504,7 @@ namespace TpDotNetCore.Controllers
     public partial class YearPunchesVm : System.ComponentModel.INotifyPropertyChanged
     {
         private string _user;
-        private string _month;
-        private string _year;
+        private int? _year;
         private System.Collections.Generic.List<MonthPunchesVm> _punches;
     
         /// <summary>Boid of user</summary>
@@ -1523,24 +1522,9 @@ namespace TpDotNetCore.Controllers
             }
         }
     
-        /// <summary>The month expressed as value between 1 and 12</summary>
-        [Newtonsoft.Json.JsonProperty("month", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Month
-        {
-            get { return _month; }
-            set 
-            {
-                if (_month != value)
-                {
-                    _month = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
         /// <summary>The year expressed as 1 to 9999</summary>
         [Newtonsoft.Json.JsonProperty("year", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Year
+        public int? Year
         {
             get { return _year; }
             set 

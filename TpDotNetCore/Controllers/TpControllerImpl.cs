@@ -78,7 +78,7 @@ namespace TpDotNetCore.Controllers
             var userIdentity = _mapper.Map<User>(registerVm);
             var result = _userManager.CreateAsync(userIdentity, registerVm.Password).Result;
 
-            if (!result.Succeeded)// return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+            if (!result.Succeeded)
                 return Task<SwaggerResponse<RegisterResponse>>.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status400BadRequest, headers, null, result.ToString()));
 
             var confirmationToken = _userManager.GenerateEmailConfirmationTokenAsync(userIdentity).Result;
@@ -241,7 +241,6 @@ namespace TpDotNetCore.Controllers
                 .ToList();
 
             var monthResponse = new MonthResponse();
-            var weekResponse = new WeekResponse();
             monthResponse.Status = new OpResult { Success = true };
             monthResponse.Punches = new MonthPunchesVm();
             monthResponse.Punches.User = user.Id;
@@ -251,9 +250,9 @@ namespace TpDotNetCore.Controllers
             foreach (var dayPunches in monthPunches)
             {
                 var dayPunch = new DayPunchesVm();
-                weekResponse.Punches.DayPunches.Add(dayPunch);
+                monthResponse.Punches.Punches.Add(dayPunch);
                 dayPunch.Punches = new List<Controllers.Punch>();
-                foreach (var punch in dayPunches)
+                foreach (var punch in dayPunches.OrderBy(p => p.PunchTime))
                 {
                     var p1 = new Controllers.Punch();
                     p1.Created = punch.Created;
@@ -270,7 +269,60 @@ namespace TpDotNetCore.Controllers
 
         Task<SwaggerResponse<YearResponse>> ITpController.GetThisYearAsync()
         {
-            throw new NotImplementedException();
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = _userManager.FindByNameAsync(userId).Result;
+            if (user == null)
+                return Task<SwaggerResponse<YearResponse>>.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status400BadRequest, headers, null, "User not found"));
+
+            var dt = DateTime.Now;
+            var yearPunches = _appDbContext.Punches
+                .Where(p => p.User.Id == user.Id)
+                .Where(p => p.YearPunch.Year == dt.Year)
+                .OrderBy(p => p.MonthPunch.Month)
+                .GroupBy(p => p.MonthPunch.Month)
+                .Select(p => new
+                {
+                    Month = p.Key,
+                    Groups = p.OrderBy(q => q.DayPunch.Day).GroupBy(q => q.DayPunch.Day)
+                });
+
+            var yearResponse = new YearResponse();
+            yearResponse.Status = new OpResult { Success = true };
+            var yearchPunchVm = new YearPunchesVm();
+            yearResponse.Punches = yearchPunchVm;
+            yearchPunchVm.User = user.Id;
+            yearchPunchVm.Year = dt.Year;
+            yearchPunchVm.Punches = new List<Controllers.MonthPunchesVm>();
+            foreach (var x in yearPunches)
+            {
+                var monthPunchVm = new MonthPunchesVm();
+                yearchPunchVm.Punches.Add(monthPunchVm);
+                monthPunchVm.User = user.Id;
+                monthPunchVm.Month = x.Month;
+                monthPunchVm.Year = dt.Year;
+                monthPunchVm.Punches = new List<Controllers.DayPunchesVm>();
+
+                foreach (IGrouping<int, Entities.Punch> dayPunches in x.Groups)
+                {
+                    var dayPunch = new DayPunchesVm();
+                    monthPunchVm.Punches.Add(dayPunch);
+                    dayPunch.Punches = new List<Controllers.Punch>();
+                    foreach (Entities.Punch punch in dayPunches.OrderBy(p => p.PunchTime))
+                    {
+                        System.Console.WriteLine(punch.DayPunch);
+                        var p1 = new Controllers.Punch();
+                        p1.Created = punch.Created;
+                        p1.Direction = punch.Direction;
+                        p1.Punchid = punch.Id;
+                        p1.Time = punch.PunchTime;
+                        p1.Timedec = (double)punch.TimeDec;
+                        p1.Updated = punch.Updated;
+                        dayPunch.Punches.Add(p1);
+                    }
+                }
+            }
+            return Task<SwaggerResponse<YearResponse>>.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, yearResponse));
         }
 
         Task<SwaggerResponse<PunchResponse>> ITpController.PunchInAsync()
