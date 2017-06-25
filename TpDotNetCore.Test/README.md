@@ -7,7 +7,7 @@ Testprojekt erzeugen
 `dotnet new xunit`
 
 Refeerenz auf das zu testende Projekt hinzufügen
-`dotnet add reference ../TpDotNetCore/TpDotNetCore.csproj`
+`dotnet add ../TpDotNetCore/TpDotNetCore.csproj` reference
 
 `dotnet restore`
 
