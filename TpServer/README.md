@@ -283,12 +283,14 @@ Create crontab job to renew the certificate
 `30 2 * * 1 /usr/bin/certbot renew >> /var/log/le-renew.log`
 `35 2 * * 1 /usr/bin/systemctl reload nginx`
 
+Renew manually
+sudo certbot renew certonly -a webroot --webroot-path=/usr/share/nginx/html -d timepuncher.ch
 
 Refer to nginx.conf sample.
 
 ### Test your SSL server
 
-https://www.ssllabs.com/ssltest/analyze.html?d=example.com
+https://www.ssllabs.com/ssltest/analyze.html?d=timepuncher.ch
 
 ### How to setup an NodeJS application
 

@@ -1,7 +1,6 @@
 
 namespace TpDotNetCore.Helpers
 {
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "11.0.0.0")]
     public class SwaggerResponse
     {
         public int StatusCode { get; private set; }
@@ -15,7 +14,6 @@ namespace TpDotNetCore.Helpers
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "11.0.0.0")]
     public class SwaggerResponse<TResult> : SwaggerResponse
     {
         public TResult Result { get; private set; }
