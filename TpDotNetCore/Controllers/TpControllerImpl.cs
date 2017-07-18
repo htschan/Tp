@@ -85,18 +85,14 @@ namespace TpDotNetCore.Controllers
                         headers,
                         new AuthResponse { Token = authResponse.authToken, ValidFor = authResponse.expiresIn, Id = authResponse.id, Status = new OpResult { Success = true, Result = "Authentication successful" } }));
             }
-            catch (Exception exception)
+            catch (RepositoryException exception)
             {
-                return HandleException<AuthResponse>(exception, headers);
+                return Task<SwaggerResponse<AuthResponse>>.FromResult(
+                    new SwaggerResponse<AuthResponse>(
+                        exception.StatusCode,
+                        headers,
+                        new AuthResponse { Token = "failed to auth", Status = new OpResult { Success = false, Result = "Authenication failed" } }, exception.Message));
             }
-            // catch (RepositoryException exception)
-            // {
-            //     return Task<SwaggerResponse<AuthResponse>>.FromResult(
-            //         new SwaggerResponse<AuthResponse>(
-            //             exception.StatusCode,
-            //             headers,
-            //             new AuthResponse { Token = "failed to auth", Status = new OpResult { Success = false, Result = "Authenication failed" } }, exception.Message));
-            // }
         }
 
         public Task<SwaggerResponse<RegisterResponse>> RegisterUserAsync(RegisterDto registerDto)
@@ -181,7 +177,8 @@ namespace TpDotNetCore.Controllers
             }
             catch (Exception exception)
             {
-                return HandleException<DayResponse>(exception, headers);
+                var response = new DayResponse { Status = new OpResult { Success = false, Result = "Failed to get Today's punches" } };
+                return HandleException<DayResponse>(exception, headers, response);
             }
         }
 
@@ -196,7 +193,8 @@ namespace TpDotNetCore.Controllers
             }
             catch (Exception exception)
             {
-                return HandleException<WeekResponse>(exception, headers);
+                var response = new WeekResponse { Status = new OpResult { Success = false, Result = "Failed to get Week's punches" } };
+                return HandleException<WeekResponse>(exception, headers, response);
             }
         }
 
@@ -211,7 +209,8 @@ namespace TpDotNetCore.Controllers
             }
             catch (Exception exception)
             {
-                return HandleException<MonthResponse>(exception, headers);
+                var response = new MonthResponse { Status = new OpResult { Success = false, Result = "Failed to get Month's punches" } };
+                return HandleException<MonthResponse>(exception, headers, response);
             }
         }
 
@@ -226,7 +225,8 @@ namespace TpDotNetCore.Controllers
             }
             catch (Exception exception)
             {
-                return HandleException<YearResponse>(exception, headers);
+                var response = new YearResponse { Status = new OpResult { Success = false, Result = "Failed to get Year's punches" } };
+                return HandleException<YearResponse>(exception, headers, response);
             }
         }
 
@@ -269,7 +269,8 @@ namespace TpDotNetCore.Controllers
             }
             catch (Exception exception)
             {
-                return HandleException<DayResponse>(exception, headers);
+                var response = new DayResponse { Status = new OpResult { Success = false, Result = "Failed to punch and get Today's punches" } };
+                return HandleException<DayResponse>(exception, headers, response);
             }
         }
 
@@ -301,11 +302,11 @@ namespace TpDotNetCore.Controllers
             }
         }
         #endregion
-        private Task<SwaggerResponse<T>> HandleException<T>(Exception exception, Dictionary<string, IEnumerable<string>> headers)
+        private Task<SwaggerResponse<T>> HandleException<T>(Exception exception, Dictionary<string, IEnumerable<string>> headers, T response)
         {
             if (exception is RepositoryException)
-                return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(((RepositoryException)exception).StatusCode, headers, default(T), exception.Message));
-            return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(StatusCodes.Status400BadRequest, headers, default(T), exception.Message));
+                return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(((RepositoryException)exception).StatusCode, headers, response, exception.Message));
+            return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(StatusCodes.Status400BadRequest, headers, response, exception.Message));
         }
     }
 }

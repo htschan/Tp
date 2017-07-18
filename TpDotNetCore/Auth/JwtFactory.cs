@@ -3,18 +3,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Auth
 {
     public class JwtFactory : IJwtFactory
     {
         private readonly JwtIssuerOptions _jwtOptions;
+        private readonly ILogger _logger;
 
-        public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions)
+        public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions, ILogger<JwtFactory> logger)
         {
             _jwtOptions = jwtOptions.Value;
             ThrowIfInvalidOptions(_jwtOptions);
+            _logger = logger;
         }
 
         public async Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity)
@@ -37,9 +41,20 @@ namespace TpDotNetCore.Auth
                 expires: _jwtOptions.Expiration,
                 signingCredentials: _jwtOptions.SigningCredentials);
 
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            _logger.LogInformation(LoggerEvents.GENERATE_JWT, $"Generate JWT " 
+                    + $"sub: {(string)jwt.Payload["sub"]} "
+                    + $"rol: {(string)jwt.Payload["rol"]} "
+                    + $"nbf: {GetDateTimeFromUnix((long)jwt.Payload["nbf"])} "
+                    + $"iat: {GetDateTimeFromUnix((long)jwt.Payload["iat"])} "
+                    + $"exp: {GetDateTimeFromUnix((long)jwt.Payload["exp"])}");
 
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             return encodedJwt;
+        }
+
+        private static DateTime GetDateTimeFromUnix(long unixtime)
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(unixtime).UtcDateTime.ToLocalTime();
         }
 
         public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)

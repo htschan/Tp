@@ -32,7 +32,7 @@ export class AuthService {
     }
 
     public getAuthenticated(): Promise<boolean> {
-        return Promise.resolve(tokenNotExpired('id_token', localStorage.getItem('id_token')));
+        return Promise.resolve(tokenNotExpired('id_token'));
     }
 
     public getMyProfile(): Observable<any> {
@@ -46,7 +46,7 @@ export class AuthService {
     }
 
     public authenticated(): boolean {
-        return tokenNotExpired('id_token', this.idToken);
+        return tokenNotExpired('id_token');
     }
 
     public login(username: string, password: string): Observable<any> {
@@ -85,7 +85,7 @@ export class AuthService {
 
     public logout() {
         this.storage.remove('profile');
-        localStorage.remove('id_token');
+        localStorage.removeItem('id_token');
         this.idToken = null;
         this.storage.remove('refresh_token');
         this.zoneImpl.run(() => this.userProfile = null);

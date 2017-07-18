@@ -4,6 +4,7 @@ import { Slides } from 'ionic-angular';
 
 import { Events, NavController } from 'ionic-angular';
 import { PunchService } from '../../services/puncher/punch.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { DayPunchesDto, WeekPunchesDto, MonthPunchesDto, PunchResponse } from '../../services/api.g';
 
 @Component({
@@ -17,7 +18,7 @@ export class HomePage {
   weekpunches: WeekPunchesDto;
   monthpunches: MonthPunchesDto;
 
-  constructor(public events: Events, public navCtrl: NavController, private punchService: PunchService) {
+  constructor(public events: Events, public navCtrl: NavController, private punchService: PunchService, private auth: AuthService) {
     events.subscribe('title:updated', (data) => {
       if (data.menuState) {
         this.title = "Projects";
@@ -26,7 +27,10 @@ export class HomePage {
       }
     });
     this.getToday();
-    console.log(this.daypunches);
+  }
+
+  ionViewDidLoad() {
+    console.log('ionViewDidLoad HomePage');
   }
 
   enter() {

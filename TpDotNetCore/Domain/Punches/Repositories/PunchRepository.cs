@@ -56,7 +56,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 {
                     PunchTime = dt,
                     TimeDec = _timeService.GetDecimalHour(dt),
-                    Direction = true,
+                    Direction = direction,
                     DayPunch = day,
                     WeekPunch = week,
                     MonthPunch = month,

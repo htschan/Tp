@@ -141,6 +141,7 @@ namespace TpDotNetCore
             app.UseCors("CorsDevPolicy");
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            loggerFactory.AddFile("Logs/TpDotNet-{Date}.log");
 
             dbInitializer.Initialize();
 
@@ -186,8 +187,8 @@ namespace TpDotNetCore
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = _signingKey,
 
-                RequireExpirationTime = false,
-                ValidateLifetime = false,
+                RequireExpirationTime = true,
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             };
             app.UseJwtBearerAuthentication(new JwtBearerOptions

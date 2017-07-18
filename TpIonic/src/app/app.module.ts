@@ -38,7 +38,17 @@ import { RegisterPage } from '../pages/register/register';
   imports: [
     BrowserModule,
     HttpModule,
-    IonicModule.forRoot(MyApp),
+    IonicModule.forRoot(MyApp, {}, {
+      links: [
+        { component: TabsPage, name: 'TabsPage', segment: 'tabs-page' },
+        { component: HomePage, name: 'Home', segment: 'home' },
+        { component: ProfilePage, name: 'Profile', segment: 'profile' },
+        { component: AboutPage, name: 'About', segment: 'about' },
+        { component: ContactPage, name: 'Contace', segment: 'contact' },
+        { component: LoginPage, name: 'LoginPage', segment: 'login' },
+        { component: RegisterPage, name: 'SignupPage', segment: 'signup' }
+      ]
+    }),
     IonicStorageModule.forRoot({
       name: '__tpionic',
       driverOrder: ['indexeddb', 'sqlite', 'websql']

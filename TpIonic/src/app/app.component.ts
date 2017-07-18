@@ -15,12 +15,15 @@ import { RegisterPage } from '../pages/register/register';
 
 export interface PageInterface {
   title: string;
+  name: string;
   component: any;
   icon: string;
   logsOut?: boolean;
   index?: number;
+  tabName?: string;
   tabComponent?: any;
 }
+
 
 @Component({
   templateUrl: 'app.html'
@@ -34,55 +37,55 @@ export class MyApp implements OnInit {
   // the left menu only works after login
   // the login page disables the left menu
   appPages: PageInterface[] = [
-    { title: 'Home', component: TabsPage, tabComponent: HomePage, icon: 'home' },
-    { title: 'About', component: TabsPage, tabComponent: AboutPage, index: 1, icon: 'information-circle' },
-    { title: 'Contact', component: TabsPage, tabComponent: ContactPage, index: 2, icon: 'contacts' },
-    { title: 'Profil', component: TabsPage, tabComponent: ProfilePage, index: 3, icon: 'person' }
+    { title: 'Home', name: 'TabsPage', component: TabsPage, tabComponent: HomePage, index: 0, icon: 'home' },
+    { title: 'About', name: 'TabsPage', component: TabsPage, tabComponent: AboutPage, index: 1, icon: 'information-circle' },
+    { title: 'Contact', name: 'TabsPage', component: TabsPage, tabComponent: ContactPage, index: 2, icon: 'contacts' },
+    { title: 'Profil', name: 'TabsPage', component: TabsPage, tabComponent: ProfilePage, index: 3, icon: 'person' }
   ];
   loggedInPages: PageInterface[] = [
-    { title: 'Home', component: HomePage, icon: 'home' },
-    { title: 'Logout', component: TabsPage, icon: 'log-out', logsOut: true }
+    { title: 'Home', name: 'TabsPage', component: HomePage, icon: 'home' },
+    { title: 'Logout', name: 'TabsPage', component: TabsPage, icon: 'log-out', logsOut: true }
   ];
   loggedOutPages: PageInterface[] = [
-    { title: 'Login', component: LoginPage, icon: 'log-in' },
-    { title: 'Signup', component: RegisterPage, icon: 'person-add' }
+    { title: 'Login', name: 'LoginPage', component: LoginPage, icon: 'log-in' },
+    { title: 'Signup', name: 'SignupPage', component: RegisterPage, icon: 'person-add' }
   ];
-  rootPage;
+  rootPage: any;
   title: string;
   menuToggleState: Boolean = false;
-  
+
   constructor(
     public events: Events,
     public platform: Platform,
     public menu: MenuController,
-    public statusBar: StatusBar,
     public splashScreen: SplashScreen,
     public storage: Storage,
     private auth: AuthService) {
 
     // Check if the user has already seen the tutorial
-    this.storage.get('hasSeenTutorial')
-      .then((hasSeenTutorial) => {
-        if (hasSeenTutorial) {
-          this.rootPage = TabsPage;
-        } else {
-          this.rootPage = TabsPage;      ///    TutorialPage;
-        }
-        this.initializeApp()
-      })
+    // this.storage.get('hasSeenTutorial')
+    //   .then((hasSeenTutorial) => {
+    //     if (hasSeenTutorial) {
+    //       this.rootPage = TabsPage;
+    //     } else {
+    //       this.rootPage = LoginPage;      ///    TutorialPage;
+    //     }
+    //     this.platformReady();
+    //   })
 
     // decide which menu items should be hidden by current login status stored in local storage
     this.auth.getAuthenticated().then((hasLoggedIn) => {
       this.enableMenu(hasLoggedIn === true);
     });
+    this.enableMenu(true);
 
     this.listenToLoginEvents();
-    this.initializeApp();
   }
 
   ngOnInit() {
     this.auth.getAuthenticated().then(authenticated => {
-      this.rootPage = this.auth.authenticated() ? HomePage : LoginPage
+      console.log(`Authenticate: ${authenticated}`)
+      this.rootPage = authenticated ? HomePage : LoginPage;
     });
   }
 
@@ -92,27 +95,32 @@ export class MyApp implements OnInit {
   }
 
   openPage(page: PageInterface) {
+    let params = {};
+
     // the nav component was found using @ViewChild(Nav)
-    // reset the nav to remove previous pages and only have this page
+    // setRoot on the nav to remove previous pages and only have this page
     // we wouldn't want the back button to show in this scenario
     if (page.index) {
-      this.nav.setRoot(page.component, { tabIndex: page.index }).catch(() => {
-        console.log("Didn't set nav root");
-      });
+      params = { tabIndex: page.index };
+    }
+
+    // If we are already on tabs just change the selected tab
+    // don't setRoot again, this maintains the history stack of the
+    // tabs even if changing them from the menu
+    let chnav = this.nav.getActiveChildNavs();
+    if (chnav && chnav.length > 0 && page.index != undefined) {
+      this.nav.getActiveChildNavs()[0].select(page.index);
+      // Set the root of the nav with params if it's a tab index
     } else {
-      this.nav.setRoot(page.component).catch(() => {
-        console.log("Didn't set nav root");
+      this.nav.setRoot(page.name, params).catch((err: any) => {
+        console.log(`Didn't set nav root: ${err}`);
       });
     }
 
     if (page.logsOut === true) {
       // Give the menu time to close before changing to logged out
-      setTimeout(() => {
-        this.auth.logout();
-        this.nav.setRoot(LoginPage);
-      }, 1000);
+      this.auth.logout();
     }
-    this.title = page.title;
   }
 
   openTutorial() {
@@ -138,11 +146,9 @@ export class MyApp implements OnInit {
     this.menu.enable(!loggedIn, 'loggedOutMenu');
   }
 
-  initializeApp() {
+  platformReady() {
+    // Call any initial plugins when ready
     this.platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      this.statusBar.styleDefault();
       this.splashScreen.hide();
     });
   }
