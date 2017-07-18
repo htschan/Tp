@@ -11,7 +11,7 @@ var config = {
   host: 'timepuncher.ch',
   port: 22,
   username: 'tpdeploy',
-  privateKey: fs.readFileSync('../../ssh.tpdeploy.private.ppk')
+  privateKey: fs.readFileSync('../../../ssh.tpdeploy.private.ppk')
 }
 
 var gulpSSHTimepuncher = new GulpSSH({
@@ -25,7 +25,7 @@ gulp.task('default', ['copyConfig']);
  * Copy development config into src directory.
  */
 gulp.task('copyConfig', () => {
-  gulp.src('../../timepuncher-client-config.ts')
+  gulp.src('../../../timepuncher-client-config.ts')
     .pipe(gulp.dest('src'));
 });
 

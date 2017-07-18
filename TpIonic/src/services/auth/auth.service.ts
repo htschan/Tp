@@ -3,12 +3,12 @@
 import { Headers, Http } from '@angular/http';
 import { Storage } from '@ionic/storage';
 import { Events } from 'ionic-angular';
-import { AuthHttp, JwtHelper, tokenNotExpired } from 'angular2-jwt';
+import { JwtHelper, tokenNotExpired } from 'angular2-jwt';
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { TpClientConfig } from '../../timepuncher-client-config';
+import { TpClient, ICredentialDto, CredentialDto, AuthResponse } from '../../services/api.g';
 
-const authUrl: string = `${TpClientConfig.baserurl}authenticate`;
 const profileUrl: string = `${TpClientConfig.baserurl}api/v1/profiles`;
 const registerUrl: string = `${TpClientConfig.baserurl}api/v1/accounts`;
 
@@ -21,38 +21,31 @@ export class AuthService {
     zoneImpl: NgZone;
     idToken: string;
 
-    constructor(private authHttp: AuthHttp, zone: NgZone, public events: Events, private http: Http, private storage: Storage) {
+    constructor(private tpClient: TpClient, zone: NgZone, public events: Events, private http: Http, private storage: Storage) {
         this.zoneImpl = zone;
         storage.ready()
             // Check if there is a profile saved in local storage
-            .then(() => storage.get('profile').then(profile => {
+            .then(() => this.storage.get('profile').then(profile => {
                 this.userProfile = JSON.parse(profile);
             }));
-        storage.get('id_token').then(token => {
-            this.idToken = token;
-        }).catch(error => {
-            console.log(error);
-        });
+        this.idToken = localStorage.getItem('id_token');
     }
 
     public getAuthenticated(): Promise<boolean> {
-        return this.storage.get('id_token').then(token => {
-            return tokenNotExpired('id_token', token);
-        });
+        return Promise.resolve(tokenNotExpired('id_token', localStorage.getItem('id_token')));
     }
 
     public getMyProfile(): Observable<any> {
-        return this.authHttp.get(`${profileUrl}/myprofile`)
-            .map(data => data.json())
+        return this.tpClient.getMyProfile()
             .map(data => {
-                return data.profileVms.profileVms[0]
+                return data.status
             })
             .do(profileVm => {
                 this.storage.set("profile", JSON.stringify(profileVm));
             });
     }
 
-    public authenticated() {
+    public authenticated(): boolean {
         return tokenNotExpired('id_token', this.idToken);
     }
 
@@ -60,20 +53,20 @@ export class AuthService {
         if (username === null || password === null) {
             return Observable.throw("Bad credentials");
         }
-        let headers = new Headers();
-        headers.append('username', username);
-        headers.append('password', password);
-        return this.http.post(authUrl, '', { headers: headers })
-            .map(data => data.json())
+        return this.tpClient.authenticate({ "email": username, "password": password } as CredentialDto)
             .do(data => {
-                console.log('Data: ' + data);
-                this.storage.set('id_token', data.token);
-                this.idToken = data.token;
-                this.events.publish('user:login');
-                return this.getMyProfile();
+                if (data instanceof AuthResponse && data.status.success) {
+                    console.log('Data: ' + data);
+                    localStorage.setItem('id_token', data.token);
+                    this.idToken = data.token;
+                    this.events.publish('user:login');
+                    // return this.getMyProfile();
+                } else {
+                    this.logout();
+                }
             },
-            // () => console.log("Authenticate complete")
-        )
+            e => console.log("OnError " + e),
+            () => console.log("Authenticate complete"));
     }
 
     public register(credentials): Observable<Response> {
@@ -92,7 +85,7 @@ export class AuthService {
 
     public logout() {
         this.storage.remove('profile');
-        this.storage.remove('id_token');
+        localStorage.remove('id_token');
         this.idToken = null;
         this.storage.remove('refresh_token');
         this.zoneImpl.run(() => this.userProfile = null);

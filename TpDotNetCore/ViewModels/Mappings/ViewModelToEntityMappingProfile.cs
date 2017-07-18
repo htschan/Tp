@@ -1,6 +1,6 @@
 using AutoMapper;
 using TpDotNetCore.Controllers;
-using TpDotNetCore.Entities;
+using TpDotNetCore.Domain.UserConfiguration;
 
 namespace TpDotNetCore.ViewModels.Mappings
 {
@@ -8,7 +8,7 @@ namespace TpDotNetCore.ViewModels.Mappings
     {
         public ViewModelToEntityMappingProfile()
         {
-            CreateMap<RegisterVm, User>().ForMember(au => au.UserName, map => map.MapFrom(vm => vm.Email));
+            CreateMap<RegisterDto, AppUser>().ForMember(au => au.UserName, map => map.MapFrom(dto => dto.Email));
         }
     }
 }

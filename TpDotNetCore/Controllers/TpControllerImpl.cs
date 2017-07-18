@@ -4,47 +4,68 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using TpDotNetCore.Auth;
-using TpDotNetCore.Entities;
-using TpDotNetCore.Models;
+using TpDotNetCore.Domain.Punches;
 using TpDotNetCore.Helpers;
 using AutoMapper;
 using TpDotNetCore.Data;
 using MimeKit;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
-using System.Text;
-using System.Globalization;
-using System.Linq.Expressions;
+using TpDotNetCore.Domain.UserConfiguration;
+using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using TpDotNetCore.Domain.Punches.Repositories;
 
 namespace TpDotNetCore.Controllers
 {
     public class TpControllerImpl : ITpController
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IJwtFactory _jwtFactory;
-        private readonly JsonSerializerSettings _serializerSettings;
-        private readonly JwtIssuerOptions _jwtOptions;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private readonly TpContext _appDbContext;
+        private readonly AppUser _appUser;
+        private readonly IAppUserRepository _appUserRepository;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly JsonSerializerSettings _serializerSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly TpMailConfigOptions _tpConfigOptions;
         private readonly ITimeService _timeService;
+        private readonly IYearPunchRepository _yearPunchRepository;
+        private readonly IMonthPunchRepository _monthPunchRepository;
+        private readonly IWeekPunchRepository _weekPunchRepository;
+        private readonly IDayPunchRepository _dayPunchRepository;
+        private readonly IPunchRepository _punchRepository;
 
-        public TpControllerImpl(UserManager<User> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, IHttpContextAccessor httpContextAccessor, IMapper mapper, TpContext appDbContext, IOptions<TpMailConfigOptions> optionsAccessor, ITimeService timeService)
+        public TpControllerImpl(IMapper mapper,
+                TpContext appDbContext,
+                AppUser appUser,
+                IAppUserRepository appUserRepoistory,
+                UserManager<AppUser> userManager,
+                IJwtFactory jwtFactory,
+                IOptions<JwtIssuerOptions> jwtOptions,
+                IHttpContextAccessor httpContextAccessor,
+                IOptions<TpMailConfigOptions> optionsAccessor,
+                ITimeService timeService,
+                IPunchRepository punchRepository,
+                IYearPunchRepository yearPunchRepository,
+                IMonthPunchRepository monthPunchRepository,
+                IWeekPunchRepository weekPunchRepository,
+                IDayPunchRepository dayPunchRepository)
         {
-            _userManager = userManager;
-            _jwtFactory = jwtFactory;
-            _jwtOptions = jwtOptions.Value;
-            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _appDbContext = appDbContext;
+            _appUser = appUser;
+            _appUserRepository = appUserRepoistory;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
             _tpConfigOptions = optionsAccessor.Value;
             _timeService = timeService;
+            _yearPunchRepository = yearPunchRepository;
+            _monthPunchRepository = monthPunchRepository;
+            _weekPunchRepository = weekPunchRepository;
+            _dayPunchRepository = dayPunchRepository;
+            _punchRepository = punchRepository;
 
             _serializerSettings = new JsonSerializerSettings
             {
@@ -52,31 +73,37 @@ namespace TpDotNetCore.Controllers
             };
         }
 
-        Task<SwaggerResponse<AuthResponse>> ITpController.AuthenticateAsync(CredentialVm credentials)
+        public Task<SwaggerResponse<AuthResponse>> AuthenticateAsync(CredentialDto credentials)
         {
-            var identity = GetClaimsIdentity(credentials.Email, credentials.Password).Result;
             var headers = new Dictionary<string, IEnumerable<string>>();
-            if (identity.claimsIdentiy == null)
+            try
             {
-                return Task<SwaggerResponse<AuthResponse>>.FromResult(new SwaggerResponse<AuthResponse>(StatusCodes.Status404NotFound, headers, new AuthResponse { Token = "failed to auth" }, identity.message));
+                var authResponse = _appUser.Authenticate(credentials);
+                return Task<SwaggerResponse<AuthResponse>>.FromResult(
+                    new SwaggerResponse<AuthResponse>(
+                        StatusCodes.Status200OK,
+                        headers,
+                        new AuthResponse { Token = authResponse.authToken, ValidFor = authResponse.expiresIn, Id = authResponse.id, Status = new OpResult { Success = true, Result = "Authentication successful" } }));
             }
-
-            // Serialize and return the response
-            var response = new
+            catch (Exception exception)
             {
-                id = identity.claimsIdentiy.Claims.Single(c => c.Type == "id").Value,
-                auth_token = _jwtFactory.GenerateEncodedToken(credentials.Email, identity.claimsIdentiy),
-                expires_in = (int)_jwtOptions.ValidFor.TotalSeconds
-            };
-
-            return Task<SwaggerResponse<AuthResponse>>.FromResult(new SwaggerResponse<AuthResponse>(StatusCodes.Status200OK, headers, new AuthResponse { Token = response.auth_token.Result }));
+                return HandleException<AuthResponse>(exception, headers);
+            }
+            // catch (RepositoryException exception)
+            // {
+            //     return Task<SwaggerResponse<AuthResponse>>.FromResult(
+            //         new SwaggerResponse<AuthResponse>(
+            //             exception.StatusCode,
+            //             headers,
+            //             new AuthResponse { Token = "failed to auth", Status = new OpResult { Success = false, Result = "Authenication failed" } }, exception.Message));
+            // }
         }
 
-        Task<SwaggerResponse<RegisterResponse>> ITpController.RegisterUserAsync(RegisterVm registerVm)
+        public Task<SwaggerResponse<RegisterResponse>> RegisterUserAsync(RegisterDto registerDto)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userIdentity = _mapper.Map<User>(registerVm);
-            var result = _userManager.CreateAsync(userIdentity, registerVm.Password).Result;
+            var userIdentity = _mapper.Map<AppUser>(registerDto);
+            var result = _userManager.CreateAsync(userIdentity, registerDto.Password).Result;
 
             if (!result.Succeeded)
                 return Task<SwaggerResponse<RegisterResponse>>.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status400BadRequest, headers, null, result.ToString()));
@@ -87,7 +114,7 @@ namespace TpDotNetCore.Controllers
             return Task<SwaggerResponse<RegisterResponse>>.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status201Created, headers, null, result.ToString()));
         }
 
-        Task<SwaggerResponse<ConfirmResponse>> ITpController.ConfirmRegisterAsync(string userid, string confirmToken)
+        public Task<SwaggerResponse<ConfirmResponse>> ConfirmRegisterAsync(string userid, string confirmToken)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
 
@@ -99,313 +126,151 @@ namespace TpDotNetCore.Controllers
             return Task<SwaggerResponse<ConfirmResponse>>.FromResult(new SwaggerResponse<ConfirmResponse>(StatusCodes.Status201Created, headers, null, result.ToString()));
         }
 
-        Task<SwaggerResponse<RecoverPasswordResponse>> ITpController.RecoverPasswordAsync(RecoverPasswordParams recoverPasswordParams)
+        public Task<SwaggerResponse<RecoverPasswordResponse>> RecoverPasswordAsync(RecoverPasswordParams recoverPasswordParams)
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<RecoverUsernameResponse>> ITpController.RecoverUsernameAsync(RecoverUsernameParams recoverUsernameParams)
+        public Task<SwaggerResponse<RecoverUsernameResponse>> RecoverUsernameAsync(RecoverUsernameParams recoverUsernameParams)
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<SetPasswordResponse>> ITpController.SetPasswordAsync(SetPasswordParams setPasswordParams)
+        public Task<SwaggerResponse<SetPasswordResponse>> SetPasswordAsync(SetPasswordParams setPasswordParams)
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<GetProfilesResponse>> ITpController.GetProfilesAsync()
+        public Task<SwaggerResponse<GetProfilesResponse>> GetProfilesAsync()
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<GetProfileResponse>> ITpController.GetMyProfileAsync()
+        public Task<SwaggerResponse<GetProfileResponse>> GetMyProfileAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var profile = _userManager.FindByEmailAsync(userId).Result;
             if (profile == null)
             {
-                profile = new User();
+                profile = new AppUser();
                 profile.UserName = _httpContextAccessor.HttpContext.User.Identity.Name;
             }
             var json = JsonConvert.SerializeObject(profile);
             return Task<SwaggerResponse<GetProfileResponse>>.FromResult(new SwaggerResponse<GetProfileResponse>(StatusCodes.Status200OK, headers, new GetProfileResponse { Status = new OpResult { Success = true } }));
         }
 
-        Task<SwaggerResponse<GetProfileResponse>> ITpController.GetProfileAsync(string userid)
+        public Task<SwaggerResponse<GetProfileResponse>> GetProfileAsync(string userid)
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<List<Punch>>> ITpController.GetPunchesAsync()
+        public Task<SwaggerResponse<List<PunchDto>>> GetPunchesAsync()
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<DayResponse>> ITpController.GetTodayAsync()
+        public Task<SwaggerResponse<DayResponse>> GetTodayAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _userManager.FindByNameAsync(userId).Result;
-            if (user == null)
-                return Task<SwaggerResponse<DayResponse>>.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status400BadRequest, headers, null, "User not found"));
-
-            var dt = DateTime.Now;
-            var punches = _appDbContext.Punches
-                .Where(p => p.User.Id == user.Id)
-                .Where(p => p.DayPunch.Day == dt.Day)
-                .Where(p => p.MonthPunch.Month == dt.Month)
-                .Where(p => p.YearPunch.Year == dt.Year)
-                .ToList();
-            var dayResponse = new DayResponse();
-            dayResponse.Status = new OpResult { Success = true };
-            dayResponse.Punches = new DayPunchesVm();
-            dayResponse.Punches.Userboid = user.Id;
-            dayResponse.Punches.Day = dt.Day;
-            dayResponse.Punches.Month = dt.Month;
-            dayResponse.Punches.Year = dt.Year;
-            dayResponse.Punches.Daytotal = 12.12;
-            dayResponse.Punches.Punches = new List<Controllers.Punch>();
-            foreach (var punch in punches)
+            try
             {
-                var p1 = new Controllers.Punch();
-                p1.Created = punch.Created;
-                p1.Direction = punch.Direction;
-                p1.Punchid = punch.Id;
-                p1.Time = punch.PunchTime;
-                p1.Timedec = (double)punch.TimeDec;
-                p1.Updated = punch.Updated;
-                dayResponse.Punches.Punches.Add(p1);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var response = _dayPunchRepository.GetCurrent(userId);
+                return Task<SwaggerResponse<DayResponse>>.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
-            return Task<SwaggerResponse<DayResponse>>.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, dayResponse));
+            catch (Exception exception)
+            {
+                return HandleException<DayResponse>(exception, headers);
+            }
         }
 
-        Task<SwaggerResponse<WeekResponse>> ITpController.GetThisWeekAsync()
+        public Task<SwaggerResponse<WeekResponse>> GetThisWeekAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _userManager.FindByNameAsync(userId).Result;
-            if (user == null)
-                return Task<SwaggerResponse<WeekResponse>>.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status400BadRequest, headers, null, "User not found"));
-
-            var dt = DateTime.Now;
-            var weekPunches = _appDbContext.Punches
-                .Where(p => p.User.Id == user.Id)
-                .Where(p => p.WeekPunch.Week == _timeService.GetWeekNumber(dt))
-                .Where(p => p.YearPunch.Year == dt.Year)
-                .GroupBy(p => p.DayPunch.Day)
-                .ToList();
-
-            var weekResponse = new WeekResponse();
-            weekResponse.Status = new OpResult { Success = true };
-            weekResponse.Punches = new WeekPunchesVm();
-            weekResponse.Punches.User = user.Id;
-            weekResponse.Punches.Week = _timeService.GetWeekNumber(dt);
-            weekResponse.Punches.Year = dt.Year;
-            weekResponse.Punches.DayPunches = new List<Controllers.DayPunchesVm>();
-            foreach (var dayPunches in weekPunches)
+            try
             {
-                var dayPunch = new DayPunchesVm();
-                weekResponse.Punches.DayPunches.Add(dayPunch);
-                dayPunch.Punches = new List<Controllers.Punch>();
-                foreach (var punch in dayPunches)
-                {
-                    var p1 = new Controllers.Punch();
-                    p1.Created = punch.Created;
-                    p1.Direction = punch.Direction;
-                    p1.Punchid = punch.Id;
-                    p1.Time = punch.PunchTime;
-                    p1.Timedec = (double)punch.TimeDec;
-                    p1.Updated = punch.Updated;
-                    dayPunch.Punches.Add(p1);
-                }
+                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var response = _weekPunchRepository.GetCurrent(userId);
+                return Task<SwaggerResponse<WeekResponse>>.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status200OK, headers, response));
             }
-            return Task<SwaggerResponse<WeekResponse>>.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status200OK, headers, weekResponse));
+            catch (Exception exception)
+            {
+                return HandleException<WeekResponse>(exception, headers);
+            }
         }
 
-        Task<SwaggerResponse<MonthResponse>> ITpController.GetThisMonthAsync()
+        public Task<SwaggerResponse<MonthResponse>> GetThisMonthAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _userManager.FindByNameAsync(userId).Result;
-            if (user == null)
-                return Task<SwaggerResponse<MonthResponse>>.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status400BadRequest, headers, null, "User not found"));
-
-            var dt = DateTime.Now;
-            var monthPunches = _appDbContext.Punches
-                .Where(p => p.User.Id == user.Id)
-                .Where(p => p.MonthPunch.Month == dt.Month)
-                .Where(p => p.YearPunch.Year == dt.Year)
-                .GroupBy(p => p.DayPunch.Day)
-                .ToList();
-
-            var monthResponse = new MonthResponse();
-            monthResponse.Status = new OpResult { Success = true };
-            monthResponse.Punches = new MonthPunchesVm();
-            monthResponse.Punches.User = user.Id;
-            monthResponse.Punches.Month = dt.Month;
-            monthResponse.Punches.Year = dt.Year;
-            monthResponse.Punches.Punches = new List<Controllers.DayPunchesVm>();
-            foreach (var dayPunches in monthPunches)
+            try
             {
-                var dayPunch = new DayPunchesVm();
-                monthResponse.Punches.Punches.Add(dayPunch);
-                dayPunch.Punches = new List<Controllers.Punch>();
-                foreach (var punch in dayPunches.OrderBy(p => p.PunchTime))
-                {
-                    var p1 = new Controllers.Punch();
-                    p1.Created = punch.Created;
-                    p1.Direction = punch.Direction;
-                    p1.Punchid = punch.Id;
-                    p1.Time = punch.PunchTime;
-                    p1.Timedec = (double)punch.TimeDec;
-                    p1.Updated = punch.Updated;
-                    dayPunch.Punches.Add(p1);
-                }
+                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var response = _monthPunchRepository.GetCurrent(userId);
+                return Task<SwaggerResponse<MonthResponse>>.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
             }
-            return Task<SwaggerResponse<MonthResponse>>.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, monthResponse));
+            catch (Exception exception)
+            {
+                return HandleException<MonthResponse>(exception, headers);
+            }
         }
 
-        Task<SwaggerResponse<YearResponse>> ITpController.GetThisYearAsync()
+        public Task<SwaggerResponse<YearResponse>> GetThisYearAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _userManager.FindByNameAsync(userId).Result;
-            if (user == null)
-                return Task<SwaggerResponse<YearResponse>>.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status400BadRequest, headers, null, "User not found"));
-
-            var dt = DateTime.Now;
-            var yearPunches = _appDbContext.Punches
-                .Where(p => p.User.Id == user.Id)
-                .Where(p => p.YearPunch.Year == dt.Year)
-                .OrderBy(p => p.MonthPunch.Month)
-                .GroupBy(p => p.MonthPunch.Month)
-                .Select(p => new
-                {
-                    Month = p.Key,
-                    Groups = p.OrderBy(q => q.DayPunch.Day).GroupBy(q => q.DayPunch.Day)
-                });
-
-            var yearResponse = new YearResponse();
-            yearResponse.Status = new OpResult { Success = true };
-            var yearchPunchVm = new YearPunchesVm();
-            yearResponse.Punches = yearchPunchVm;
-            yearchPunchVm.User = user.Id;
-            yearchPunchVm.Year = dt.Year;
-            yearchPunchVm.Punches = new List<Controllers.MonthPunchesVm>();
-            foreach (var x in yearPunches)
+            try
             {
-                var monthPunchVm = new MonthPunchesVm();
-                yearchPunchVm.Punches.Add(monthPunchVm);
-                monthPunchVm.User = user.Id;
-                monthPunchVm.Month = x.Month;
-                monthPunchVm.Year = dt.Year;
-                monthPunchVm.Punches = new List<Controllers.DayPunchesVm>();
-
-                foreach (IGrouping<int, Entities.Punch> dayPunches in x.Groups)
-                {
-                    var dayPunch = new DayPunchesVm();
-                    monthPunchVm.Punches.Add(dayPunch);
-                    dayPunch.Punches = new List<Controllers.Punch>();
-                    foreach (Entities.Punch punch in dayPunches.OrderBy(p => p.PunchTime))
-                    {
-                        System.Console.WriteLine(punch.DayPunch);
-                        var p1 = new Controllers.Punch();
-                        p1.Created = punch.Created;
-                        p1.Direction = punch.Direction;
-                        p1.Punchid = punch.Id;
-                        p1.Time = punch.PunchTime;
-                        p1.Timedec = (double)punch.TimeDec;
-                        p1.Updated = punch.Updated;
-                        dayPunch.Punches.Add(p1);
-                    }
-                }
+                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var response = _yearPunchRepository.GetCurrent(userId);
+                return Task<SwaggerResponse<YearResponse>>.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, response));
             }
-            return Task<SwaggerResponse<YearResponse>>.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, yearResponse));
+            catch (Exception exception)
+            {
+                return HandleException<YearResponse>(exception, headers);
+            }
         }
 
-        Task<SwaggerResponse<PunchResponse>> ITpController.PunchInAsync()
+        public Task<SwaggerResponse<DayResponse>> PunchInAsync()
         {
             return Punch(true);
         }
 
-        Task<SwaggerResponse<PunchResponse>> ITpController.PunchOutAsync()
+        public Task<SwaggerResponse<DayResponse>> PunchOutAsync()
         {
             return Punch(false);
         }
 
-        Task<SwaggerResponse<PunchResponse>> ITpController.PunchModifyAsync(ModifyPunchVm modifyPunchViewModel)
+        public Task<SwaggerResponse<PunchResponse>> PunchModifyAsync(ModifyPunchVm modifyPunchViewModel)
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<PunchResponse>> ITpController.PunchModifyAdminAsync(ModifyPunchAdminParams modifyPunchAdminParams)
+        public Task<SwaggerResponse<PunchResponse>> PunchModifyAdminAsync(ModifyPunchAdminParams modifyPunchAdminParams)
         {
             throw new NotImplementedException();
         }
 
-        Task<SwaggerResponse<PunchResponse>> ITpController.PunchSetStatusAdminAsync(SetStatusAdminParams setStatusAdminParams)
+        public Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(SetStatusAdminParams setStatusAdminParams)
         {
             throw new NotImplementedException();
         }
 
         #region Other
 
-        private Task<SwaggerResponse<PunchResponse>> Punch(bool direction)
+        private Task<SwaggerResponse<DayResponse>> Punch(bool direction)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _userManager.FindByNameAsync(userId).Result;
-            if (user == null)
-                return Task<SwaggerResponse<PunchResponse>>.FromResult(new SwaggerResponse<PunchResponse>(StatusCodes.Status400BadRequest, headers, null, "User not found"));
-
-            var dt = DateTime.Now;
-            var day = _appDbContext.DayPunches.FirstOrDefault(d => d.Day == dt.Day);
-            var week = _appDbContext.WeekPunches.FirstOrDefault(d => d.Week == _timeService.GetWeekNumber(dt));
-            var month = _appDbContext.MonthPunches.FirstOrDefault(d => d.Month == dt.Month);
-            var year = _appDbContext.YearPunches.FirstOrDefault(d => d.Year == dt.Year);
-            var punch = new Entities.Punch
+            try
             {
-                PunchTime = dt,
-                TimeDec = _timeService.GetDecimalHour(dt),
-                Direction = true,
-                DayPunch = day,
-                WeekPunch = week,
-                MonthPunch = month,
-                YearPunch = year,
-                User = user,
-                Created = DateTime.Now,
-                Updated = DateTime.MinValue
-            };
-            _appDbContext.Punches.Add(punch);
-            _appDbContext.SaveChanges();
-            return Task<SwaggerResponse<PunchResponse>>.FromResult(new SwaggerResponse<PunchResponse>(StatusCodes.Status200OK, headers, new PunchResponse { Status = new OpResult { Success = true } }));
-        }
-
-        private async Task<(ClaimsIdentity claimsIdentiy, string message)> GetClaimsIdentity(string userName, string password)
-        {
-            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
-            {
-                // get the user to verifty
-                var userToVerify = await _userManager.FindByNameAsync(userName);
-
-                if (userToVerify != null)
-                {
-                    if (!_userManager.IsEmailConfirmedAsync(userToVerify).Result)
-                    {
-                        return await Task.FromResult((identity: (ClaimsIdentity)null, message: "Email not yet confirmed"));
-                    }
-                    // check the credentials  
-                    if (await _userManager.CheckPasswordAsync(userToVerify, password))
-                    {
-                        return await Task.FromResult((identity: _jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id), message: ""));
-                    }
-                }
+                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                _punchRepository.Punch(userId, direction);
+                var response = _dayPunchRepository.GetCurrent(userId);
+                return Task<SwaggerResponse<DayResponse>>.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
-
-            // Credentials are invalid, or account doesn't exist
-            return await Task.FromResult((identity: (ClaimsIdentity)null, message: "Credentials are invalid or account doesn't exist"));
+            catch (Exception exception)
+            {
+                return HandleException<DayResponse>(exception, headers);
+            }
         }
 
         private void SendEmail(string userId, string confirmationToken)
@@ -436,5 +301,11 @@ namespace TpDotNetCore.Controllers
             }
         }
         #endregion
+        private Task<SwaggerResponse<T>> HandleException<T>(Exception exception, Dictionary<string, IEnumerable<string>> headers)
+        {
+            if (exception is RepositoryException)
+                return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(((RepositoryException)exception).StatusCode, headers, default(T), exception.Message));
+            return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(StatusCodes.Status400BadRequest, headers, default(T), exception.Message));
+        }
     }
 }

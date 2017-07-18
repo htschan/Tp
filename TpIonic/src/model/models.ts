@@ -50,30 +50,30 @@ export class ColumnPunches {
 */
 
 // from TpServer viewmodels.ts
-export class PunchVm {
-    constructor(
-        public id: number,
-        public t: Date, // time
-        public td: number, // time decimal
-        public dir: boolean, // true: In, false: Out
-        public d: number, // day
-        public w: number, // week
-        public y?: number, // year
-        public m?: number, // month
-    ) { }
-}
+// export class PunchVm {
+//     constructor(
+//         public id: number,
+//         public t: Date, // time
+//         public td: number, // time decimal
+//         public dir: boolean, // true: In, false: Out
+//         public d: number, // day
+//         public w: number, // week
+//         public y?: number, // year
+//         public m?: number, // month
+//     ) { }
+// }
 
-export class PunchVms {
-    punchVms: PunchVm[];
-    xVms: DayPunchesVm[];
-}
+// export class PunchVms {
+//     punchVms: PunchVm[];
+//     xVms: DayPunchesVm[];
+// }
 
-export class DayPunchesVm {
-    day: string;
-    p1: string;
-    p2: string;
-    p3: string;
-    p4: string;
-    p5: string;
-    p6: string;
-}
+// export class DayPunchesVm {
+//     day: string;
+//     p1: string;
+//     p2: string;
+//     p3: string;
+//     p4: string;
+//     p5: string;
+//     p6: string;
+// }

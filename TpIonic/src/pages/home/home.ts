@@ -4,7 +4,7 @@ import { Slides } from 'ionic-angular';
 
 import { Events, NavController } from 'ionic-angular';
 import { PunchService } from '../../services/puncher/punch.service';
-import { DayPunchesVm } from '../../model/models';
+import { DayPunchesDto, WeekPunchesDto, MonthPunchesDto, PunchResponse } from '../../services/api.g';
 
 @Component({
   selector: 'page-home',
@@ -13,9 +13,9 @@ import { DayPunchesVm } from '../../model/models';
 export class HomePage {
   @ViewChild(Slides) slides: Slides;
   title: String = ' ';
-  daypunches: DayPunchesVm[];
-  weekpunches: DayPunchesVm[];
-  monthpunches: DayPunchesVm[];
+  daypunches: DayPunchesDto;
+  weekpunches: WeekPunchesDto;
+  monthpunches: MonthPunchesDto;
 
   constructor(public events: Events, public navCtrl: NavController, private punchService: PunchService) {
     events.subscribe('title:updated', (data) => {
@@ -26,19 +26,20 @@ export class HomePage {
       }
     });
     this.getToday();
+    console.log(this.daypunches);
   }
 
   enter() {
     this.punchService.punch('In')
-      .subscribe(data =>
-        this.daypunches = data
+      .subscribe(response =>
+        this.daypunches = response.punches
       );
   }
 
   leave() {
     this.punchService.punch('Out')
-      .subscribe(data =>
-        this.daypunches = data
+      .subscribe(response =>
+        this.daypunches = response.punches
       );
   }
 
@@ -60,22 +61,22 @@ export class HomePage {
 
   getToday() {
     this.punchService.getToday()
-      .subscribe(data =>
-        this.daypunches = data
+      .subscribe(response =>
+        this.daypunches = response.punches
       );
   }
 
   getWeek() {
     this.punchService.getWeek()
       .subscribe(data =>
-        this.weekpunches = data
+        this.weekpunches = data.punches
       );
   }
 
   getMonth() {
     this.punchService.getMonth()
       .subscribe(data =>
-        this.monthpunches = data
+        this.monthpunches = data.punches
       );
   }
 }

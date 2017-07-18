@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace TpDotNetCore.Entities
+namespace TpDotNetCore.Domain.Punches
 {
     public class YearPunch
     {

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 
-namespace TpDotNetCore.Entities
+namespace TpDotNetCore.Domain.Punches
 {
-    public class MonthPunch
+    public class DayPunch
     {
         public int Id { get; set; }
-
-        public int Month { get; set; }
+        
+        public int Day { get; set; }
         
         public List<Punch> Punches { get; set; }
     }

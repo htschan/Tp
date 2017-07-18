@@ -19,14 +19,15 @@ using AutoMapper;
 using FluentValidation.AspNetCore;
 using Swashbuckle.AspNetCore.Swagger;
 using TpDotNetCore.Data;
-using TpDotNetCore.Entities;
 using TpDotNetCore.Helpers;
 using TpDotNetCore.Extensions;
-using TpDotNetCore.Models;
 using TpDotNetCore.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using TpDotNetCore.Controllers;
+using TpDotNetCore.Domain.UserConfiguration;
+using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using TpDotNetCore.Domain.Punches.Repositories;
 
 namespace TpDotNetCore
 {
@@ -80,6 +81,13 @@ namespace TpDotNetCore
             services.AddSingleton<IHolidayService, HolidayService>();
             services.AddSingleton<ITimeService, TimeService>();
             services.AddTransient<ITpController, TpControllerImpl>();
+            services.AddTransient<AppUser>();
+            services.AddTransient<IAppUserRepository, AppUserRepository>();
+            services.AddTransient<IPunchRepository, PunchRepository>();
+            services.AddTransient<IDayPunchRepository, DayPunchRepository>();
+            services.AddTransient<IWeekPunchRepository, WeekPunchRepository>();
+            services.AddTransient<IMonthPunchRepository, MonthPunchRepository>();
+            services.AddTransient<IYearPunchRepository, YearPunchRepository>();
 
             // jwt wire up
             // Get options from app settings
@@ -99,7 +107,7 @@ namespace TpDotNetCore
                 options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
             });
 
-            services.AddIdentity<User, IdentityRole>
+            services.AddIdentity<AppUser, IdentityRole>
                 (o =>
                 {
                     // configure identity options

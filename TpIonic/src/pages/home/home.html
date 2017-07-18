@@ -17,36 +17,27 @@
     <ion-slide>
       <h1>Heute</h1>
       <ion-grid>
-        <ion-row *ngFor="let row of daypunches">
-          <ion-col width-20>{{row?.day}}</ion-col>
-          <ion-col width-20>{{row?.p1}}</ion-col>
-          <ion-col width-20>{{row?.p2}}</ion-col>
-          <ion-col width-20>{{row?.p3}}</ion-col>
-          <ion-col width-20></ion-col>
+        <ion-row>
+          <ion-col width-20>{{daypunches?.day}}</ion-col>
+          <ion-col *ngFor="let pu of daypunches?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
         </ion-row>
       </ion-grid>
     </ion-slide>
     <ion-slide>
       <h1>Woche </h1>
-      <ion-grid>
-        <ion-row *ngFor="let row of weekpunches">
-          <ion-col width-20>{{row?.day}}</ion-col>
-          <ion-col width-20>{{row?.p1}}</ion-col>
-          <ion-col width-20>{{row?.p2}}</ion-col>
-          <ion-col width-20>{{row?.p3}}</ion-col>
+       <ion-grid>
+        <ion-row *ngFor="let row of weekpunches?.dayPunches">
+          <ion-col *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
         </ion-row>
-      </ion-grid>
+      </ion-grid> 
     </ion-slide>
     <ion-slide>
       <h1>Monat</h1>
-      <ion-grid>
-        <ion-row *ngFor="let row of monthpunches">
-          <ion-col width-20>{{row?.day}}</ion-col>
-          <ion-col width-20>{{row?.p1}}</ion-col>
-          <ion-col width-20>{{row?.p2}}</ion-col>
-          <ion-col width-20>{{row?.p3}}</ion-col>
+       <ion-grid>
+        <ion-row *ngFor="let row of monthpunches?.punches">
+          <ion-col *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
         </ion-row>
-      </ion-grid>
+      </ion-grid> 
     </ion-slide>
   </ion-slides>
 </ion-content>

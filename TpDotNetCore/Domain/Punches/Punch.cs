@@ -1,6 +1,7 @@
 using System;
+using TpDotNetCore.Domain.UserConfiguration;
 
-namespace TpDotNetCore.Entities
+namespace TpDotNetCore.Domain.Punches
 {
     public class Punch
     {
@@ -22,6 +23,6 @@ namespace TpDotNetCore.Entities
         public int YearPunchId { get; set; }
         public YearPunch YearPunch { get; set; }
         public string UserId { get; set; }
-        public User User { get; set; }
+        public AppUser User { get; set; }
     }
 }

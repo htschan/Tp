@@ -3,7 +3,7 @@ using FluentValidation.Attributes;
 
 namespace TpDotNetCore.Controllers
 {
-    public class CredentialVmValidator : AbstractValidator<CredentialVm>
+    public class CredentialVmValidator : AbstractValidator<CredentialDto>
     {
         public CredentialVmValidator()
         {

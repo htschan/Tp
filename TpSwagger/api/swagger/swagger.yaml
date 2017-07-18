@@ -39,12 +39,12 @@ paths:
       summary: Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]
       operationId: authenticate
       parameters:
-        - name: credentialVm
+        - name: credentials
           in: body
           required: true
           description: Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
           schema:
-            $ref: '#/definitions/CredentialVm'
+            $ref: '#/definitions/CredentialDto'
       tags:
         - Authentication
       responses:
@@ -62,12 +62,12 @@ paths:
       summary: Einen Benutzer registrieren [AllowAnonymous]
       operationId: registerUser
       parameters:
-        - name: registerVm
+        - name: registerDto
           in: body
           required: true
           description: Registrierungsinformationen
           schema:
-            $ref: '#/definitions/RegisterVm'
+            $ref: '#/definitions/RegisterDto'
       tags:
         - Authentication
       responses:
@@ -265,7 +265,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Punch'
+              $ref: '#/definitions/PunchDto'
         default:
           description: Unexpected error
           schema:
@@ -293,7 +293,7 @@ paths:
     get:
       description: |
         Get all punches of current week for current user
-      summary: Retrieves all punches of current user of today
+      summary: Retrieves all punches of current user current week
       operationId: getThisWeek
       produces:
         - application/json
@@ -312,7 +312,7 @@ paths:
     get:
       description: |
         Get all punches of today for current user
-      summary: Retrieves all punches of current user of today
+      summary: Retrieves all punches of current user of current month
       operationId: getThisMonth
       produces:
         - application/json
@@ -331,7 +331,7 @@ paths:
     get:
       description: |
         Get all punches of current year for current user
-      summary: Retrieves all punches of current user of this year
+      summary: Retrieves all punches of current user of current year
       operationId: getThisYear
       produces:
         - application/json
@@ -356,10 +356,14 @@ paths:
       tags:
         - Punches
       responses:
+        200:
+          description: Liefert die Tagesstempel zurück
+          schema:
+            $ref: '#/definitions/DayResponse'
         default:
           description: Unexpected error
           schema:
-              $ref: '#/definitions/PunchResponse'
+              $ref: '#/definitions/OpResult'
   /punches/punch/Out:
     post:
       description: |
@@ -370,6 +374,10 @@ paths:
       tags:
         - Punches
       responses:
+        200:
+          description: Liefert die Tagesstempel zurück
+          schema:
+            $ref: '#/definitions/DayResponse'
         default:
           description: Unexpected error
           schema:
@@ -442,11 +450,21 @@ definitions:
   AuthResponse:
     type: object
     properties:
+      status:
+        $ref: '#/definitions/OpResult'
+      validFor:
+        type: integer
+        description:
+          The token will be valid for validFor seconds
+      id:
+        type: string
+        description:
+          The user id
       token:
         type: string
         description: 
           Ein Authentifizierungstoken mit dem alle folgenden Aufrufe authentifiziert werden.
-  CredentialVm:
+  CredentialDto:
     type: object
     properties:
       email:
@@ -456,7 +474,7 @@ definitions:
       password:
         type: string
         description: Das Passwort 1 .. 80 Zeichen. Wird für die Anmeldung benötigt.
-  RegisterVm:
+  RegisterDto:
     type: object
     properties:
       firstname:
@@ -544,36 +562,36 @@ definitions:
     properties:
       status:
         $ref: '#/definitions/OpResult'
-      data:
-        $ref: '#/definitions/DayPunchesArray'
+      punches:
+        $ref: '#/definitions/DayPunchesDto'
   DayResponse:
     type: object
     properties:
       status:
         $ref: '#/definitions/OpResult'
       punches:
-        $ref: '#/definitions/DayPunchesVm'
+        $ref: '#/definitions/DayPunchesDto'
   WeekResponse:
     type: object
     properties:
       status:
         $ref: '#/definitions/OpResult'
       punches:
-        $ref: '#/definitions/WeekPunchesVm'
+        $ref: '#/definitions/WeekPunchesDto'
   MonthResponse:
     type: object
     properties:
       status:
         $ref: '#/definitions/OpResult'
       punches:
-        $ref: '#/definitions/MonthPunchesVm'
+        $ref: '#/definitions/MonthPunchesDto'
   YearResponse:
     type: object
     properties:
       status:
         $ref: '#/definitions/OpResult'
       punches:
-        $ref: '#/definitions/YearPunchesVm'
+        $ref: '#/definitions/YearPunchesDto'
   ModifyPunchVm:
     type: object
     properties:
@@ -607,7 +625,7 @@ definitions:
 ################################################################################
 #                                 Sub - Definitions                            #
 ################################################################################              
-  YearPunchesVm:
+  YearPunchesDto:
     type: object
     properties:
       user:
@@ -619,8 +637,8 @@ definitions:
       punches:
         type: array
         items:
-          $ref: '#/definitions/MonthPunchesVm'
-  MonthPunchesVm:
+          $ref: '#/definitions/MonthPunchesDto'
+  MonthPunchesDto:
     type: object
     properties:
       user:
@@ -635,8 +653,8 @@ definitions:
       punches:
         type: array
         items:
-          $ref: '#/definitions/DayPunchesVm'
-  WeekPunchesVm:
+          $ref: '#/definitions/DayPunchesDto'
+  WeekPunchesDto:
     type: object
     properties:
       user:
@@ -651,15 +669,8 @@ definitions:
       dayPunches:
         type: array
         items:
-          $ref: '#/definitions/DayPunchesVm'
-  DayPunchesArray:
-    type: object
-    properties:
-      punches:
-        type: array
-        items:
-          $ref: '#/definitions/DayPunchesVm'
-  DayPunchesVm:
+          $ref: '#/definitions/DayPunchesDto'
+  DayPunchesDto:
     type: object
     properties:
       userboid:
@@ -677,11 +688,11 @@ definitions:
       punches:
         type: array
         items:
-          $ref: '#/definitions/Punch'
+          $ref: '#/definitions/PunchDto'
       daytotal:
         type: number
         format: float
-  Punch:
+  PunchDto:
     type: object
     properties:
       time:
@@ -706,9 +717,6 @@ definitions:
   OpResult:
     type: object
     properties:
-      status:
-        type: integer
-        description: The http-Code
       success:
         type: boolean
         description: True wenn die Operation erfolgreich war

@@ -4,7 +4,8 @@ using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using TpDotNetCore.Entities;
+using TpDotNetCore.Domain.UserConfiguration;
+using TpDotNetCore.Domain.Punches;
 using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Data
@@ -12,13 +13,13 @@ namespace TpDotNetCore.Data
     public class DbInitializer : IDisposable
     {
         private TpContext _context;
-        private UserManager<User> _userManager;
+        private UserManager<AppUser> _userManager;
         private IMapper _mapper;
         private IHolidayService _holidayService;
         private ITimeService _timeService;
         private Random _random;
 
-        public DbInitializer(TpContext context, UserManager<User> userManager, IMapper mapper, IHolidayService holidayService, ITimeService timeService)
+        public DbInitializer(TpContext context, UserManager<AppUser> userManager, IMapper mapper, IHolidayService holidayService, ITimeService timeService)
         {
             _context = context;
             _userManager = userManager;
@@ -33,29 +34,29 @@ namespace TpDotNetCore.Data
             _context.Database.EnsureCreated();
 
             // Look for any users.
-            if (_context.Users.Any())
+            if (_context.AppUsers.Any())
             {
                 return;   // DB has been seeded
             }
 
-            var userDict = new Dictionary<int, User>();
+            var userDict = new Dictionary<int, AppUser>();
             var dayDict = new Dictionary<int, DayPunch>();
             var weekDict = new Dictionary<int, WeekPunch>();
             var monthDict = new Dictionary<int, MonthPunch>();
             var yearDict = new Dictionary<int, YearPunch>();
 
             // create some users
-            var users = new TpDotNetCore.Controllers.RegisterVm[]
+            var users = new TpDotNetCore.Controllers.RegisterDto[]
             {
-                new TpDotNetCore.Controllers.RegisterVm { Firstname = "Hans", Name = "Tschan", Email = "hts@koch-it.ch", Username = "hts" },
-                new TpDotNetCore.Controllers.RegisterVm { Firstname = "Hanspeter", Name = "Gysin", Email = "hgy@koch-it.ch", Username = "hgy" },
-                new TpDotNetCore.Controllers.RegisterVm { Firstname = "Matthias", Name = "Höhner", Email = "mho@koch-it.ch", Username = "mho" },
-                new TpDotNetCore.Controllers.RegisterVm { Firstname = "Alexander", Name = "Hilty", Email = "ahi@koch-it.ch", Username = "ahi" },
-                new TpDotNetCore.Controllers.RegisterVm { Firstname = "Angelo", Name = "Spatharis", Email = "asp@koch-it.ch", Username = "asp" },
+                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Hans", Name = "Tschan", Email = "hts@koch-it.ch", Username = "hts" },
+                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Hanspeter", Name = "Gysin", Email = "hgy@koch-it.ch", Username = "hgy" },
+                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Matthias", Name = "Höhner", Email = "mho@koch-it.ch", Username = "mho" },
+                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Alexander", Name = "Hilty", Email = "ahi@koch-it.ch", Username = "ahi" },
+                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Angelo", Name = "Spatharis", Email = "asp@koch-it.ch", Username = "asp" },
             };
             for (var i = 0; i < users.Length; i++)
             {
-                var userIdentity = _mapper.Map<User>(users[i]);
+                var userIdentity = _mapper.Map<AppUser>(users[i]);
                 userIdentity.EmailConfirmed = true;
                 var user = await _userManager.CreateAsync(userIdentity, "axil311");
                 userDict.Add(i, userIdentity);

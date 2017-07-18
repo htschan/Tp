@@ -1,11 +1,12 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TpDotNetCore.Entities;
+using TpDotNetCore.Domain.UserConfiguration;
+using TpDotNetCore.Domain.Punches;
 
 namespace TpDotNetCore.Data
 {
-    public class TpContext : IdentityDbContext<User>
+    public class TpContext : IdentityDbContext<AppUser>
     {
         public TpContext() { }
 
@@ -13,6 +14,8 @@ namespace TpDotNetCore.Data
 
         // public DbSet<User> Users { get; set; }
 
+        public DbSet<AppUser> AppUsers { get; set; }
+        
         public DbSet<Punch> Punches { get; set; }
 
         public DbSet<DayPunch> DayPunches { get; set; }

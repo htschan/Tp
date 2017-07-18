@@ -3,6 +3,7 @@ import { Events, NavController, NavParams, AlertController, LoadingController, L
 import { RegisterPage } from '../register/register';
 import { TabsPage } from '../tabs/tabs';
 import { AuthService } from '../../services/auth/auth.service';
+import { AuthResponse } from "../../services/api.g";
 
 @Component({
   selector: 'page-login',
@@ -11,7 +12,7 @@ import { AuthService } from '../../services/auth/auth.service';
 export class LoginPage {
   title: String = ' ';
   loading: Loading;
-  registerCredentials = { email: '', password: '' };
+  registerCredentials = { "email": "", "password": "" };
 
   constructor(public events: Events, public navCtrl: NavController, public navParams: NavParams, private auth: AuthService, private alertCtrl: AlertController, private loadingCtrl: LoadingController) {
     events.subscribe('title:updated', (data) => {
@@ -35,7 +36,7 @@ export class LoginPage {
   public login() {
     this.showLoading()
     this.auth.login(this.registerCredentials.email, this.registerCredentials.password).subscribe(data => {
-      if (data.success) {
+      if (data instanceof AuthResponse && data.status.success) {
         setTimeout(() => {
           this.loading.dismiss();
           this.navCtrl.setRoot(TabsPage)
@@ -45,6 +46,7 @@ export class LoginPage {
       }
     },
       error => {
+        this.loading.dismiss();
         this.showError(error);
       });
   }

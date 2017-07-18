@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 
-namespace TpDotNetCore.Models
+namespace TpDotNetCore.Auth
 {
     public class JwtIssuerOptions
     {
