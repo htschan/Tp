@@ -1,10 +1,6 @@
 using System;
 using System.Text;
 using System.Net;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Diagnostics;
@@ -17,13 +13,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Rewrite;
 using Swashbuckle.AspNetCore.Swagger;
 using TpDotNetCore.Data;
 using TpDotNetCore.Helpers;
 using TpDotNetCore.Extensions;
 using TpDotNetCore.Auth;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
@@ -139,9 +134,15 @@ namespace TpDotNetCore
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbInitializer dbInitializer)
         {
             app.UseCors("CorsDevPolicy");
+
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
             loggerFactory.AddFile("Logs/TpDotNet-{Date}.log");
+
+            app.UseRewriter(new RewriteOptions().Add(new Rewriter
+            {
+                ExcludeLocalhost = false
+            }));
 
             dbInitializer.Initialize();
 

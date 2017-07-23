@@ -79,15 +79,48 @@ http://developer.telerik.com/featured/new-configuration-model-asp-net-core/
 
 
 
+# Configure IIS as reverse proxy for Kestrel web server
+
+Install .NET Core Server Hosting Bundle: https://go.microsoft.com/fwlink/?linkid=848766
+
+Install NodeJS (v6.11.1 doesn't work, v6.9.5 is ok)
+
+https://docs.microsoft.com/en-us/aspnet/core/publishing/iis
+https://docs.microsoft.com/en-us/iis/publish/troubleshooting-web-deploy/troubleshooting-common-problems-with-web-deploy
+
+## Let's Encrypt on Windows IIS
+
+Install the IIS URL Rewrite module and configure redirect to HTTPS except for Let's encrypt challenges (refer to web.config)
+
+https://weblog.west-wind.com/posts/2016/feb/22/using-lets-encrypt-with-iis-on-windows
 
 
 
+# SSH on Windows 2012 R2
+
+https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH
+
+In sshd_config change this line
+`PidFile .\logs\sshd.pid`
+
+Make folder `logs` readable for this user `NT Service\sshd`
+
+Don't delete the private keys in the OpenSSH folder
+
+Put the public key of the client user into this file
+
+`c:\Users\<user>\.ssh\authorized_keys`
+
+In the file `authorized_key` delete header and footer, put everythin on one line and prepend the key with `ssh-rsa`.
+Sample: `ssh-rsa AAAAB3NzaC.....rPLaYw==`
+
+Run powershell as another user:
+
+`start powershell -credential ""`
 
 
-
-
-
-
+Deployment with Git
+http://www.bk2k.info/zeige/website-deployment-mit-git.html
 
 
 
@@ -109,7 +142,7 @@ Add these NuGet packages to the project:
 - IdentityServer4
 - IdentityServer4.AccessTokenValidation 
 
-## Username/Passowrd base token JWT authentication
+## Username/Password based token JWT authentication
 
 Refer to http://docs.identityserver.io/en/release/quickstarts/0_overview.html
 

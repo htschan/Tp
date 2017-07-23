@@ -50,13 +50,17 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     .GroupBy(p => p.DayPunch.Day)
                     .ToList();
 
-                var response = new MonthResponse();
-                response.Status = new OpResult { Success = true };
-                response.Punches = new MonthPunchesDto();
-                response.Punches.User = user.Id;
-                response.Punches.Month = dt.Month;
-                response.Punches.Year = dt.Year;
-                response.Punches.Punches = new List<DayPunchesDto>();
+                var response = new MonthResponse
+                {
+                    Status = new OpResult {Success = true},
+                    Punches = new MonthPunchesDto
+                    {
+                        User = user.Id,
+                        Month = dt.Month,
+                        Year = dt.Year,
+                        Punches = new List<DayPunchesDto>()
+                    }
+                };
                 foreach (var dayPunches in punches)
                 {
                     var dayPunch = new DayPunchesDto();
@@ -64,13 +68,15 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     dayPunch.Punches = new List<PunchDto>();
                     foreach (var punch in dayPunches.OrderBy(p => p.PunchTime))
                     {
-                        var p1 = new PunchDto();
-                        p1.Created = punch.Created;
-                        p1.Direction = punch.Direction;
-                        p1.Punchid = punch.Id;
-                        p1.Time = punch.PunchTime;
-                        p1.Timedec = (double)punch.TimeDec;
-                        p1.Updated = punch.Updated;
+                        var p1 = new PunchDto
+                        {
+                            Created = punch.Created,
+                            Direction = punch.Direction,
+                            Punchid = punch.Id,
+                            Time = punch.PunchTime,
+                            Timedec = (double) punch.TimeDec,
+                            Updated = punch.Updated
+                        };
                         dayPunch.Punches.Add(p1);
                     }
                 }
@@ -80,7 +86,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             {
                 throw;
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetCurret month punches threw an exception: {exception.Message}", exception);
             }

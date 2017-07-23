@@ -50,13 +50,17 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     .GroupBy(p => p.DayPunch.Day)
                     .ToList();
 
-                var response = new WeekResponse();
-                response.Status = new OpResult { Success = true };
-                response.Punches = new WeekPunchesDto();
-                response.Punches.User = user.Id;
-                response.Punches.Week = _timeService.GetWeekNumber(dt);
-                response.Punches.Year = dt.Year;
-                response.Punches.DayPunches = new List<DayPunchesDto>();
+                var response = new WeekResponse
+                {
+                    Status = new OpResult {Success = true},
+                    Punches = new WeekPunchesDto
+                    {
+                        User = user.Id,
+                        Week = _timeService.GetWeekNumber(dt),
+                        Year = dt.Year,
+                        DayPunches = new List<DayPunchesDto>()
+                    }
+                };
                 foreach (var dayPunches in punches)
                 {
                     var dayPunch = new DayPunchesDto();
@@ -64,13 +68,15 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     dayPunch.Punches = new List<PunchDto>();
                     foreach (var punch in dayPunches)
                     {
-                        var p1 = new PunchDto();
-                        p1.Created = punch.Created;
-                        p1.Direction = punch.Direction;
-                        p1.Punchid = punch.Id;
-                        p1.Time = punch.PunchTime;
-                        p1.Timedec = (double)punch.TimeDec;
-                        p1.Updated = punch.Updated;
+                        var p1 = new PunchDto
+                        {
+                            Created = punch.Created,
+                            Direction = punch.Direction,
+                            Punchid = punch.Id,
+                            Time = punch.PunchTime,
+                            Timedec = (double) punch.TimeDec,
+                            Updated = punch.Updated
+                        };
                         dayPunch.Punches.Add(p1);
                     }
                 }

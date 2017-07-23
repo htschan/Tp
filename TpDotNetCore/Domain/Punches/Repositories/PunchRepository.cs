@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using TpDotNetCore.Controllers;
 using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Helpers;
@@ -52,7 +51,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 var week = _appDbContext.WeekPunches.FirstOrDefault(d => d.Week == _timeService.GetWeekNumber(dt));
                 var month = _appDbContext.MonthPunches.FirstOrDefault(d => d.Month == dt.Month);
                 var year = _appDbContext.YearPunches.FirstOrDefault(d => d.Year == dt.Year);
-                var punch = new Domain.Punches.Punch
+                var punch = new Punch
                 {
                     PunchTime = dt,
                     TimeDec = _timeService.GetDecimalHour(dt),
@@ -72,7 +71,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             {
                 throw;
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"Punch threw an exception: {exception.Message}", exception);
             }

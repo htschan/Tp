@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -12,19 +11,17 @@ namespace TpDotNetCore.Data
 {
     public class DbInitializer : IDisposable
     {
-        private TpContext _context;
-        private UserManager<AppUser> _userManager;
-        private IMapper _mapper;
-        private IHolidayService _holidayService;
-        private ITimeService _timeService;
-        private Random _random;
+        private readonly TpContext _context;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IMapper _mapper;
+        private readonly ITimeService _timeService;
+        private readonly Random _random;
 
-        public DbInitializer(TpContext context, UserManager<AppUser> userManager, IMapper mapper, IHolidayService holidayService, ITimeService timeService)
+        public DbInitializer(TpContext context, UserManager<AppUser> userManager, IMapper mapper, ITimeService timeService)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
-            _holidayService = holidayService;
             _timeService = timeService;
             _random = new Random((int)DateTime.Now.Ticks);
         }
@@ -46,13 +43,13 @@ namespace TpDotNetCore.Data
             var yearDict = new Dictionary<int, YearPunch>();
 
             // create some users
-            var users = new TpDotNetCore.Controllers.RegisterDto[]
+            var users = new[]
             {
-                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Hans", Name = "Tschan", Email = "hts@koch-it.ch", Username = "hts" },
-                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Hanspeter", Name = "Gysin", Email = "hgy@koch-it.ch", Username = "hgy" },
-                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Matthias", Name = "Höhner", Email = "mho@koch-it.ch", Username = "mho" },
-                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Alexander", Name = "Hilty", Email = "ahi@koch-it.ch", Username = "ahi" },
-                new TpDotNetCore.Controllers.RegisterDto { Firstname = "Angelo", Name = "Spatharis", Email = "asp@koch-it.ch", Username = "asp" },
+                new Controllers.RegisterDto { Firstname = "Hans", Name = "Tschan", Email = "hts@koch-it.ch", Username = "hts" },
+                new Controllers.RegisterDto { Firstname = "Hanspeter", Name = "Gysin", Email = "hgy@koch-it.ch", Username = "hgy" },
+                new Controllers.RegisterDto { Firstname = "Matthias", Name = "Höhner", Email = "mho@koch-it.ch", Username = "mho" },
+                new Controllers.RegisterDto { Firstname = "Alexander", Name = "Hilty", Email = "ahi@koch-it.ch", Username = "ahi" },
+                new Controllers.RegisterDto { Firstname = "Angelo", Name = "Spatharis", Email = "asp@koch-it.ch", Username = "asp" },
             };
             for (var i = 0; i < users.Length; i++)
             {
@@ -90,7 +87,7 @@ namespace TpDotNetCore.Data
             }
 
             // create some punches for every user
-            for (DateTime date = new DateTime(2015, 1, 1); date <= new DateTime(2017, 6, 16); date += TimeSpan.FromDays(1))
+            for (var date = new DateTime(2015, 1, 1); date <= new DateTime(2017, 6, 16); date += TimeSpan.FromDays(1))
             {
                 if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
                     continue;

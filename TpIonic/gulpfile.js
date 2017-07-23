@@ -4,13 +4,16 @@ const gulp = require("gulp"),
   fs = require("fs"),
   rename = require('gulp-rename'),
   shell = require('gulp-shell'),
+  gutil = require('gulp-util'),
+  ftp = require('vinyl-ftp'),
   runSequence = require('run-sequence'),
   GulpSSH = require("gulp-ssh");
 
 var config = {
   host: 'timepuncher.ch',
   port: 22,
-  username: 'tpdeploy',
+  username: 'tpdotnetcore',
+  remotePath: '/sites/TpIonic/',
   privateKey: fs.readFileSync('../../../ssh.tpdeploy.private.ppk')
 }
 
@@ -33,7 +36,7 @@ gulp.task('copyConfig', () => {
  * Copy production config into src directory.
  */
 gulp.task('copyConfigProd', () => {
-  gulp.src('../../timepuncher-client-config-timepuncher.ch.ts')
+  gulp.src('../../../timepuncher-client-config-timepuncher.ch.ts')
     .pipe(rename('timepuncher-client-config.ts'))
     .pipe(gulp.dest('src'));
 });
@@ -42,21 +45,46 @@ gulp.task('copyConfigProd', () => {
  * Remove build directory.
  */
 gulp.task('clean', (cb) => {
-  return del(["www"], cb);
+  return del(["www","platforms/browser"], cb);
 });
 
 /**
  * Build the browser version.
  */
-gulp.task('buildbrowser', shell.task(['ionic build browser']));
+gulp.task('buildbrowser', shell.task(['ionic cordova build browser']));
 
 /**
  * Upload distribution to timepuncher.ch.
  */
-gulp.task('upload', (cb) => {
+gulp.task('upload_obsolete', (cb) => {
   return gulp
     .src(['www/**/*.*', '!**/node_modules/**'])
     .pipe(gulpSSHTimepuncher.dest('/usr/share/nginx/tpionic/'))
+});
+
+/**
+ * Upload distribution to timepuncher.ch.
+ */
+gulp.task('upload', function () {
+  var conn = ftp.create({
+    host: config.host,
+    user: 'anonymous',
+    password: 'anonymous',
+    // user: config.username,
+    // password: '1jEvJC8vbm1IW1LV4Glz',
+    parallel: 10,
+    log: gutil.log,
+    secure: true
+  });
+
+  var globs = ['platforms/browser/www/**'];
+
+  // using base = '.' will transfer everything to /public_html correctly
+  // turn off buffering in gulp.src for best performance
+
+  return gulp.src(globs, { base: 'platforms/browser/www', buffer: false })
+    .pipe(conn.newer('/')) // only upload newer files
+    .pipe(conn.dest('/'));
 });
 
 /**
@@ -65,3 +93,4 @@ gulp.task('upload', (cb) => {
 gulp.task('deploy', (cb) => {
   runSequence('clean', 'copyConfigProd', 'buildbrowser', 'upload', cb);
 });
+

@@ -42,60 +42,61 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 if (user == null)
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
-            var dt = DateTime.Now;
-            var punches = _appDbContext.Punches
-                .Where(p => p.User.Id == user.Id)
-                .Where(p => p.YearPunch.Year == dt.Year)
-                .OrderBy(p => p.MonthPunch.Month)
-                .GroupBy(p => p.MonthPunch.Month)
-                .Select(p => new
-                {
-                    Month = p.Key,
-                    Groups = p.OrderBy(q => q.DayPunch.Day).GroupBy(q => q.DayPunch.Day)
-                });
-
-            var response = new YearResponse();
-            response.Status = new OpResult { Success = true };
-            var yearchPunchVm = new YearPunchesDto();
-            response.Punches = yearchPunchVm;
-            yearchPunchVm.User = user.Id;
-            yearchPunchVm.Year = dt.Year;
-            yearchPunchVm.Punches = new List<MonthPunchesDto>();
-            foreach (var x in punches)
-            {
-                var monthPunchDto = new MonthPunchesDto();
-                yearchPunchVm.Punches.Add(monthPunchDto);
-                monthPunchDto.User = user.Id;
-                monthPunchDto.Month = x.Month;
-                monthPunchDto.Year = dt.Year;
-                monthPunchDto.Punches = new List<DayPunchesDto>();
-
-                foreach (IGrouping<int, Punch> dayPunches in x.Groups)
-                {
-                    var dayPunch = new DayPunchesDto();
-                    monthPunchDto.Punches.Add(dayPunch);
-                    dayPunch.Punches = new List<PunchDto>();
-                    foreach (var punch in dayPunches.OrderBy(p => p.PunchTime))
+                var dt = DateTime.Now;
+                var punches = _appDbContext.Punches
+                    .Where(p => p.User.Id == user.Id)
+                    .Where(p => p.YearPunch.Year == dt.Year)
+                    .OrderBy(p => p.MonthPunch.Month)
+                    .GroupBy(p => p.MonthPunch.Month)
+                    .Select(p => new
                     {
-                        System.Console.WriteLine(punch.DayPunch);
-                        var p1 = new PunchDto();
-                        p1.Created = punch.Created;
-                        p1.Direction = punch.Direction;
-                        p1.Punchid = punch.Id;
-                        p1.Time = punch.PunchTime;
-                        p1.Timedec = (double)punch.TimeDec;
-                        p1.Updated = punch.Updated;
-                        dayPunch.Punches.Add(p1);
+                        Month = p.Key,
+                        Groups = p.OrderBy(q => q.DayPunch.Day).GroupBy(q => q.DayPunch.Day)
+                    });
+
+                var response = new YearResponse { Status = new OpResult { Success = true } };
+                var yearchPunchVm = new YearPunchesDto();
+                response.Punches = yearchPunchVm;
+                yearchPunchVm.User = user.Id;
+                yearchPunchVm.Year = dt.Year;
+                yearchPunchVm.Punches = new List<MonthPunchesDto>();
+                foreach (var x in punches)
+                {
+                    var monthPunchDto = new MonthPunchesDto();
+                    yearchPunchVm.Punches.Add(monthPunchDto);
+                    monthPunchDto.User = user.Id;
+                    monthPunchDto.Month = x.Month;
+                    monthPunchDto.Year = dt.Year;
+                    monthPunchDto.Punches = new List<DayPunchesDto>();
+
+                    foreach (var dayPunches in x.Groups)
+                    {
+                        var dayPunch = new DayPunchesDto();
+                        monthPunchDto.Punches.Add(dayPunch);
+                        dayPunch.Punches = new List<PunchDto>();
+                        foreach (var punch in dayPunches.OrderBy(p => p.PunchTime))
+                        {
+                            Console.WriteLine(punch.DayPunch);
+                            var p1 = new PunchDto
+                            {
+                                Created = punch.Created,
+                                Direction = punch.Direction,
+                                Punchid = punch.Id,
+                                Time = punch.PunchTime,
+                                Timedec = (double) punch.TimeDec,
+                                Updated = punch.Updated
+                            };
+                            dayPunch.Punches.Add(p1);
+                        }
                     }
                 }
-            }
                 return response;
             }
             catch (RepositoryException)
             {
                 throw;
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetCurret year punches threw an exception: {exception.Message}", exception);
             }

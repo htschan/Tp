@@ -1,21 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using TpDotNetCore.Auth;
-using TpDotNetCore.Domain.Punches;
 using TpDotNetCore.Helpers;
 using AutoMapper;
-using TpDotNetCore.Data;
 using MimeKit;
 using MailKit.Net.Smtp;
 using TpDotNetCore.Domain.UserConfiguration;
-using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Domain.Punches.Repositories;
 
 namespace TpDotNetCore.Controllers
@@ -23,14 +18,10 @@ namespace TpDotNetCore.Controllers
     public class TpControllerImpl : ITpController
     {
         private readonly IMapper _mapper;
-        private readonly TpContext _appDbContext;
         private readonly AppUser _appUser;
-        private readonly IAppUserRepository _appUserRepository;
         private readonly UserManager<AppUser> _userManager;
-        private readonly JsonSerializerSettings _serializerSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly TpMailConfigOptions _tpConfigOptions;
-        private readonly ITimeService _timeService;
         private readonly IYearPunchRepository _yearPunchRepository;
         private readonly IMonthPunchRepository _monthPunchRepository;
         private readonly IWeekPunchRepository _weekPunchRepository;
@@ -38,15 +29,10 @@ namespace TpDotNetCore.Controllers
         private readonly IPunchRepository _punchRepository;
 
         public TpControllerImpl(IMapper mapper,
-                TpContext appDbContext,
                 AppUser appUser,
-                IAppUserRepository appUserRepoistory,
                 UserManager<AppUser> userManager,
-                IJwtFactory jwtFactory,
-                IOptions<JwtIssuerOptions> jwtOptions,
                 IHttpContextAccessor httpContextAccessor,
                 IOptions<TpMailConfigOptions> optionsAccessor,
-                ITimeService timeService,
                 IPunchRepository punchRepository,
                 IYearPunchRepository yearPunchRepository,
                 IMonthPunchRepository monthPunchRepository,
@@ -54,20 +40,17 @@ namespace TpDotNetCore.Controllers
                 IDayPunchRepository dayPunchRepository)
         {
             _mapper = mapper;
-            _appDbContext = appDbContext;
             _appUser = appUser;
-            _appUserRepository = appUserRepoistory;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
             _tpConfigOptions = optionsAccessor.Value;
-            _timeService = timeService;
             _yearPunchRepository = yearPunchRepository;
             _monthPunchRepository = monthPunchRepository;
             _weekPunchRepository = weekPunchRepository;
             _dayPunchRepository = dayPunchRepository;
             _punchRepository = punchRepository;
 
-            _serializerSettings = new JsonSerializerSettings
+            new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             };
@@ -79,7 +62,7 @@ namespace TpDotNetCore.Controllers
             try
             {
                 var authResponse = _appUser.Authenticate(credentials);
-                return Task<SwaggerResponse<AuthResponse>>.FromResult(
+                return Task.FromResult(
                     new SwaggerResponse<AuthResponse>(
                         StatusCodes.Status200OK,
                         headers,
@@ -87,7 +70,7 @@ namespace TpDotNetCore.Controllers
             }
             catch (RepositoryException exception)
             {
-                return Task<SwaggerResponse<AuthResponse>>.FromResult(
+                return Task.FromResult(
                     new SwaggerResponse<AuthResponse>(
                         exception.StatusCode,
                         headers,
@@ -102,12 +85,12 @@ namespace TpDotNetCore.Controllers
             var result = _userManager.CreateAsync(userIdentity, registerDto.Password).Result;
 
             if (!result.Succeeded)
-                return Task<SwaggerResponse<RegisterResponse>>.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status400BadRequest, headers, null, result.ToString()));
+                return Task.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status400BadRequest, headers, null, result.ToString()));
 
             var confirmationToken = _userManager.GenerateEmailConfirmationTokenAsync(userIdentity).Result;
             SendEmail(userIdentity.Id, confirmationToken);
 
-            return Task<SwaggerResponse<RegisterResponse>>.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status201Created, headers, null, result.ToString()));
+            return Task.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status201Created, headers, null, result.ToString()));
         }
 
         public Task<SwaggerResponse<ConfirmResponse>> ConfirmRegisterAsync(string userid, string confirmToken)
@@ -117,9 +100,9 @@ namespace TpDotNetCore.Controllers
             var user = _userManager.FindByIdAsync(userid).Result;
             IdentityResult result = _userManager.ConfirmEmailAsync(user, confirmToken).Result;
             if (!result.Succeeded)
-                return Task<SwaggerResponse<ConfirmResponse>>.FromResult(new SwaggerResponse<ConfirmResponse>(StatusCodes.Status400BadRequest, headers, null, result.ToString()));
+                return Task.FromResult(new SwaggerResponse<ConfirmResponse>(StatusCodes.Status400BadRequest, headers, null, result.ToString()));
 
-            return Task<SwaggerResponse<ConfirmResponse>>.FromResult(new SwaggerResponse<ConfirmResponse>(StatusCodes.Status201Created, headers, null, result.ToString()));
+            return Task.FromResult(new SwaggerResponse<ConfirmResponse>(StatusCodes.Status201Created, headers, null, result.ToString()));
         }
 
         public Task<SwaggerResponse<RecoverPasswordResponse>> RecoverPasswordAsync(RecoverPasswordParams recoverPasswordParams)
@@ -153,7 +136,7 @@ namespace TpDotNetCore.Controllers
                 profile.UserName = _httpContextAccessor.HttpContext.User.Identity.Name;
             }
             var json = JsonConvert.SerializeObject(profile);
-            return Task<SwaggerResponse<GetProfileResponse>>.FromResult(new SwaggerResponse<GetProfileResponse>(StatusCodes.Status200OK, headers, new GetProfileResponse { Status = new OpResult { Success = true } }));
+            return Task.FromResult(new SwaggerResponse<GetProfileResponse>(StatusCodes.Status200OK, headers, new GetProfileResponse { Status = new OpResult { Success = true } }));
         }
 
         public Task<SwaggerResponse<GetProfileResponse>> GetProfileAsync(string userid)
@@ -173,7 +156,7 @@ namespace TpDotNetCore.Controllers
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var response = _dayPunchRepository.GetCurrent(userId);
-                return Task<SwaggerResponse<DayResponse>>.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
+                return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
@@ -189,7 +172,7 @@ namespace TpDotNetCore.Controllers
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var response = _weekPunchRepository.GetCurrent(userId);
-                return Task<SwaggerResponse<WeekResponse>>.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status200OK, headers, response));
+                return Task.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
@@ -205,7 +188,7 @@ namespace TpDotNetCore.Controllers
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var response = _monthPunchRepository.GetCurrent(userId);
-                return Task<SwaggerResponse<MonthResponse>>.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
+                return Task.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
@@ -221,7 +204,7 @@ namespace TpDotNetCore.Controllers
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var response = _yearPunchRepository.GetCurrent(userId);
-                return Task<SwaggerResponse<YearResponse>>.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, response));
+                return Task.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
@@ -265,7 +248,7 @@ namespace TpDotNetCore.Controllers
                 var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _punchRepository.Punch(userId, direction);
                 var response = _dayPunchRepository.GetCurrent(userId);
-                return Task<SwaggerResponse<DayResponse>>.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
+                return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
@@ -302,11 +285,12 @@ namespace TpDotNetCore.Controllers
             }
         }
         #endregion
+
         private Task<SwaggerResponse<T>> HandleException<T>(Exception exception, Dictionary<string, IEnumerable<string>> headers, T response)
         {
             if (exception is RepositoryException)
-                return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(((RepositoryException)exception).StatusCode, headers, response, exception.Message));
-            return Task<SwaggerResponse<T>>.FromResult(new SwaggerResponse<T>(StatusCodes.Status400BadRequest, headers, response, exception.Message));
+                return Task.FromResult(new SwaggerResponse<T>(((RepositoryException)exception).StatusCode, headers, response, exception.Message));
+            return Task.FromResult(new SwaggerResponse<T>(StatusCodes.Status400BadRequest, headers, response, exception.Message));
         }
     }
 }
