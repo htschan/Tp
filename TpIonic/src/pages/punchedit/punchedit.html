@@ -1,0 +1,41 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            {{title}}
+        </ion-title>
+        <ion-buttons start>
+            <button ion-button (click)="dismiss()">
+        <span ion-text color="primary" showWhen="ios">Cancel</span>
+        <ion-icon name="md-close" showWhen="android, windows, core"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <ion-grid>
+        <ion-row>
+            <ion-col col-4>{{punchVm?.timedec | number: "1.2-2"}}</ion-col>
+            <ion-item>
+                <ion-label> {{punchVm?.direction ? "Kommen" : "Gehen"}}</ion-label>
+                <ion-toggle [(ngModel)]="punchVm.direction"></ion-toggle>
+            </ion-item>
+        </ion-row>
+        <ion-row>
+            <ion-col col-8>
+                <ion-label>Time (hh:mm)</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="punchTime"></ion-datetime>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col col-8>
+                <ion-label>{{time}}</ion-label>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col col-3><button ion-button (click)="delete()">Stempel löschen</button></ion-col>
+            <ion-col col-3><button ion-button (click)="save()">Übernehmen</button></ion-col>
+            <ion-col col-3><button ion-button (click)="reset()">Rückgängig</button></ion-col>
+            <ion-col col-3><button ion-button (click)="dismiss()">Abbrechen</button></ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>

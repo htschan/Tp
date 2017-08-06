@@ -1,11 +1,8 @@
-import { Component } from '@angular/core';
-import { ViewChild } from '@angular/core';
-import { Slides } from 'ionic-angular';
-
-import { Events, NavController } from 'ionic-angular';
-import { PunchService } from '../../services/puncher/punch.service';
-import { AuthService } from '../../services/auth/auth.service';
-import { DayPunchesDto, WeekPunchesDto, MonthPunchesDto, PunchResponse } from '../../services/api.g';
+import { Component, ViewChild } from '@angular/core';
+import { Events, Slides, ModalController, ToastController } from 'ionic-angular';
+import { PunchService, PunchDayVm, PunchVm, EditResultEnum } from '../../services/puncher/punch.service';
+import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult } from '../../services/api.g';
+import { PunchEditModal } from '../punchedit/punchedit';
 
 @Component({
   selector: 'page-home',
@@ -14,11 +11,14 @@ import { DayPunchesDto, WeekPunchesDto, MonthPunchesDto, PunchResponse } from '.
 export class HomePage {
   @ViewChild(Slides) slides: Slides;
   title: String = ' ';
-  daypunches: DayPunchesDto;
+  punchDayVm: PunchDayVm;
   weekpunches: WeekPunchesDto;
   monthpunches: MonthPunchesDto;
 
-  constructor(public events: Events, public navCtrl: NavController, private punchService: PunchService, private auth: AuthService) {
+  constructor(public events: Events,
+    private modalCtrl: ModalController,
+    private punchService: PunchService,
+    private toastController: ToastController) {
     events.subscribe('title:updated', (data) => {
       if (data.menuState) {
         this.title = "Projects";
@@ -35,16 +35,55 @@ export class HomePage {
 
   enter() {
     this.punchService.punch('In')
-      .subscribe(response =>
-        this.daypunches = response.punches
-      );
+      .subscribe(response => {
+        this.punchDayVm = response;
+      });
   }
 
   leave() {
     this.punchService.punch('Out')
-      .subscribe(response =>
-        this.daypunches = response.punches
-      );
+      .subscribe(response => {
+        this.punchDayVm = response;
+      });
+  }
+
+  addPunch() {
+    let timeEditModal = this.modalCtrl.create(PunchEditModal, { punchVm: new PunchVm(new PunchDto()), title: "Neue Stempelung" });
+    timeEditModal.onDidDismiss(editPunchVm => {
+      switch (editPunchVm.editResult) {
+        case EditResultEnum.Save:
+          // this.punchService.updatePunch(editPunchVm).subscribe(response => {
+          //   this.punchService.updatePunch(editPunchVm);
+          // });
+          break;
+      }
+    })
+    timeEditModal.present();
+  }
+
+  editPunch(punchVm: PunchVm) {
+    let timeEditModal = this.modalCtrl.create(PunchEditModal, { punchVm: punchVm, title: "Stempelung editieren" });
+    timeEditModal.onDidDismiss((editPunchVm: PunchVm) => {
+      switch (editPunchVm.editResult) {
+        case EditResultEnum.Delete:
+          this.punchService.deletePunch(editPunchVm).subscribe((response: OpResult) => {
+            if (response.success)
+              this.getToday();
+            else
+              this.handleError(response.result);
+          });
+          break;
+        case EditResultEnum.Save:
+          this.punchService.updatePunch(editPunchVm).subscribe((response: OpResult) => {
+            if (response.success)
+              this.getToday();
+            else
+              this.handleError(response.result);
+          });
+          break;
+      }
+    })
+    timeEditModal.present();
   }
 
   slideChanged() {
@@ -64,10 +103,9 @@ export class HomePage {
   }
 
   getToday() {
-    this.punchService.getToday()
-      .subscribe(response =>
-        this.daypunches = response.punches
-      );
+    this.punchService.getToday().subscribe(response => {
+      this.punchDayVm = response;
+    });
   }
 
   getWeek() {
@@ -82,5 +120,16 @@ export class HomePage {
       .subscribe(data =>
         this.monthpunches = data.punches
       );
+  }
+
+  handleError(err: string) {
+    if (err) {
+      let toast = this.toastController.create({
+        message: err,
+        duration: 10000,
+        showCloseButton: true
+      });
+      toast.present();
+    }
   }
 }

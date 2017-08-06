@@ -43,7 +43,9 @@ $colors: (
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 
-
+$toggle-md-active-color: color($colors, light);
+$toggle-md-track-background-color-on: color($colors, danger);
+$toggle-md-track-background-color-off: color($colors, primary);
 
 
 // App Windows Variables

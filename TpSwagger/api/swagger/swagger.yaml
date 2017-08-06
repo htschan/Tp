@@ -393,15 +393,35 @@ paths:
       tags:
         - Punches
       parameters:
-        - name: modifyPunchViewModel
+        - name: modifyPunchDto
           in: body
           schema:
-            $ref: '#/definitions/ModifyPunchVm'
+            $ref: '#/definitions/ModifyPunchDto'
       responses:
         default:
           description: Unexpected error
           schema:
               $ref: '#/definitions/PunchResponse'
+  /punchDelete:
+    delete:
+      description: |
+        Löscht einen Zeitstempel des aktuellen Benutzers.
+        Die Monatsabrechnung muss im Status *open* sein
+        damit der Benutzer löschen kann.
+      summary: Löscht einen Zeitstempel
+      operationId: punchDelete
+      tags:
+        - Punches
+      parameters:
+        - name: deletePunchDto
+          in: body
+          schema:
+            $ref: '#/definitions/DeletePunchDto'
+      responses:
+        default:
+          description: Unexpected error
+          schema:
+              $ref: '#/definitions/OpResult'
   /punchModifyAdmin:
     post:
       description: | 
@@ -412,10 +432,10 @@ paths:
       tags:
         - Punches
       parameters:
-        - name: modifyPunchAdminParams
+        - name: modifyPunchAdminDto
           in: body
           schema:
-            $ref: '#/definitions/ModifyPunchAdminParams'
+            $ref: '#/definitions/ModifyPunchAdminDto'
       responses:
         default:
           description: Unexpected error
@@ -433,10 +453,10 @@ paths:
       tags:
         - Punches
       parameters:
-        - name: setStatusAdminParams
+        - name: setStatusAdminDto
           in: body
           schema:
-            $ref: '#/definitions/SetStatusAdminParams'
+            $ref: '#/definitions/SetStatusAdminDto'
       responses:
         default:
           description: Unexpected error
@@ -592,21 +612,26 @@ definitions:
         $ref: '#/definitions/OpResult'
       punches:
         $ref: '#/definitions/YearPunchesDto'
-  ModifyPunchVm:
+  ModifyPunchDto:
     type: object
     properties:
       punchid:
-        type: number
+        type: string
       timedec:
         type: number
         format: float
       direction:
         type: boolean
-  ModifyPunchAdminParams:
+  DeletePunchDto:
     type: object
     properties:
       punchid:
-        type: number
+        type: string
+  ModifyPunchAdminDto:
+    type: object
+    properties:
+      punchid:
+        type: string
       userid:
         type: string
       timedec:
@@ -614,7 +639,7 @@ definitions:
         format: float
       direction:
         type: boolean
-  SetStatusAdminParams:
+  SetStatusAdminDto:
     type: object
     properties:
       userid:
@@ -721,5 +746,5 @@ definitions:
         type: boolean
         description: True wenn die Operation erfolgreich war
       result:
-        type: object
+        type: string
         description: Eine Text-Meldung

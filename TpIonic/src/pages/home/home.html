@@ -13,34 +13,42 @@
   <p>
     <button ion-button full large (click)="leave()">Gehen</button>
   </p>
+
   <ion-slides class="punch-slider" (ionSlideDidChange)="slideChanged()">
     <ion-slide>
       <h1>Heute</h1>
       <ion-grid>
         <ion-row>
-          <ion-col col-4>{{daypunches?.day}}</ion-col>
+          <ion-col col-4>{{punchDayVm?.date | date:"fullDate"}}</ion-col>
+          <ion-col col-4>{{punchDayVm?.daySum | number: "1.2-2"}}</ion-col>
         </ion-row>
-        <ion-row *ngFor="let pu of daypunches?.punches">
-          <ion-col col-6 *ngIf="pu.direction">{{pu?.timedec | number: "1.2-2"}}</ion-col>
-          <ion-col col-6 offset-2 *ngIf="!pu.direction">{{pu?.timedec | number: "1.2-2"}}</ion-col>
+        <ion-row *ngFor="let row of punchDayVm?.punchRow">
+          <ion-col col-3 (click)="editPunch(row?.enter)">{{row?.enter?.timedec | number: "1.2-2"}}</ion-col>
+          <ion-col col-3 (click)="editPunch(row?.leave)">{{row?.leave?.timedec | number: "1.2-2"}}</ion-col>
+          <ion-col col-3>{{row?.sum | number: "1.2-2"}}</ion-col>
         </ion-row>
       </ion-grid>
+      <ion-fab>
+        <button ion-fab mini (click)="addPunch()" color="primary"><ion-icon name="add"></ion-icon></button>
+      </ion-fab>
     </ion-slide>
+
     <ion-slide>
       <h1>Woche </h1>
-       <ion-grid>
+      <ion-grid>
         <ion-row *ngFor="let row of weekpunches?.dayPunches">
           <ion-col *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
         </ion-row>
-      </ion-grid> 
+      </ion-grid>
     </ion-slide>
+
     <ion-slide>
       <h1>Monat</h1>
-       <ion-grid>
+      <ion-grid>
         <ion-row *ngFor="let row of monthpunches?.punches">
           <ion-col *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
         </ion-row>
-      </ion-grid> 
+      </ion-grid>
     </ion-slide>
   </ion-slides>
 </ion-content>

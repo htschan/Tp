@@ -5,19 +5,18 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { AuthConfig } from 'angular2-jwt';
 import { TpClientConfig } from '../timepuncher-client-config';
 import { TpClient, API_BASE_URL } from '../services/api.g';
 import { AuthService } from '../services/auth/auth.service';
 import { PunchService } from '../services/puncher/punch.service';
 import { Http, XHRBackend, RequestOptions } from '@angular/http';
-import { Storage } from '@ionic/storage';
 import { Device } from '@ionic-native/device';
 import { httpFactory } from '../http/http.factory';
 import { MyApp } from './app.component';
 import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
+import { PunchEditModal } from '../pages/punchedit/punchedit';
 import { TabsPage } from '../pages/tabs/tabs';
 import { ProfilePage } from '../pages/profile/profile';
 import { LoginPage } from '../pages/login/login';
@@ -30,6 +29,7 @@ import { RegisterPage } from '../pages/register/register';
     AboutPage,
     ContactPage,
     HomePage,
+    PunchEditModal,
     TabsPage,
     ProfilePage,
     LoginPage,
@@ -42,6 +42,7 @@ import { RegisterPage } from '../pages/register/register';
       links: [
         { component: TabsPage, name: 'TabsPage', segment: 'tabs-page' },
         { component: HomePage, name: 'Home', segment: 'home' },
+        { component: PunchEditModal, name: 'PunchEditModal', segment: 'puncheditmodal' },
         { component: ProfilePage, name: 'Profile', segment: 'profile' },
         { component: AboutPage, name: 'About', segment: 'about' },
         { component: ContactPage, name: 'Contace', segment: 'contact' },
@@ -60,6 +61,7 @@ import { RegisterPage } from '../pages/register/register';
     AboutPage,
     ContactPage,
     HomePage,
+    PunchEditModal,
     TabsPage,
     ProfilePage,
     LoginPage,

@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using TpDotNetCore.Data;
+using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Helpers;
 
@@ -25,7 +27,22 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 
         public void Delete(Punch entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var punch = _appDbContext.Punches.AsNoTracking().SingleOrDefault(p => p.Id == entity.Id);
+                if (punch == null)
+                    throw new RepositoryException(StatusCodes.Status404NotFound, "Punch not found");
+                _appDbContext.Punches.Remove(entity);
+                _appDbContext.SaveChanges();
+            }
+            catch (RepositoryException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw new RepositoryException(StatusCodes.Status400BadRequest, $"Delete Punch threw an exception: {exception.Message}", exception);
+            }
         }
 
         public IList<Punch> GetAll()
@@ -79,7 +96,27 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 
         public void Update(Punch entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var punch = _appDbContext.Punches.SingleOrDefault(p => p.Id == entity.Id);
+                if (punch == null)
+                    throw new RepositoryException(StatusCodes.Status404NotFound, "Punch not found");
+                _appDbContext.Punches.Update(entity);
+                _appDbContext.SaveChanges();
+            }
+            catch (RepositoryException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw new RepositoryException(StatusCodes.Status400BadRequest, $"Update Punch threw an exception: {exception.Message}", exception);
+            }
+        }
+
+        public Punch GetByUser(Punch punch, AppUser user)
+        {
+            return _appDbContext.Punches.AsNoTracking().FirstOrDefault(u => u.Id == punch.Id && u.UserId == user.Id);
         }
     }
 }

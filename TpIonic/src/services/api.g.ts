@@ -113,17 +113,22 @@ export interface ITpClient {
      * Modifiziert einen Zeitstempel
      * @return Unexpected error
      */
-    punchModify(modifyPunchViewModel: ModifyPunchVm | undefined): Observable<PunchResponse | null>;
+    punchModify(modifyPunchDto: ModifyPunchDto | undefined): Observable<PunchResponse | null>;
+    /**
+     * Löscht einen Zeitstempel
+     * @return Unexpected error
+     */
+    punchDelete(deletePunchDto: DeletePunchDto | undefined): Observable<OpResult | null>;
     /**
      * Modifiziert einen Zeitstempel
      * @return Unexpected error
      */
-    punchModifyAdmin(modifyPunchAdminParams: ModifyPunchAdminParams | undefined): Observable<PunchResponse | null>;
+    punchModifyAdmin(modifyPunchAdminDto: ModifyPunchAdminDto | undefined): Observable<PunchResponse | null>;
     /**
      * Setzt den Status der Monatsabrechung
      * @return Unexpected error
      */
-    punchSetStatusAdmin(setStatusAdminParams: SetStatusAdminParams | undefined): Observable<PunchResponse | null>;
+    punchSetStatusAdmin(setStatusAdminDto: SetStatusAdminDto | undefined): Observable<PunchResponse | null>;
 }
 
 @Injectable()
@@ -941,11 +946,11 @@ export class TpClient implements ITpClient {
      * Modifiziert einen Zeitstempel
      * @return Unexpected error
      */
-    punchModify(modifyPunchViewModel: ModifyPunchVm | undefined): Observable<PunchResponse | null> {
+    punchModify(modifyPunchDto: ModifyPunchDto | undefined): Observable<PunchResponse | null> {
         let url_ = this.baseUrl + "/punchModify";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(modifyPunchViewModel);
+        const content_ = JSON.stringify(modifyPunchDto);
         
         let options_ = {
             body: content_,
@@ -983,14 +988,59 @@ export class TpClient implements ITpClient {
     }
 
     /**
+     * Löscht einen Zeitstempel
+     * @return Unexpected error
+     */
+    punchDelete(deletePunchDto: DeletePunchDto | undefined): Observable<OpResult | null> {
+        let url_ = this.baseUrl + "/punchDelete";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(deletePunchDto);
+        
+        let options_ = {
+            body: content_,
+            method: "delete",
+            headers: new Headers({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request(url_, options_).flatMap((response_) => {
+            return this.processPunchDelete(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof Response) {
+                try {
+                    return this.processPunchDelete(response_);
+                } catch (e) {
+                    return <Observable<OpResult>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<OpResult>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processPunchDelete(response: Response): Observable<OpResult | null> {
+        const status = response.status; 
+
+        {
+            const _responseText = response.text();
+            let result: OpResult | null = null;
+            let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result = resultData ? OpResult.fromJS(resultData) : new OpResult();
+            return Observable.of(result);
+        }
+    }
+
+    /**
      * Modifiziert einen Zeitstempel
      * @return Unexpected error
      */
-    punchModifyAdmin(modifyPunchAdminParams: ModifyPunchAdminParams | undefined): Observable<PunchResponse | null> {
+    punchModifyAdmin(modifyPunchAdminDto: ModifyPunchAdminDto | undefined): Observable<PunchResponse | null> {
         let url_ = this.baseUrl + "/punchModifyAdmin";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(modifyPunchAdminParams);
+        const content_ = JSON.stringify(modifyPunchAdminDto);
         
         let options_ = {
             body: content_,
@@ -1031,11 +1081,11 @@ export class TpClient implements ITpClient {
      * Setzt den Status der Monatsabrechung
      * @return Unexpected error
      */
-    punchSetStatusAdmin(setStatusAdminParams: SetStatusAdminParams | undefined): Observable<PunchResponse | null> {
+    punchSetStatusAdmin(setStatusAdminDto: SetStatusAdminDto | undefined): Observable<PunchResponse | null> {
         let url_ = this.baseUrl + "/punchSetStatusAdmin";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(setStatusAdminParams);
+        const content_ = JSON.stringify(setStatusAdminDto);
         
         let options_ = {
             body: content_,
@@ -1799,12 +1849,12 @@ export interface IYearResponse {
     punches?: YearPunchesDto | undefined;
 }
 
-export class ModifyPunchVm implements IModifyPunchVm {
-    punchid?: number | undefined;
+export class ModifyPunchDto implements IModifyPunchDto {
+    punchid?: string | undefined;
     timedec?: number | undefined;
     direction?: boolean | undefined;
 
-    constructor(data?: IModifyPunchVm) {
+    constructor(data?: IModifyPunchDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1821,8 +1871,8 @@ export class ModifyPunchVm implements IModifyPunchVm {
         }
     }
 
-    static fromJS(data: any): ModifyPunchVm {
-        let result = new ModifyPunchVm();
+    static fromJS(data: any): ModifyPunchDto {
+        let result = new ModifyPunchDto();
         result.init(data);
         return result;
     }
@@ -1836,19 +1886,54 @@ export class ModifyPunchVm implements IModifyPunchVm {
     }
 }
 
-export interface IModifyPunchVm {
-    punchid?: number | undefined;
+export interface IModifyPunchDto {
+    punchid?: string | undefined;
     timedec?: number | undefined;
     direction?: boolean | undefined;
 }
 
-export class ModifyPunchAdminParams implements IModifyPunchAdminParams {
-    punchid?: number | undefined;
+export class DeletePunchDto implements IDeletePunchDto {
+    punchid?: string | undefined;
+
+    constructor(data?: IDeletePunchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.punchid = data["punchid"];
+        }
+    }
+
+    static fromJS(data: any): DeletePunchDto {
+        let result = new DeletePunchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["punchid"] = this.punchid;
+        return data; 
+    }
+}
+
+export interface IDeletePunchDto {
+    punchid?: string | undefined;
+}
+
+export class ModifyPunchAdminDto implements IModifyPunchAdminDto {
+    punchid?: string | undefined;
     userid?: string | undefined;
     timedec?: number | undefined;
     direction?: boolean | undefined;
 
-    constructor(data?: IModifyPunchAdminParams) {
+    constructor(data?: IModifyPunchAdminDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1866,8 +1951,8 @@ export class ModifyPunchAdminParams implements IModifyPunchAdminParams {
         }
     }
 
-    static fromJS(data: any): ModifyPunchAdminParams {
-        let result = new ModifyPunchAdminParams();
+    static fromJS(data: any): ModifyPunchAdminDto {
+        let result = new ModifyPunchAdminDto();
         result.init(data);
         return result;
     }
@@ -1882,18 +1967,18 @@ export class ModifyPunchAdminParams implements IModifyPunchAdminParams {
     }
 }
 
-export interface IModifyPunchAdminParams {
-    punchid?: number | undefined;
+export interface IModifyPunchAdminDto {
+    punchid?: string | undefined;
     userid?: string | undefined;
     timedec?: number | undefined;
     direction?: boolean | undefined;
 }
 
-export class SetStatusAdminParams implements ISetStatusAdminParams {
+export class SetStatusAdminDto implements ISetStatusAdminDto {
     userid?: string | undefined;
     status?: string | undefined;
 
-    constructor(data?: ISetStatusAdminParams) {
+    constructor(data?: ISetStatusAdminDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1909,8 +1994,8 @@ export class SetStatusAdminParams implements ISetStatusAdminParams {
         }
     }
 
-    static fromJS(data: any): SetStatusAdminParams {
-        let result = new SetStatusAdminParams();
+    static fromJS(data: any): SetStatusAdminDto {
+        let result = new SetStatusAdminDto();
         result.init(data);
         return result;
     }
@@ -1923,7 +2008,7 @@ export class SetStatusAdminParams implements ISetStatusAdminParams {
     }
 }
 
-export interface ISetStatusAdminParams {
+export interface ISetStatusAdminDto {
     userid?: string | undefined;
     status?: string | undefined;
 }
@@ -2241,7 +2326,7 @@ export class OpResult implements IOpResult {
     /** True wenn die Operation erfolgreich war */
     success?: boolean | undefined;
     /** Eine Text-Meldung */
-    result?: any | undefined;
+    result?: string | undefined;
 
     constructor(data?: IOpResult) {
         if (data) {
@@ -2255,13 +2340,7 @@ export class OpResult implements IOpResult {
     init(data?: any) {
         if (data) {
             this.success = data["success"];
-            if (data["result"]) {
-                this.result = {};
-                for (let key in data["result"]) {
-                    if (data["result"].hasOwnProperty(key))
-                        this.result[key] = data["result"][key];
-                }
-            }
+            this.result = data["result"];
         }
     }
 
@@ -2274,13 +2353,7 @@ export class OpResult implements IOpResult {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["success"] = this.success;
-        if (this.result) {
-            data["result"] = {};
-            for (let key in this.result) {
-                if (this.result.hasOwnProperty(key))
-                    data["result"][key] = this.result[key];
-            }
-        }
+        data["result"] = this.result;
         return data; 
     }
 }
@@ -2289,7 +2362,7 @@ export interface IOpResult {
     /** True wenn die Operation erfolgreich war */
     success?: boolean | undefined;
     /** Eine Text-Meldung */
-    result?: any | undefined;
+    result?: string | undefined;
 }
 
 export class SwaggerException extends Error {

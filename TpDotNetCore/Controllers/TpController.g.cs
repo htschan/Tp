@@ -74,13 +74,16 @@ namespace TpDotNetCore.Controllers
         System.Threading.Tasks.Task<SwaggerResponse<DayResponse>> PunchOutAsync();
         /// <summary>Modifiziert einen Zeitstempel</summary>
         /// <returns>Unexpected error</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchModifyAsync(ModifyPunchVm modifyPunchViewModel);
+        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchModifyAsync(ModifyPunchDto modifyPunchDto);
+        /// <summary>Löscht einen Zeitstempel</summary>
+        /// <returns>Unexpected error</returns>
+        System.Threading.Tasks.Task<SwaggerResponse<OpResult>> PunchDeleteAsync(DeletePunchDto deletePunchDto);
         /// <summary>Modifiziert einen Zeitstempel</summary>
         /// <returns>Unexpected error</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchModifyAdminAsync(ModifyPunchAdminParams modifyPunchAdminParams);
+        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchModifyAdminAsync(ModifyPunchAdminDto modifyPunchAdminDto);
         /// <summary>Setzt den Status der Monatsabrechung</summary>
         /// <returns>Unexpected error</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(SetStatusAdminParams setStatusAdminParams);
+        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(SetStatusAdminDto setStatusAdminDto);
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "11.3.3.0")]
@@ -337,10 +340,24 @@ namespace TpDotNetCore.Controllers
         /// <returns>Unexpected error</returns>
         
         [HttpPost, Route("punchModify")]
-        public async System.Threading.Tasks.Task<IActionResult> PunchModify([FromBody]ModifyPunchVm modifyPunchViewModel)
+        public async System.Threading.Tasks.Task<IActionResult> PunchModify([FromBody]ModifyPunchDto modifyPunchDto)
         {    
             if(!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _implementation.PunchModifyAsync(modifyPunchViewModel);
+            var result = await _implementation.PunchModifyAsync(modifyPunchDto);
+            foreach (var header in result.Headers)
+                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+            if (result.StatusCode == 200)
+                return Ok(result.Result);
+            else
+                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+        }
+        /// <summary>Löscht einen Zeitstempel</summary>
+        /// <returns>Unexpected error</returns>
+        
+        [HttpDelete, Route("punchDelete")]
+        public async System.Threading.Tasks.Task<IActionResult> PunchDelete([FromBody]DeletePunchDto deletePunchDto)
+        {    
+            var result = await _implementation.PunchDeleteAsync(deletePunchDto);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)
@@ -352,10 +369,10 @@ namespace TpDotNetCore.Controllers
         /// <returns>Unexpected error</returns>
         
         [HttpPost, Route("punchModifyAdmin")]
-        public async System.Threading.Tasks.Task<IActionResult> PunchModifyAdmin([FromBody]ModifyPunchAdminParams modifyPunchAdminParams)
+        public async System.Threading.Tasks.Task<IActionResult> PunchModifyAdmin([FromBody]ModifyPunchAdminDto modifyPunchAdminDto)
         {    
             if(!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _implementation.PunchModifyAdminAsync(modifyPunchAdminParams);
+            var result = await _implementation.PunchModifyAdminAsync(modifyPunchAdminDto);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)
@@ -367,10 +384,10 @@ namespace TpDotNetCore.Controllers
         /// <returns>Unexpected error</returns>
         
         [HttpPost, Route("punchSetStatusAdmin")]
-        public async System.Threading.Tasks.Task<IActionResult> PunchSetStatusAdmin([FromBody]SetStatusAdminParams setStatusAdminParams)
+        public async System.Threading.Tasks.Task<IActionResult> PunchSetStatusAdmin([FromBody]SetStatusAdminDto setStatusAdminDto)
         {    
             if(!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _implementation.PunchSetStatusAdminAsync(setStatusAdminParams);
+            var result = await _implementation.PunchSetStatusAdminAsync(setStatusAdminDto);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)
@@ -1341,14 +1358,14 @@ namespace TpDotNetCore.Controllers
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
-    public partial class ModifyPunchVm : System.ComponentModel.INotifyPropertyChanged
+    public partial class ModifyPunchDto : System.ComponentModel.INotifyPropertyChanged
     {
-        private double? _punchid;
+        private string _punchid;
         private double? _timedec;
         private bool? _direction;
     
         [Newtonsoft.Json.JsonProperty("punchid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double? Punchid
+        public string Punchid
         {
             get { return _punchid; }
             set 
@@ -1396,9 +1413,9 @@ namespace TpDotNetCore.Controllers
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
         
-        public static ModifyPunchVm FromJson(string data)
+        public static ModifyPunchDto FromJson(string data)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<ModifyPunchVm>(data);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ModifyPunchDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
@@ -1410,15 +1427,54 @@ namespace TpDotNetCore.Controllers
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
-    public partial class ModifyPunchAdminParams : System.ComponentModel.INotifyPropertyChanged
+    public partial class DeletePunchDto : System.ComponentModel.INotifyPropertyChanged
     {
-        private double? _punchid;
+        private string _punchid;
+    
+        [Newtonsoft.Json.JsonProperty("punchid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Punchid
+        {
+            get { return _punchid; }
+            set 
+            {
+                if (_punchid != value)
+                {
+                    _punchid = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static DeletePunchDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<DeletePunchDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class ModifyPunchAdminDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private string _punchid;
         private string _userid;
         private double? _timedec;
         private bool? _direction;
     
         [Newtonsoft.Json.JsonProperty("punchid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double? Punchid
+        public string Punchid
         {
             get { return _punchid; }
             set 
@@ -1480,9 +1536,9 @@ namespace TpDotNetCore.Controllers
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
         
-        public static ModifyPunchAdminParams FromJson(string data)
+        public static ModifyPunchAdminDto FromJson(string data)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<ModifyPunchAdminParams>(data);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ModifyPunchAdminDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
@@ -1494,7 +1550,7 @@ namespace TpDotNetCore.Controllers
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
-    public partial class SetStatusAdminParams : System.ComponentModel.INotifyPropertyChanged
+    public partial class SetStatusAdminDto : System.ComponentModel.INotifyPropertyChanged
     {
         private string _userid;
         private string _status;
@@ -1534,9 +1590,9 @@ namespace TpDotNetCore.Controllers
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
         
-        public static SetStatusAdminParams FromJson(string data)
+        public static SetStatusAdminDto FromJson(string data)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<SetStatusAdminParams>(data);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<SetStatusAdminDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
@@ -2031,7 +2087,7 @@ namespace TpDotNetCore.Controllers
     public partial class OpResult : System.ComponentModel.INotifyPropertyChanged
     {
         private bool? _success;
-        private object _result;
+        private string _result;
     
         /// <summary>True wenn die Operation erfolgreich war</summary>
         [Newtonsoft.Json.JsonProperty("success", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -2050,7 +2106,7 @@ namespace TpDotNetCore.Controllers
     
         /// <summary>Eine Text-Meldung</summary>
         [Newtonsoft.Json.JsonProperty("result", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Result
+        public string Result
         {
             get { return _result; }
             set 

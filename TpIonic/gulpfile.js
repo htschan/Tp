@@ -56,22 +56,11 @@ gulp.task('buildbrowser', shell.task(['ionic cordova build browser']));
 /**
  * Upload distribution to timepuncher.ch.
  */
-gulp.task('upload_obsolete', (cb) => {
-  return gulp
-    .src(['www/**/*.*', '!**/node_modules/**'])
-    .pipe(gulpSSHTimepuncher.dest('/usr/share/nginx/tpionic/'))
-});
-
-/**
- * Upload distribution to timepuncher.ch.
- */
 gulp.task('upload', function () {
   var conn = ftp.create({
     host: config.host,
-    user: 'anonymous',
-    password: 'anonymous',
-    // user: config.username,
-    // password: '1jEvJC8vbm1IW1LV4Glz',
+    user: config.user,
+    password: config.password,
     parallel: 10,
     log: gutil.log,
     secure: true

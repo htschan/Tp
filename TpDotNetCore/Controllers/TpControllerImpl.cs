@@ -12,6 +12,7 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.Punches.Repositories;
+using TpDotNetCore.Domain.Punches;
 
 namespace TpDotNetCore.Controllers
 {
@@ -27,6 +28,7 @@ namespace TpDotNetCore.Controllers
         private readonly IWeekPunchRepository _weekPunchRepository;
         private readonly IDayPunchRepository _dayPunchRepository;
         private readonly IPunchRepository _punchRepository;
+        private readonly IPunchService _punchService;
 
         public TpControllerImpl(IMapper mapper,
                 AppUser appUser,
@@ -37,7 +39,8 @@ namespace TpDotNetCore.Controllers
                 IYearPunchRepository yearPunchRepository,
                 IMonthPunchRepository monthPunchRepository,
                 IWeekPunchRepository weekPunchRepository,
-                IDayPunchRepository dayPunchRepository)
+                IDayPunchRepository dayPunchRepository,
+                IPunchService punchService)
         {
             _mapper = mapper;
             _appUser = appUser;
@@ -49,6 +52,7 @@ namespace TpDotNetCore.Controllers
             _weekPunchRepository = weekPunchRepository;
             _dayPunchRepository = dayPunchRepository;
             _punchRepository = punchRepository;
+            _punchService = punchService;
 
             new JsonSerializerSettings
             {
@@ -223,17 +227,48 @@ namespace TpDotNetCore.Controllers
             return Punch(false);
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PunchModifyAsync(ModifyPunchVm modifyPunchViewModel)
+        public Task<SwaggerResponse<PunchResponse>> PunchModifyAsync(ModifyPunchDto modifyPunchDto)
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var punchIdentity = _mapper.Map<Punch>(modifyPunchDto);
+
+                _punchService.UpdatePunch(punchIdentity, userId);
+                return Task.FromResult(new SwaggerResponse<PunchResponse>(StatusCodes.Status200OK, headers, new PunchResponse { Status = new OpResult { Success = true } }));
+            }
+            catch (Exception exception)
+            {
+                var response = new PunchResponse { Status = new OpResult { Success = false, Result = $"Failed to delete punch. Exception: {exception.Message}" } };
+                return HandleException<PunchResponse>(exception, headers, response);
+            }
+        }
+
+        public Task<SwaggerResponse<OpResult>> PunchDeleteAsync(DeletePunchDto deletePunchDto)
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var punchIdentity = _mapper.Map<Punch>(deletePunchDto);
+
+                _punchService.DeletePunch(punchIdentity, userId);
+                return Task.FromResult(new SwaggerResponse<OpResult>(StatusCodes.Status200OK, headers, new OpResult { Success = true }));
+            }
+            catch (Exception exception)
+            {
+                var response = new OpResult { Success = false, Result = $"Failed to delete punch. Exception: {exception.Message}" };
+                return HandleException<OpResult>(exception, headers, response);
+            }
+        }
+
+        public Task<SwaggerResponse<PunchResponse>> PunchModifyAdminAsync(ModifyPunchAdminDto modifyPunchAdminDto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PunchModifyAdminAsync(ModifyPunchAdminParams modifyPunchAdminParams)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(SetStatusAdminParams setStatusAdminParams)
+        public Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(SetStatusAdminDto setStatusAdminDto)
         {
             throw new NotImplementedException();
         }
@@ -252,7 +287,7 @@ namespace TpDotNetCore.Controllers
             }
             catch (Exception exception)
             {
-                var response = new DayResponse { Status = new OpResult { Success = false, Result = "Failed to punch and get Today's punches" } };
+                var response = new DayResponse { Status = new OpResult { Success = false, Result = $"Failed to punch and get Today's punches. Exception: {exception.Message}" } };
                 return HandleException<DayResponse>(exception, headers, response);
             }
         }

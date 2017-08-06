@@ -23,6 +23,7 @@ using TpDotNetCore.Controllers;
 using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Domain.Punches.Repositories;
+using TpDotNetCore.Domain.Punches;
 
 namespace TpDotNetCore
 {
@@ -72,7 +73,7 @@ namespace TpDotNetCore
             services.AddEntityFrameworkSqlite().AddDbContext<TpContext>();
             services.AddTransient<DbInitializer>();
 
-            services.AddSingleton<IJwtFactory, JwtFactory>();
+            services.AddTransient<IJwtFactory, JwtFactory>();
             services.AddSingleton<IHolidayService, HolidayService>();
             services.AddSingleton<ITimeService, TimeService>();
             services.AddTransient<ITpController, TpControllerImpl>();
@@ -83,6 +84,7 @@ namespace TpDotNetCore
             services.AddTransient<IWeekPunchRepository, WeekPunchRepository>();
             services.AddTransient<IMonthPunchRepository, MonthPunchRepository>();
             services.AddTransient<IYearPunchRepository, YearPunchRepository>();
+            services.AddTransient<IPunchService, PunchService>();
 
             // jwt wire up
             // Get options from app settings
