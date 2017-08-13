@@ -10,7 +10,6 @@ import { TpClient, API_BASE_URL } from '../services/api.g';
 import { AuthService } from '../services/auth/auth.service';
 import { PunchService } from '../services/puncher/punch.service';
 import { Http, XHRBackend, RequestOptions } from '@angular/http';
-import { Device } from '@ionic-native/device';
 import { httpFactory } from '../http/http.factory';
 import { MyApp } from './app.component';
 import { AboutPage } from '../pages/about/about';
@@ -85,8 +84,7 @@ import { RegisterPage } from '../pages/register/register';
     },
     PunchService,
     StatusBar,
-    SplashScreen,
-    Device
+    SplashScreen
   ]
 })
 export class AppModule { }

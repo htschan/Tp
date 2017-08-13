@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Events, NavController } from 'ionic-angular';
-import { Device } from '@ionic-native/device';
 
 @Component({
   selector: 'page-about',
@@ -9,7 +8,7 @@ import { Device } from '@ionic-native/device';
 export class AboutPage {
   title: String = ' ';
 
-  constructor(public events: Events, public navCtrl: NavController, public device: Device) {
+  constructor(public events: Events, public navCtrl: NavController) {
     events.subscribe('title:updated', (data) => {
       if (data.menuState) {
         this.title = "Projects";
