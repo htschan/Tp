@@ -148,36 +148,6 @@ namespace TpDotNetCore
 
             dbInitializer.Initialize();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true
-                });
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
-
-            app.UseExceptionHandler(
-              builder =>
-              {
-                  builder.Run(
-                    async context =>
-                  {
-                      context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                      context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-
-                      var error = context.Features.Get<IExceptionHandlerFeature>();
-                      if (error != null)
-                      {
-                          context.Response.AddApplicationError(error.Error.Message);
-                          await context.Response.WriteAsync(error.Error.Message).ConfigureAwait(false);
-                      }
-                  });
-              });
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -194,12 +164,15 @@ namespace TpDotNetCore
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             };
+
             app.UseJwtBearerAuthentication(new JwtBearerOptions
             {
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
                 TokenValidationParameters = tokenValidationParameters
             });
+            
+            app.UseMvc();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -209,19 +182,6 @@ namespace TpDotNetCore
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
-
-            app.UseStaticFiles();
-
-            app.UseMvc(routes =>
-                {
-                    routes.MapRoute(
-                        name: "default",
-                        template: "{controller=Home}/{action=Index}/{id?}");
-
-                    routes.MapSpaFallbackRoute(
-                        name: "spa-fallback",
-                        defaults: new { controller = "Home", action = "Index" });
-                });
         }
     }
 }
