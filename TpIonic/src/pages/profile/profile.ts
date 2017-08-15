@@ -3,6 +3,7 @@
 import { Events } from 'ionic-angular';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
+import { SampleService } from '../../services/sample.service';
 
 @Component({
   selector: "page-profile",
@@ -15,7 +16,7 @@ export class ProfilePage implements OnInit {
 
   // We need to inject AuthService so that we can
   // use it in the view
-  constructor(public events: Events, public auth: AuthService) {
+  constructor(public events: Events, public auth: AuthService, public sampleService: SampleService) {
     events.subscribe('title:updated', (data) => {
       if (data.menuState) {
         this.title = "Projects";

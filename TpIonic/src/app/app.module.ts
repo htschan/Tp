@@ -9,6 +9,7 @@ import { TpClientConfig } from '../timepuncher-client-config';
 import { TpClient, API_BASE_URL } from '../services/api.g';
 import { AuthService } from '../services/auth/auth.service';
 import { PunchService } from '../services/puncher/punch.service';
+import { SampleService } from '../services/sample.service';
 import { Http, XHRBackend, RequestOptions } from '@angular/http';
 import { httpFactory } from '../http/http.factory';
 import { MyApp } from './app.component';
@@ -83,6 +84,7 @@ import { RegisterPage } from '../pages/register/register';
       deps: [XHRBackend, RequestOptions, API_BASE_URL]
     },
     PunchService,
+    SampleService,
     StatusBar,
     SplashScreen
   ]

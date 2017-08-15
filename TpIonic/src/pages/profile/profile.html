@@ -39,4 +39,10 @@
 
   </ion-card>
 
+  <ion-card>
+    <button ion-button (click)="sampleService.getSample()">Get Sample</button>
+    <ion-card-content>
+      {{sampleService.sampleData | json}}
+    </ion-card-content>
+  </ion-card>
 </ion-content>
