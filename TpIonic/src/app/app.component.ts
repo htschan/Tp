@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Nav, Platform, MenuController, Events } from 'ionic-angular';
-import { SplashScreen } from '@ionic-native/splash-screen';
 import { Storage } from '@ionic/storage';
 import { AuthService } from '../services/auth/auth.service';
 
@@ -57,7 +56,6 @@ export class MyApp implements OnInit {
     public events: Events,
     public platform: Platform,
     public menu: MenuController,
-    public splashScreen: SplashScreen,
     public storage: Storage,
     private auth: AuthService) {
 
@@ -148,7 +146,7 @@ export class MyApp implements OnInit {
   platformReady() {
     // Call any initial plugins when ready
     this.platform.ready().then(() => {
-      this.splashScreen.hide();
+      // this.splashScreen.hide();
     });
   }
 
