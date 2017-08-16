@@ -3,8 +3,6 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
 import { TpClientConfig } from '../timepuncher-client-config';
 import { TpClient, API_BASE_URL } from '../services/api.g';
 import { AuthService } from '../services/auth/auth.service';
@@ -84,9 +82,7 @@ import { RegisterPage } from '../pages/register/register';
       deps: [XHRBackend, RequestOptions, API_BASE_URL]
     },
     PunchService,
-    SampleService,
-    StatusBar,
-    SplashScreen
+    SampleService
   ]
 })
 export class AppModule { }
