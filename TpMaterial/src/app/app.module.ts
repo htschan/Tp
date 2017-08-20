@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { ApplicationRef, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -41,13 +41,36 @@ import {
   StyleModule
 } from '@angular/material';
 import { CdkTableModule } from '@angular/cdk';
+import { httpFactory } from './http/http.factory';
+import { IonicStorageModule } from '@ionic/storage';
+import { TpClientConfig } from './timepuncher-client-config';
 import { AppComponent } from './app.component';
 import { DialogComponent } from './dialog/dialog.component';
+import { AlertDirective } from './directives/alert/alert.directive';
+import { AppRoutingModule } from './app.routing';
+import { AuthGuard } from './http/auth.guard';
+import { TpClient, API_BASE_URL } from './services/api.g';
+import { AuthService } from './services/auth/auth.service';
+import { AlertService } from './services/alert/alert.service';
+import { MainRoutingModule } from './pages/main.rounting.module';
+import { MainComponent } from './pages/main/main.component';
+import { LoginComponent } from './pages/login/login.component';
+import { RegistrationComponent } from './pages/registration/registration.component';
+import { OverviewComponent } from './pages/overview/overview.component';
+import { ProfileComponent } from './pages/profile/profile.component';
+import { LogoutComponent } from './pages/logout/logout.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DialogComponent,
+    LoginComponent,
+    RegistrationComponent,
+    AlertDirective,
+    MainComponent,
+    OverviewComponent,
+    ProfileComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserModule,
@@ -57,9 +80,29 @@ import { DialogComponent } from './dialog/dialog.component';
     FlexLayoutModule,
     BrowserAnimationsModule,
     MdButtonModule,
-    MdCheckboxModule
+    MdCheckboxModule,
+    MainRoutingModule,
+    AppRoutingModule,
+    IonicStorageModule.forRoot({
+      name: '__tpmaterial',
+      driverOrder: ['indexeddb', 'sqlite', 'websql']
+    })
   ],
-  providers: [],
+  providers: [
+    AuthGuard,
+    TpClient,
+    AlertService,
+    AuthService,
+    {
+      provide: API_BASE_URL,
+      useValue: TpClientConfig.baserurl
+    },
+    {
+      provide: Http,
+      useFactory: httpFactory,
+      deps: [XHRBackend, RequestOptions, API_BASE_URL]
+    },
+  ],
   entryComponents: [DialogComponent],
   bootstrap: [AppComponent],
   exports: [

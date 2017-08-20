@@ -1,52 +1,12 @@
 <div fxLayout="column" fxFlex [class.dark-theme]="isDarkTheme">
-
-  <md-toolbar color="primary">
-    <span>Timepuncher</span>
-
-    <!-- Filler that pushes the menu button to the end of the toolbar -->
-    <span fxFlex></span>
-
-    <button md-icon-button [mdMenuTriggerFor]="themeMenu">
-          <md-icon>more_vert</md-icon>
-        </button>
-
-  </md-toolbar>
-
-
-
-  <md-sidenav-container fxflex>
-    <md-sidenav>
-      <!-- sidenav content -->
-      <md-nav-list>
-        <a md-list-item routerLinkActive>Settings</a>
-        <a md-list-item routerLinkActive>Help</a>
-      </md-nav-list>
-
-    </md-sidenav>
-    <div>
-      <div style="text-align:center">
+  <div>
+    <div class="jumbotron">
+      <div class="container">
+        <div class="col-sm-8 col-sm-offset-2">
+          <alert></alert>
+          <router-outlet></router-outlet>
+        </div>
       </div>
-      <h2>Here are some links to help you start: </h2>
-      <ul>
-        <li>
-          <h2><a target="_blank" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-        </li>
-        <li>
-          <h2><a target="_blank" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-        </li>
-        <li>
-          <h2><a target="_blank" href="https://blog.angular.io//">Angular blog</a></h2>
-        </li>
-      </ul>
     </div>
-  </md-sidenav-container>
-
-  <md-menu #themeMenu x-position="before">
-    <button md-menu-item (click)="isDarkTheme = !isDarkTheme">Toggle Theme</button>
-  </md-menu>
-
-  <button md-fab (click)="openAdminDialog()" class="fab-bottom-right">
-      <md-icon>add</md-icon>
-    </button>
-
+  </div>
 </div>

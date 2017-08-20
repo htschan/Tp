@@ -14,6 +14,12 @@ gulp.task('watch', ['transpile'], () => {
 
 gulp.task('default', ['watch']);
 
+gulp.task('copyToTpMaterial', (cb) => {
+	gulp
+	.src('../TpIonic/src/services/api.g.ts')
+	.pipe(gulp.dest('../TpMaterial/src/app/services', {overwrite: true}))
+});
+
 gulp.task('generate', (cb) => {
 	runExe('..\\..\\NSwag\\src\\NSwag.Console\\bin\\Debug\\net46\\NSwag.exe run swagger.nswag', (err, stdout, stderr) =>{
 		console.log(stdout);
@@ -33,5 +39,5 @@ gulp.task('clean', (cb) => {
 });
 
 gulp.task("build", function (callback) {
-  runSequence('clean', 'swagger', 'generate', callback);
+  runSequence('clean', 'swagger', 'generate', 'copyToTpMaterial', callback);
 });
