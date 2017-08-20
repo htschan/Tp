@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { AlertService} from '../../services/alert/alert.service';
+import { AlertService } from '../../services/alert/alert.service';
 import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
@@ -9,10 +9,11 @@ import { AuthService } from '../../services/auth/auth.service';
     selector: 'app-login',
     templateUrl: 'login.component.html',
     styleUrls: ['./login.component.css']
-  })
+})
 
 export class LoginComponent implements OnInit {
-    model: any = {};
+    isDarkTheme = false;
+    model: any = { username: 'hts@koch-it.ch' };
     loading = false;
     returnUrl: string;
 
@@ -34,12 +35,12 @@ export class LoginComponent implements OnInit {
         this.loading = true;
         this.authenticationService.login(this.model.username, this.model.password)
             .subscribe(
-                data => {
-                    this.router.navigate([this.returnUrl]);
-                },
-                error => {
-                    this.alertService.error(error);
-                    this.loading = false;
-                });
+            data => {
+                this.router.navigate([this.returnUrl]);
+            },
+            error => {
+                this.alertService.error(error);
+                this.loading = false;
+            });
     }
 }

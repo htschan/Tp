@@ -1,39 +1,33 @@
 <div fxLayout="column" fxFlex [class.dark-theme]="isDarkTheme">
-    
-      <md-toolbar color="primary">
-        <span>Timepuncher</span>
-    
-        <!-- Filler that pushes the menu button to the end of the toolbar -->
-        <span fxFlex></span>
-    
-        <button md-icon-button [mdMenuTriggerFor]="themeMenu">
+
+  <md-toolbar color="primary">
+    <span>Timepuncher</span>
+
+    <!-- Filler that pushes the menu button to the end of the toolbar -->
+    <span fxFlex></span>
+
+    <button md-icon-button [mdMenuTriggerFor]="themeMenu">
                   <md-icon>more_vert</md-icon>
                 </button>
-    
-      </md-toolbar>
-    
-      <md-sidenav-container fxflex>
-        <md-sidenav>
-          <!-- sidenav content -->
-          <md-nav-list>
-            <a md-list-item routerLinkActive>Settings</a>
-            <a md-list-item routerLinkActive>Help</a>
-          </md-nav-list>
-        </md-sidenav>
-        <div>
-          <div style="text-align:center">
-            This is the home.component
-          </div>
-          <nav>
-            <a routerLink="/main/profile" routerLinkActive="active">Profile</a>
-            <a routerLink="/logout" routerLinkActive="active">Logout</a>
-          </nav>
-          <router-outlet></router-outlet>
-        </div>
-      </md-sidenav-container>
-    
-      <md-menu #themeMenu x-position="before">
-        <button md-menu-item (click)="isDarkTheme = !isDarkTheme">Toggle Theme</button>
-      </md-menu>
-    
+
+  </md-toolbar>
+
+  <md-sidenav-container fxflex>
+    <md-sidenav mode="side" opened="true">
+      <!-- sidenav content -->
+      <md-nav-list>
+        <a md-list-item routerLinkActive routerLink="/main/overview">Overview</a>
+        <a md-list-item routerLinkActive routerLink="/main/profile">Profile</a>
+        <a md-list-item routerLinkActive routerLink="/main/logout">Logout</a>
+      </md-nav-list>
+    </md-sidenav>
+    <div class="my-content">
+      <router-outlet></router-outlet>
     </div>
+  </md-sidenav-container>
+
+  <md-menu #themeMenu x-position="before">
+    <button md-menu-item (click)="isDarkTheme = !isDarkTheme">Toggle Theme</button>
+  </md-menu>
+
+</div>

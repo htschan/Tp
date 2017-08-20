@@ -23,15 +23,20 @@ export class AuthService {
     constructor(private tpClient: TpClient, zone: NgZone/*, public events: Events*/, private http: Http, private storage: Storage) {
         this.zoneImpl = zone;
         storage.ready()
-            // Check if there is a profile saved in local storage
+            // Check if there is a profile saved in storage
             .then(() => this.storage.get('profile').then(profile => {
                 this.userProfile = JSON.parse(profile);
             }));
-        this.idToken = localStorage.getItem('id_token');
+        storage.get('id_token').then(token => this.idToken = token);
     }
 
     public getAuthenticated(): Promise<boolean> {
-        return Promise.resolve(tokenNotExpired('id_token'));
+        return this.storage.get('id_token')
+            .then(token => {
+                return token === null ? Promise.resolve(false)
+                    : Promise.resolve(tokenNotExpired('id_token', token));
+            })
+            .catch(() => { return Promise.resolve(false); });
     }
 
     public getMyProfile(): Observable<any> {
@@ -56,7 +61,7 @@ export class AuthService {
             .do(data => {
                 if (data instanceof AuthResponse && data.status.success) {
                     console.log('Data: ' + data);
-                    localStorage.setItem('id_token', data.token);
+                    this.storage.set('id_token', data.token);
                     this.idToken = data.token;
                     // this.events.publish('user:login');
                     // return this.getMyProfile();
@@ -84,7 +89,7 @@ export class AuthService {
 
     public logout() {
         this.storage.remove('profile');
-        localStorage.removeItem('id_token');
+        this.storage.remove('id_token');
         this.idToken = null;
         this.storage.remove('refresh_token');
         this.zoneImpl.run(() => this.userProfile = null);
@@ -155,7 +160,7 @@ export class AuthService {
 
     public getNewJwt() {
         // Get a new JWT from Auth0 using the refresh token saved
-        // in local storage
+        // in storage
         this.storage.get('refresh_token').then(token => {
             console.log("refresh");
         }).catch(error => {
