@@ -9,7 +9,8 @@ import 'rxjs/add/operator/filter';
 })
 export class AppComponent {
   title = 'app';
-
+  isDarkTheme = false;
+  
   constructor() {
   }
 }
