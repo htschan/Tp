@@ -5,6 +5,7 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { Storage } from '@ionic/storage';
 import {
   MdAutocompleteModule,
   MdButtonModule,
@@ -52,6 +53,7 @@ import { AuthGuard } from './http/auth.guard';
 import { TpClient, API_BASE_URL } from './services/api.g';
 import { AuthService } from './services/auth/auth.service';
 import { AlertService } from './services/alert/alert.service';
+import { PunchService } from './services/puncher/punch.service';
 import { MainRoutingModule } from './pages/main.rounting.module';
 import { MainComponent } from './pages/main/main.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -92,6 +94,7 @@ import { LogoutComponent } from './pages/logout/logout.component';
     AuthGuard,
     TpClient,
     AlertService,
+    PunchService,
     AuthService,
     {
       provide: API_BASE_URL,
@@ -100,7 +103,7 @@ import { LogoutComponent } from './pages/logout/logout.component';
     {
       provide: Http,
       useFactory: httpFactory,
-      deps: [XHRBackend, RequestOptions, API_BASE_URL]
+      deps: [XHRBackend, RequestOptions, API_BASE_URL, Storage]
     },
   ],
   entryComponents: [DialogComponent],

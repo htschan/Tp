@@ -27,11 +27,16 @@ export class AuthService {
             .then(() => this.storage.get('profile').then(profile => {
                 this.userProfile = JSON.parse(profile);
             }));
-        this.idToken = localStorage.getItem('id_token');
+        this.getToken().then(token => this.idToken = token);
     }
 
     public getAuthenticated(): Promise<boolean> {
-        return Promise.resolve(tokenNotExpired('id_token'));
+        return this.getToken()
+            .then(token => {
+                return token === null ? Promise.resolve(false)
+                    : Promise.resolve(tokenNotExpired('id_token', token));
+            })
+            .catch(() => { return Promise.resolve(false); });
     }
 
     public getMyProfile(): Observable<any> {
@@ -48,6 +53,10 @@ export class AuthService {
         return tokenNotExpired('id_token');
     }
 
+    public getToken(): Promise<string> {
+        return this.storage.get('id_token');
+    }
+
     public login(username: string, password: string): Observable<any> {
         if (username === null || password === null) {
             return Observable.throw("Bad credentials");
@@ -56,7 +65,7 @@ export class AuthService {
             .do(data => {
                 if (data instanceof AuthResponse && data.status.success) {
                     console.log('Data: ' + data);
-                    localStorage.setItem('id_token', data.token);
+                    this.storage.set('id_token', data.token);                    
                     this.idToken = data.token;
                     this.events.publish('user:login');
                     // return this.getMyProfile();
@@ -84,7 +93,7 @@ export class AuthService {
 
     public logout() {
         this.storage.remove('profile');
-        localStorage.removeItem('id_token');
+        this.storage.remove('id_token');
         this.idToken = null;
         this.storage.remove('refresh_token');
         this.zoneImpl.run(() => this.userProfile = null);

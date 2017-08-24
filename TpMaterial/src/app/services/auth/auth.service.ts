@@ -27,11 +27,11 @@ export class AuthService {
             .then(() => this.storage.get('profile').then(profile => {
                 this.userProfile = JSON.parse(profile);
             }));
-        storage.get('id_token').then(token => this.idToken = token);
+        this.getToken().then(token => this.idToken = token);
     }
 
     public getAuthenticated(): Promise<boolean> {
-        return this.storage.get('id_token')
+        return this.getToken()
             .then(token => {
                 return token === null ? Promise.resolve(false)
                     : Promise.resolve(tokenNotExpired('id_token', token));
@@ -51,6 +51,10 @@ export class AuthService {
 
     public authenticated(): boolean {
         return tokenNotExpired('id_token');
+    }
+
+    public getToken(): Promise<string> {
+        return this.storage.get('id_token');
     }
 
     public login(username: string, password: string): Observable<any> {
