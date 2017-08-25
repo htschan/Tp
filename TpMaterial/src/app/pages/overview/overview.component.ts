@@ -6,7 +6,7 @@ import { MdTabChangeEvent } from '@angular/material';
 import { PunchService, PunchDayVm, PunchVm, EditResultEnum } from '../../services/puncher/punch.service';
 import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult } from '../../services/api.g';
 
-import { DialogComponent } from '../../dialog/dialog.component';
+import { PunchEditComponent } from '../../dialog/punchedit.component';
 
 @Component({
   selector: 'app-overview',
@@ -18,20 +18,6 @@ export class OverviewComponent implements OnInit {
   punchDayVm: PunchDayVm;
   weekpunches: WeekPunchesDto;
   monthpunches: MonthPunchesDto;
-
-  users = [
-    {
-      name: 'Lia Lugo',
-      avatar: 'svg-11',
-      details: 'I love cheese, especially airedale queso. Cheese and biscuits halloumi cauliflower cheese cottage ' +
-      'cheese swiss boursin fondue caerphilly. Cow port-salut camembert de normandie macaroni cheese feta ' +
-      'who moved my cheese babybel boursin. Red leicester roquefort boursin squirty cheese jarlsberg blue ' +
-      'castello caerphilly chalk and cheese. Lancashire.',
-      isAdmin: true,
-      isCool: false
-    }
-  ]
-  selectedUser = this.users[0];
 
   constructor(iconRegistry: MdIconRegistry, sanitizer: DomSanitizer, private dialog: MdDialog, private punchService: PunchService) { }
 
@@ -53,53 +39,51 @@ export class OverviewComponent implements OnInit {
       });
   }
 
-
-
-  openAdminDialog() {
-    this.dialog.open(DialogComponent).afterClosed()
-      .filter(result => !!result)
-      .subscribe(user => {
-        this.users.push(user);
-        this.selectedUser = user;
-      });
-  }
   addPunch() {
-    // let timeEditModal = this.modalCtrl.create(PunchEditModal, { punchVm: new PunchVm(new PunchDto()), title: "Neue Stempelung" });
-    // timeEditModal.onDidDismiss(editPunchVm => {
-    //   switch (editPunchVm.editResult) {
-    //     case EditResultEnum.Save:
-    //       // this.punchService.updatePunch(editPunchVm).subscribe(response => {
-    //       //   this.punchService.updatePunch(editPunchVm);
-    //       // });
-    //       break;
-    //   }
-    // })
-    // timeEditModal.present();
+    this.dialog.open(PunchEditComponent, {
+      height: '300px', width: '400px', data: {
+        punchVm: new PunchVm(new PunchDto()), title: "Neue Stempelung"
+      }
+    }).afterClosed()
+      .filter(result => !!result)
+      .subscribe((editPunchVm: PunchVm) => {
+        switch (editPunchVm.editResult) {
+          case EditResultEnum.Save:
+            // this.punchService.updatePunch(editPunchVm).subscribe(response => {
+            //   this.punchService.updatePunch(editPunchVm);
+            // });
+            break;
+        }
+      });
   }
 
   editPunch(punchVm: PunchVm) {
-    // let timeEditModal = this.modalCtrl.create(PunchEditModal, { punchVm: punchVm, title: "Stempelung editieren" });
-    // timeEditModal.onDidDismiss((editPunchVm: PunchVm) => {
-    //   switch (editPunchVm.editResult) {
-    //     case EditResultEnum.Delete:
-    //       this.punchService.deletePunch(editPunchVm).subscribe((response: OpResult) => {
-    //         if (response.success)
-    //           this.getToday();
-    //         else
-    //           this.handleError(response.result);
-    //       });
-    //       break;
-    //     case EditResultEnum.Save:
-    //       this.punchService.updatePunch(editPunchVm).subscribe((response: OpResult) => {
-    //         if (response.success)
-    //           this.getToday();
-    //         else
-    //           this.handleError(response.result);
-    //       });
-    //       break;
-    //   }
-    // })
-    // timeEditModal.present();
+    this.dialog.open(PunchEditComponent, {
+      height: '300px', width: '500px', data: {
+        punchVm: punchVm, title: "Editieren Stempelung"
+      }
+    }).afterClosed()
+      .filter(result => !!result)
+      .subscribe((editPunchVm: PunchVm) => {
+        switch (editPunchVm.editResult) {
+          case EditResultEnum.Delete:
+            this.punchService.deletePunch(editPunchVm).subscribe((response: OpResult) => {
+              if (response.success)
+                this.getToday();
+              else
+                this.handleError(response.result);
+            });
+            break;
+          case EditResultEnum.Save:
+            this.punchService.updatePunch(editPunchVm).subscribe((response: OpResult) => {
+              if (response.success)
+                this.getToday();
+              else
+                this.handleError(response.result);
+            });
+            break;
+        }
+      });
   }
 
   tabChanged(event: MdTabChangeEvent) {
@@ -115,7 +99,7 @@ export class OverviewComponent implements OnInit {
         this.getMonth();
         break;
     }
-}
+  }
   getToday() {
     this.punchService.getToday().subscribe(response => {
       this.punchDayVm = response;

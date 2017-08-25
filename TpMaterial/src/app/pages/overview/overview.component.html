@@ -1,13 +1,14 @@
-<div>
-  <div>
-    <p style="display: inline">
-      <button md-raised-button large full color="danger" (click)="enter()">Kommen</button>
+<div fxFill>
+  <div fxLayout="row" fxLayoutAlign="space-around">
+    <span fxFlex="10%"></span>
+    <p fxFlex="40%" style="display: inline">
+      <button md-raised-button large full color="danger" (click)="enter()" class="bigbutton">Kommen</button>
     </p>
-    <p style="display: inline">
-      <button md-raised-button full large (click)="leave()">Gehen</button>
+    <p fxFlex="40%" style="display: inline">
+      <button md-raised-button full large (click)="leave()" class="bigbutton">Gehen</button>
     </p>
   </div>
-  <md-tab-group (selectChange)="tabChanged($event)">
+  <md-tab-group (selectChange)="tabChanged($event)" class="punchpane">
     <md-tab label="Heute" id="tab1">
       <md-grid-list cols="4" rowHeight="3:1">
         <md-grid-tile col-3>{{punchDayVm?.date | date:"fullDate"}}</md-grid-tile>

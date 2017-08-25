@@ -47,6 +47,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { TpClientConfig } from './timepuncher-client-config';
 import { AppComponent } from './app.component';
 import { DialogComponent } from './dialog/dialog.component';
+import { PunchEditComponent } from './dialog/punchedit.component';
 import { AlertDirective } from './directives/alert/alert.directive';
 import { AppRoutingModule } from './app.routing';
 import { AuthGuard } from './http/auth.guard';
@@ -66,6 +67,7 @@ import { LogoutComponent } from './pages/logout/logout.component';
   declarations: [
     AppComponent,
     DialogComponent,
+    PunchEditComponent,
     LoginComponent,
     RegistrationComponent,
     AlertDirective,
@@ -106,7 +108,7 @@ import { LogoutComponent } from './pages/logout/logout.component';
       deps: [XHRBackend, RequestOptions, API_BASE_URL, Storage]
     },
   ],
-  entryComponents: [DialogComponent],
+  entryComponents: [DialogComponent, PunchEditComponent],
   bootstrap: [AppComponent],
   exports: [
     MdAutocompleteModule,
