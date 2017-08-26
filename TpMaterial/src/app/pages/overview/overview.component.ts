@@ -40,9 +40,12 @@ export class OverviewComponent implements OnInit {
   }
 
   addPunch() {
+    let dto = new PunchDto();
+    dto.init({ time: new Date(), timedec: 0.0, direction: false, created: new Date(), punchid: "" });
+    let punchVm = new PunchVm(dto);
     this.dialog.open(PunchEditComponent, {
-      height: '300px', width: '400px', data: {
-        punchVm: new PunchVm(new PunchDto()), title: "Neue Stempelung"
+      height: '300px', width: '500px', data: {
+        punchVm: punchVm, title: "Neue Stempelung"
       }
     }).afterClosed()
       .filter(result => !!result)
@@ -60,7 +63,7 @@ export class OverviewComponent implements OnInit {
   editPunch(punchVm: PunchVm) {
     this.dialog.open(PunchEditComponent, {
       height: '300px', width: '500px', data: {
-        punchVm: punchVm, title: "Editieren Stempelung"
+        punchVm: punchVm, title: "Stempelung editieren"
       }
     }).afterClosed()
       .filter(result => !!result)
