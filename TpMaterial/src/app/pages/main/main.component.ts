@@ -1,5 +1,8 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ObservableMedia } from "@angular/flex-layout";
+import { Component, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
+import { ObservableMedia, MediaChange } from "@angular/flex-layout";
+import { MdSidenav } from '@angular/material';
+import { Observable } from "rxjs/Observable";
+import { Subscription } from "rxjs/Subscription";
 
 @Component({
   selector: 'app-main',
@@ -7,10 +10,41 @@ import { ObservableMedia } from "@angular/flex-layout";
   styleUrls: ['./main.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class MainComponent implements OnInit {
+export class MainComponent implements OnInit, OnDestroy {
+
+  @ViewChild("sidenav") sidenav: MdSidenav;
   isDarkTheme = false;
+  mediaInfo = "";
+  mediaSubscription: Subscription;
 
   constructor(public media: ObservableMedia) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.manageSidenav();
+    this.mediaSubscription = this.media.asObservable().subscribe((change: MediaChange) => this.manageSidenav(change));
+  }
+
+  ngOnDestroy(): void {
+    this.mediaSubscription.unsubscribe();
+  }
+
+  private manageSidenav(mediaChange?: MediaChange) {
+    if (mediaChange) {
+      this.mediaInfo = mediaChange.mediaQuery + ' mqAlias: ' + mediaChange.mqAlias;
+    }
+    if (this.media.isActive('(max-width: 599px)')) {
+      this.loadMobileContent();
+    } else
+      if (this.media.isActive('(min-width: 600px)')) {
+        this.loadDesktopContent();
+      }
+  }
+
+  private loadMobileContent() {
+    this.sidenav.close();
+  }
+
+  private loadDesktopContent() {
+    this.sidenav.open();
+  }
 }
