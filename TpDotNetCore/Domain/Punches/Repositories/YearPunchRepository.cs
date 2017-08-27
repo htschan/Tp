@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
@@ -43,7 +44,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
                 var dt = DateTime.Now;
-                var punches = _appDbContext.Punches
+                var groupedPunches = _appDbContext.Punches
                     .Where(p => p.User.Id == user.Id)
                     .Where(p => p.YearPunch.Year == dt.Year)
                     .OrderBy(p => p.MonthPunch.Month)
@@ -60,34 +61,20 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 yearchPunchVm.User = user.Id;
                 yearchPunchVm.Year = dt.Year;
                 yearchPunchVm.Punches = new List<MonthPunchesDto>();
-                foreach (var x in punches)
+                foreach (var groupPunch in groupedPunches)
                 {
                     var monthPunchDto = new MonthPunchesDto();
                     yearchPunchVm.Punches.Add(monthPunchDto);
                     monthPunchDto.User = user.Id;
-                    monthPunchDto.Month = x.Month;
+                    monthPunchDto.Month = groupPunch.Month;
                     monthPunchDto.Year = dt.Year;
                     monthPunchDto.Punches = new List<DayPunchesDto>();
 
-                    foreach (var dayPunches in x.Groups)
+                    foreach (var dayPunches in groupPunch.Groups)
                     {
                         var dayPunch = new DayPunchesDto();
+                        dayPunch.GetRowedDayPunches(dayPunches.OrderBy(dp => dp.TimeDec).ToArray());
                         monthPunchDto.Punches.Add(dayPunch);
-                        dayPunch.Punches = new List<PunchDto>();
-                        foreach (var punch in dayPunches.OrderBy(p => p.PunchTime))
-                        {
-                            Console.WriteLine(punch.DayPunch);
-                            var p1 = new PunchDto
-                            {
-                                Created = punch.Created,
-                                Direction = punch.Direction,
-                                Punchid = punch.Id,
-                                Time = punch.PunchTime,
-                                Timedec = (double) punch.TimeDec,
-                                Updated = punch.Updated
-                            };
-                            dayPunch.Punches.Add(p1);
-                        }
                     }
                 }
                 return response;

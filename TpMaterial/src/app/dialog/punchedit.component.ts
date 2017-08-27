@@ -8,7 +8,7 @@ import { PunchVm, EditResultEnum } from "../services/puncher/punch.service";
 export class PunchEditComponent {
   punchTime: string;
   time: string;
-  isDarkTheme = false;
+  isDarkTheme = true;
   
   constructor(public dialogRef: MdDialogRef<PunchEditComponent>, @Inject(MD_DIALOG_DATA) public dlgData: any) {
     this.punchTime = this.dlgData.punchVm.time.toLocaleTimeString();

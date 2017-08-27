@@ -2199,7 +2199,7 @@ export class DayPunchesDto implements IDayPunchesDto {
     month?: number | undefined;
     /** The year expressed as 1 to 9999 */
     year?: number | undefined;
-    punches?: PunchDto[] | undefined;
+    punches?: PunchRowDto[] | undefined;
     daytotal?: number | undefined;
 
     constructor(data?: IDayPunchesDto) {
@@ -2220,7 +2220,7 @@ export class DayPunchesDto implements IDayPunchesDto {
             if (data["punches"] && data["punches"].constructor === Array) {
                 this.punches = [];
                 for (let item of data["punches"])
-                    this.punches.push(PunchDto.fromJS(item));
+                    this.punches.push(PunchRowDto.fromJS(item));
             }
             this.daytotal = data["daytotal"];
         }
@@ -2257,8 +2257,53 @@ export interface IDayPunchesDto {
     month?: number | undefined;
     /** The year expressed as 1 to 9999 */
     year?: number | undefined;
-    punches?: PunchDto[] | undefined;
+    punches?: PunchRowDto[] | undefined;
     daytotal?: number | undefined;
+}
+
+export class PunchRowDto implements IPunchRowDto {
+    enter?: PunchDto | undefined;
+    leave?: PunchDto | undefined;
+    /** Time between enter and leav */
+    rowTotal?: number | undefined;
+
+    constructor(data?: IPunchRowDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.enter = data["enter"] ? PunchDto.fromJS(data["enter"]) : <any>undefined;
+            this.leave = data["leave"] ? PunchDto.fromJS(data["leave"]) : <any>undefined;
+            this.rowTotal = data["rowTotal"];
+        }
+    }
+
+    static fromJS(data: any): PunchRowDto {
+        let result = new PunchRowDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["enter"] = this.enter ? this.enter.toJSON() : <any>undefined;
+        data["leave"] = this.leave ? this.leave.toJSON() : <any>undefined;
+        data["rowTotal"] = this.rowTotal;
+        return data; 
+    }
+}
+
+export interface IPunchRowDto {
+    enter?: PunchDto | undefined;
+    leave?: PunchDto | undefined;
+    /** Time between enter and leav */
+    rowTotal?: number | undefined;
 }
 
 export class PunchDto implements IPunchDto {

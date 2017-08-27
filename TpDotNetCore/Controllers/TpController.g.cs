@@ -1855,7 +1855,7 @@ namespace TpDotNetCore.Controllers
         private int? _day;
         private int? _month;
         private int? _year;
-        private System.Collections.Generic.List<PunchDto> _punches;
+        private System.Collections.Generic.List<PunchRowDto> _punches;
         private double? _daytotal;
     
         /// <summary>Boid of user</summary>
@@ -1919,7 +1919,7 @@ namespace TpDotNetCore.Controllers
         }
     
         [Newtonsoft.Json.JsonProperty("punches", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<PunchDto> Punches
+        public System.Collections.Generic.List<PunchRowDto> Punches
         {
             get { return _punches; }
             set 
@@ -1956,6 +1956,76 @@ namespace TpDotNetCore.Controllers
         public static DayPunchesDto FromJson(string data)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<DayPunchesDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class PunchRowDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private PunchDto _enter;
+        private PunchDto _leave;
+        private double? _rowTotal;
+    
+        [Newtonsoft.Json.JsonProperty("enter", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public PunchDto Enter
+        {
+            get { return _enter; }
+            set 
+            {
+                if (_enter != value)
+                {
+                    _enter = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("leave", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public PunchDto Leave
+        {
+            get { return _leave; }
+            set 
+            {
+                if (_leave != value)
+                {
+                    _leave = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>Time between enter and leav</summary>
+        [Newtonsoft.Json.JsonProperty("rowTotal", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? RowTotal
+        {
+            get { return _rowTotal; }
+            set 
+            {
+                if (_rowTotal != value)
+                {
+                    _rowTotal = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static PunchRowDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<PunchRowDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
@@ -52,7 +53,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 
                 var response = new WeekResponse
                 {
-                    Status = new OpResult {Success = true},
+                    Status = new OpResult { Success = true },
                     Punches = new WeekPunchesDto
                     {
                         User = user.Id,
@@ -64,21 +65,8 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 foreach (var dayPunches in punches)
                 {
                     var dayPunch = new DayPunchesDto();
+                    dayPunch.GetRowedDayPunches(dayPunches.OrderBy(dp => dp.TimeDec).ToArray());                    
                     response.Punches.DayPunches.Add(dayPunch);
-                    dayPunch.Punches = new List<PunchDto>();
-                    foreach (var punch in dayPunches)
-                    {
-                        var p1 = new PunchDto
-                        {
-                            Created = punch.Created,
-                            Direction = punch.Direction,
-                            Punchid = punch.Id,
-                            Time = punch.PunchTime,
-                            Timedec = (double) punch.TimeDec,
-                            Updated = punch.Updated
-                        };
-                        dayPunch.Punches.Add(p1);
-                    }
                 }
                 return response;
             }

@@ -14,6 +14,7 @@ const mainRoutes: Routes = [
             { path: 'overview', component: OverviewComponent,/* canActivate: [AuthGuard] */ },
             { path: 'profile', component: ProfileComponent,/* canActivate: [AuthGuard] */ },
             { path: 'logout', component: LogoutComponent,/* canActivate: [AuthGuard] */ },
+            { path: '**', redirectTo: 'main/overview' }            
         ]
     }
 ];

@@ -1,6 +1,6 @@
-<div fxLayout="column" fxFlex [class.dark-theme]="isDarkTheme">
+<div fxLayout="column" [class.dark-theme]="isDarkTheme">
 
-  <md-toolbar color="primary">
+  <md-toolbar color="primary" fxFlex="60px">
     <span><button md-button (click)="sidenav.toggle()"><md-icon>menu</md-icon></button></span>
     <span>Timepuncher - {{mediaInfo}}</span>
 
@@ -13,8 +13,8 @@
 
   </md-toolbar>
 
-  <md-sidenav-container fxflex>
-    <md-sidenav #sidenav mode="{{media.isActive('gt-xs') ? 'side' : 'over'}}" align="begin" class="md-whiteframe-4dp">
+  <md-sidenav-container>
+    <md-sidenav #sidenav mode="{{media.isActive('gt-xs') ? 'side' : 'over'}}" align="begin" >
       <!-- sidenav content -->
       <md-nav-list>
           <md-list-item>

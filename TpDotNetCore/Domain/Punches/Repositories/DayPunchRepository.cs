@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
@@ -48,30 +49,12 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     .ToList();
                 var response = new DayResponse
                 {
-                    Status = new OpResult {Success = true},
-                    Punches = new DayPunchesDto
-                    {
-                        Userboid = user.Id,
-                        Day = dt.Day,
-                        Month = dt.Month,
-                        Year = dt.Year,
-                        Daytotal = 12.12,
-                        Punches = new List<PunchDto>()
-                    }
+                    Status = new OpResult { Success = true },
                 };
-                foreach (var punch in punches)
-                {
-                    var p1 = new PunchDto
-                    {
-                        Created = punch.Created,
-                        Direction = punch.Direction,
-                        Punchid = punch.Id,
-                        Time = punch.PunchTime,
-                        Timedec = (double) punch.TimeDec,
-                        Updated = punch.Updated
-                    };
-                    response.Punches.Punches.Add(p1);
-                }
+
+                var dayPunch = new DayPunchesDto();
+                dayPunch.GetRowedDayPunches(punches.OrderBy(dp => dp.TimeDec).ToArray());
+                response.Punches = dayPunch;
                 return response;
             }
             catch (RepositoryException)

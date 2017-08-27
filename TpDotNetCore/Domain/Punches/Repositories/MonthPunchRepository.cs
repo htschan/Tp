@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
@@ -43,7 +44,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
                 var dt = DateTime.Now;
-                var punches = _appDbContext.Punches
+                var groupedPunches = _appDbContext.Punches
                     .Where(p => p.User.Id == user.Id)
                     .Where(p => p.MonthPunch.Month == dt.Month)
                     .Where(p => p.YearPunch.Year == dt.Year)
@@ -52,7 +53,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 
                 var response = new MonthResponse
                 {
-                    Status = new OpResult {Success = true},
+                    Status = new OpResult { Success = true },
                     Punches = new MonthPunchesDto
                     {
                         User = user.Id,
@@ -61,24 +62,11 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                         Punches = new List<DayPunchesDto>()
                     }
                 };
-                foreach (var dayPunches in punches)
+                foreach (var dayPunches in groupedPunches)
                 {
                     var dayPunch = new DayPunchesDto();
+                    dayPunch.GetRowedDayPunches(dayPunches.OrderBy(dp => dp.TimeDec).ToArray());
                     response.Punches.Punches.Add(dayPunch);
-                    dayPunch.Punches = new List<PunchDto>();
-                    foreach (var punch in dayPunches.OrderBy(p => p.PunchTime))
-                    {
-                        var p1 = new PunchDto
-                        {
-                            Created = punch.Created,
-                            Direction = punch.Direction,
-                            Punchid = punch.Id,
-                            Time = punch.PunchTime,
-                            Timedec = (double) punch.TimeDec,
-                            Updated = punch.Updated
-                        };
-                        dayPunch.Punches.Add(p1);
-                    }
                 }
                 return response;
             }

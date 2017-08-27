@@ -1,39 +1,45 @@
-<div fxFill>
+<div>
   <div fxLayout="row" fxLayoutAlign="space-around">
     <span fxFlex="10%"></span>
     <p fxFlex="40%" style="display: inline">
-      <button md-raised-button large full color="danger" (click)="enter()" class="bigbutton">Kommen</button>
+      <button md-raised-button large full color="accent" (click)="enter()" class="bigbutton">Kommen</button>
     </p>
     <p fxFlex="40%" style="display: inline">
-      <button md-raised-button full large (click)="leave()" class="bigbutton">Gehen</button>
+      <button md-raised-button large full (click)="leave()" class="bigbutton">Gehen</button>
     </p>
   </div>
-  <md-tab-group (selectChange)="tabChanged($event)" class="punchpane">
-    <md-tab label="Heute" id="tab1">
-      <md-grid-list cols="4" rowHeight="3:1">
-        <md-grid-tile col-3>{{punchDayVm?.date | date:"fullDate"}}</md-grid-tile>
-        <md-grid-tile col-3>{{punchDayVm?.daySum | number: "1.2-2"}}</md-grid-tile>
-      </md-grid-list>
-      <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of punchDayVm?.punchRow">
-        <md-grid-tile col-3 (click)="editPunch(row?.enter)">{{row?.enter?.timedec | number: "1.2-2"}}</md-grid-tile>
-        <md-grid-tile col-3 (click)="editPunch(row?.leave)">{{row?.leave?.timedec | number: "1.2-2"}}</md-grid-tile>
-        <md-grid-tile col-3>{{row?.sum | number: "1.2-2"}}</md-grid-tile>
-      </md-grid-list>
-    </md-tab>
-    <md-tab label="Woche">
-      <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of weekpunches?.dayPunches">
-        <md-grid-tile col-3 *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</md-grid-tile>
-      </md-grid-list>
-    </md-tab>
-    <md-tab label="Monat">
-      <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of monthpunches?.punches">
-        <md-grid-tile col-3 *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</md-grid-tile>
-      </md-grid-list>
-    </md-tab>
-    <md-tab label="Jahr">
+  <div fxLayout="column">
+    <div fxFlex="100vh">
+      <md-tab-group (selectChange)="tabChanged($event)" class="punchpane">
+        <md-tab label="Heute" id="tab1">
+          <md-grid-list cols="4" rowHeight="3:1">
+            <md-grid-tile col-3>{{punchDayVm?.date | date:"fullDate"}}</md-grid-tile>
+            <md-grid-tile col-3>{{punchDayVm?.daySum | number: "1.2-2"}}</md-grid-tile>
+          </md-grid-list>
+          <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of punchDayVm?.punchRow">
+            <md-grid-tile col-3 (click)="editPunch(row?.enter)">{{row?.enter?.timedec | number: "1.2-2"}}</md-grid-tile>
+            <md-grid-tile col-3 (click)="editPunch(row?.leave)">{{row?.leave?.timedec | number: "1.2-2"}}</md-grid-tile>
+            <md-grid-tile col-3>{{row?.sum | number: "1.2-2"}}</md-grid-tile>
+          </md-grid-list>
+        </md-tab>
+        <md-tab label="Woche">
+          <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of weekpunches?.dayPunches">
+            <md-grid-tile col-3 >{{row.daytotal | number: "1.2-2"}}</md-grid-tile>
+            <!-- <md-grid-tile col-3 *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</md-grid-tile> -->
+          </md-grid-list>
+        </md-tab>
+        <md-tab label="Monat">
+          <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of monthpunches?.punches">
+            <md-grid-tile col-3>{{row.daytotal | number: "1.2-2"}}</md-grid-tile>
+            <!-- <md-grid-tile col-3 *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</md-grid-tile> -->
+          </md-grid-list>
+        </md-tab>
+        <md-tab label="Jahr">
 
-    </md-tab>
-  </md-tab-group>
+        </md-tab>
+      </md-tab-group>
+    </div>
+  </div>
   <button md-fab (click)="addPunch()" class="fab-bottom-right">
     <md-icon>add</md-icon>
   </button>

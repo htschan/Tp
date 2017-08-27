@@ -103,33 +103,41 @@ export class PunchDayVm {
         this.setDayPunches(dayResponse.punches);
     }
     setDayPunches(dto: DayPunchesDto) {
-        let i = 0;
-        if (dto.punches.length > 0) {
-            this.date = new Date(dto.year, dto.month - 1, dto.day);
-        }
-        do {
+        for (let punch of dto.punches) {
             let vm = new PunchRowVm();
-            if (dto.punches.length > 0) {
-                let punchDto = dto.punches[i];
-                if (punchDto.direction) {
-                    vm.enter = new PunchVm(punchDto);
-                    if (i < dto.punches.length - 1 && !dto.punches[i + 1].direction) {
-                        i++;
-                        vm.leave = new PunchVm(dto.punches[i]);
-                    }
-                }
-                else {
-                    vm.leave = new PunchVm(punchDto);
-                }
-            }
+            vm.enter = new PunchVm(punch.enter);
+            vm.leave = new PunchVm(punch.leave);
             this.punchRow.push(vm);
-            i++;
-        } while (i < dto.punches.length);
-        this.daySum = 0.0;
-        for (let row of this.punchRow) {
-            row.calcSum();
-            this.daySum += row.sum;
         }
+        this.daySum = dto.daytotal;
+        this.date = new Date(dto.year, dto.month, dto.day);
+        // let i = 0;
+        // if (dto.punches.length > 0) {
+        //     this.date = new Date(dto.year, dto.month - 1, dto.day);
+        // }
+        // do {
+        //     let vm = new PunchRowVm();
+        //     if (dto.punches.length > 0) {
+        //         let punchDto = dto.punches[i];
+        //         if (punchDto.direction) {
+        //             vm.enter = new PunchVm(punchDto);
+        //             if (i < dto.punches.length - 1 && !dto.punches[i + 1].direction) {
+        //                 i++;
+        //                 vm.leave = new PunchVm(dto.punches[i]);
+        //             }
+        //         }
+        //         else {
+        //             vm.leave = new PunchVm(punchDto);
+        //         }
+        //     }
+        //     this.punchRow.push(vm);
+        //     i++;
+        // } while (i < dto.punches.length);
+        // this.daySum = 0.0;
+        // for (let row of this.punchRow) {
+        //     row.calcSum();
+        //     this.daySum += row.sum;
+        // }
     }
     punchRow?: PunchRowVm[] = [];
     daySum?: number;

@@ -713,10 +713,21 @@ definitions:
       punches:
         type: array
         items:
-          $ref: '#/definitions/PunchDto'
+          $ref: '#/definitions/PunchRowDto'
       daytotal:
         type: number
         format: float
+  PunchRowDto:
+    type: object
+    properties:
+      enter:
+        $ref: '#/definitions/PunchDto'
+      leave:
+        $ref: '#/definitions/PunchDto'
+      rowTotal:
+        type: number
+        format: float
+        description: Time between enter and leav
   PunchDto:
     type: object
     properties:
