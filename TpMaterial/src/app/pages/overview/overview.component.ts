@@ -3,8 +3,8 @@ import { MdIconRegistry, MdDialog } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MdTabChangeEvent } from '@angular/material';
 
-import { PunchService, PunchDayVm, PunchVm, EditResultEnum } from '../../services/puncher/punch.service';
-import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult } from '../../services/api.g';
+import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm } from '../../services/puncher/punch.service';
+import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult, YearPunchesDto } from '../../services/api.g';
 
 import { PunchEditComponent } from '../../dialog/punchedit.component';
 
@@ -16,8 +16,9 @@ import { PunchEditComponent } from '../../dialog/punchedit.component';
 export class OverviewComponent implements OnInit {
 
   punchDayVm: PunchDayVm;
-  weekpunches: WeekPunchesDto;
+  punchWeekVm: PunchWeekVm;
   monthpunches: MonthPunchesDto;
+  yearpunches: YearPunchesDto;
 
   constructor(iconRegistry: MdIconRegistry, sanitizer: DomSanitizer, private dialog: MdDialog, private punchService: PunchService) { }
 
@@ -44,7 +45,9 @@ export class OverviewComponent implements OnInit {
     dto.init({ time: new Date(), timedec: 0.0, direction: false, created: new Date(), punchid: "" });
     let punchVm = new PunchVm(dto);
     this.dialog.open(PunchEditComponent, {
-      height: '300px', width: '500px', data: {
+      height: '300px',
+      width: '500px',
+      data: {
         punchVm: punchVm, title: "Neue Stempelung"
       }
     }).afterClosed()
@@ -62,8 +65,11 @@ export class OverviewComponent implements OnInit {
 
   editPunch(punchVm: PunchVm) {
     this.dialog.open(PunchEditComponent, {
-      height: '300px', width: '500px', data: {
-        punchVm: punchVm, title: "Stempelung editieren"
+      height: '300px',
+      width: '500px',
+      data: {
+        punchVm: punchVm,
+        title: "Stempelung editieren"
       }
     }).afterClosed()
       .filter(result => !!result)
@@ -110,16 +116,22 @@ export class OverviewComponent implements OnInit {
   }
 
   getWeek() {
-    this.punchService.getWeek()
-      .subscribe(data =>
-        this.weekpunches = data.punches
-      );
+    this.punchService.getWeek().subscribe(response => {
+      this.punchWeekVm = response;
+    });
   }
 
   getMonth() {
     this.punchService.getMonth()
       .subscribe(data =>
         this.monthpunches = data.punches
+      );
+  }
+
+  getYear() {
+    this.punchService.getYear()
+      .subscribe(data =>
+        this.yearpunches = data.punches
       );
   }
 

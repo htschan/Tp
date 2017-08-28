@@ -44,9 +44,10 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
                 var dt = DateTime.Now;
+                var week = _timeService.GetWeekNumber(dt);
                 var punches = _appDbContext.Punches
                     .Where(p => p.User.Id == user.Id)
-                    .Where(p => p.WeekPunch.Week == _timeService.GetWeekNumber(dt))
+                    .Where(p => p.WeekPunch.Week == week)
                     .Where(p => p.YearPunch.Year == dt.Year)
                     .GroupBy(p => p.DayPunch.Day)
                     .ToList();
@@ -65,7 +66,10 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 foreach (var dayPunches in punches)
                 {
                     var dayPunch = new DayPunchesDto();
-                    dayPunch.GetRowedDayPunches(dayPunches.OrderBy(dp => dp.TimeDec).ToArray());                    
+                    dayPunch.GetRowedDayPunches(dayPunches.OrderBy(dp => dp.TimeDec).ToArray());
+                    dayPunch.Day = dayPunches.Key;
+                    dayPunch.Month = dt.Month;
+                    dayPunch.Year = dt.Year;
                     response.Punches.DayPunches.Add(dayPunch);
                 }
                 return response;

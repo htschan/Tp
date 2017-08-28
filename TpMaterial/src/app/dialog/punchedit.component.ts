@@ -9,29 +9,33 @@ export class PunchEditComponent {
   punchTime: string;
   time: string;
   isDarkTheme = true;
+  punchVm: PunchVm;
+  title: string;
   
   constructor(public dialogRef: MdDialogRef<PunchEditComponent>, @Inject(MD_DIALOG_DATA) public dlgData: any) {
-    this.punchTime = this.dlgData.punchVm.time.toLocaleTimeString();
+    this.punchVm = dlgData.punchVm;
+    this.title = dlgData.title;
+    this.punchTime = this.punchVm.time.toLocaleTimeString();
     this.time = this.punchTime;
   }
 
   delete() {
-    this.dlgData.punchVm.editResult = EditResultEnum.Delete;
-    this.dialogRef.close(this.dlgData.punchVm);
+    this.punchVm.editResult = EditResultEnum.Delete;
+    this.dialogRef.close(this.punchVm);
   }
 
   save() {
-    this.dlgData.punchVm.editResult = EditResultEnum.Save;
-    this.dialogRef.close(this.dlgData.punchVm);
+    this.punchVm.editResult = EditResultEnum.Save;
+    this.dialogRef.close(this.punchVm);
   }
 
   reset() {
-    this.dlgData.punchVm.resetChanges();
+    this.punchVm.resetChanges();
   }
 
   dismiss() {
-    this.dlgData.punchVm.editResult = EditResultEnum.Undefined;
-    this.dialogRef.close(this.dlgData.punchVm);
+    this.punchVm.editResult = EditResultEnum.Undefined;
+    this.dialogRef.close(this.punchVm);
   }
 
   calculateTime(offset: any) {
@@ -41,7 +45,6 @@ export class PunchEditComponent {
     // create new Date object for different city
     // using supplied offset
     let nd = new Date(d.getTime() + (3600000 * offset));
-
     return nd.toISOString();
   }
 }
