@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpModule } from '@angular/http';
+import { Storage } from '@ionic/storage';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 import { TpClientConfig } from '../timepuncher-client-config';
@@ -79,7 +80,7 @@ import { RegisterPage } from '../pages/register/register';
     {
       provide: Http,
       useFactory: httpFactory,
-      deps: [XHRBackend, RequestOptions, API_BASE_URL]
+      deps: [XHRBackend, RequestOptions, API_BASE_URL, Storage]
     },
     PunchService,
     SampleService

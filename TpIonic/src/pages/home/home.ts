@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Events, Slides, ModalController, ToastController } from 'ionic-angular';
-import { PunchService, PunchDayVm, PunchVm, EditResultEnum } from '../../services/puncher/punch.service';
-import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult } from '../../services/api.g';
+import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm } from '../../services/puncher/punch.service';
+import { MonthPunchesDto, PunchDto, OpResult } from '../../services/api.g';
 import { PunchEditModal } from '../punchedit/punchedit';
 
 @Component({
@@ -12,7 +12,7 @@ export class HomePage {
   @ViewChild(Slides) slides: Slides;
   title: String = ' ';
   punchDayVm: PunchDayVm;
-  weekpunches: WeekPunchesDto;
+  punchWeekVm: PunchWeekVm;
   monthpunches: MonthPunchesDto;
 
   constructor(public events: Events,
@@ -109,10 +109,9 @@ export class HomePage {
   }
 
   getWeek() {
-    this.punchService.getWeek()
-      .subscribe(data =>
-        this.weekpunches = data.punches
-      );
+    this.punchService.getWeek().subscribe(response =>
+      this.punchWeekVm = response
+    );
   }
 
   getMonth() {

@@ -2,7 +2,6 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Response, RequestOptions, RequestMethod } from '@angular/http';
-import { Observable } from 'rxjs/Rx';
 
 const options = new RequestOptions({
     method: RequestMethod.Get,

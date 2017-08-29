@@ -12,7 +12,7 @@ import { AuthResponse } from "../../services/api.g";
 export class LoginPage {
   title: String = ' ';
   loading: Loading;
-  registerCredentials = { "email": "", "password": "" };
+  registerCredentials = { "email": "hts@koch-it.ch", "password": "" };
 
   constructor(public events: Events, public navCtrl: NavController, public navParams: NavParams, private auth: AuthService, private alertCtrl: AlertController, private loadingCtrl: LoadingController) {
     events.subscribe('title:updated', (data) => {

@@ -19,7 +19,7 @@
       <h1>Heute</h1>
       <ion-grid>
         <ion-row>
-          <ion-col col-4>{{punchDayVm?.date | date:"fullDate"}}</ion-col>
+          <ion-col col-4>{{punchDayVm?.date | date:"EEE dd.MM.yyyy"}}</ion-col>
           <ion-col col-4>{{punchDayVm?.daySum | number: "1.2-2"}}</ion-col>
         </ion-row>
         <ion-row *ngFor="let row of punchDayVm?.punchRow">
@@ -36,8 +36,13 @@
     <ion-slide>
       <h1>Woche </h1>
       <ion-grid>
-        <ion-row *ngFor="let row of weekpunches?.dayPunches">
-          <ion-col *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
+        <ion-row>
+          <ion-col col-4>Kalenderwoche {{punchWeekVm?.week}}/{{punchWeekVm?.year}}</ion-col>
+          <ion-col col-4>Wochentotal {{punchWeekVm?.weekSum | number: "1.2-2"}}</ion-col>
+        </ion-row>
+        <ion-row *ngFor="let day of punchWeekVm?.punchDays">
+          <ion-col col-4>{{day?.date | date:"EEE dd.MM.yyyy"}}</ion-col>
+          <ion-col col-4>{{day.daySum | number: "1.2-2"}} h</ion-col>
         </ion-row>
       </ion-grid>
     </ion-slide>
@@ -45,6 +50,10 @@
     <ion-slide>
       <h1>Monat</h1>
       <ion-grid>
+        <ion-row>
+          <ion-col col-4>Monat {{monthpunches?.month}}</ion-col>
+          <ion-col col-4>{{monthpunches?.year}}</ion-col>
+        </ion-row>
         <ion-row *ngFor="let row of monthpunches?.punches">
           <ion-col *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
         </ion-row>
