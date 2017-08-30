@@ -3,7 +3,7 @@ import { MdIconRegistry, MdDialog } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MdTabChangeEvent } from '@angular/material';
 
-import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm } from '../../services/puncher/punch.service';
+import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
 import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult, YearPunchesDto } from '../../services/api.g';
 
 import { PunchEditComponent } from '../../dialog/punchedit.component';
@@ -17,8 +17,8 @@ export class OverviewComponent implements OnInit {
 
   punchDayVm: PunchDayVm;
   punchWeekVm: PunchWeekVm;
-  monthpunches: MonthPunchesDto;
-  yearpunches: YearPunchesDto;
+  punchMonthVm: PunchMonthVm;
+  punchYearVm: PunchYearVm;
 
   constructor(iconRegistry: MdIconRegistry, sanitizer: DomSanitizer, private dialog: MdDialog, private punchService: PunchService) { }
 
@@ -107,6 +107,9 @@ export class OverviewComponent implements OnInit {
       case 2:
         this.getMonth();
         break;
+      case 3:
+        this.getYear();
+        break;
     }
   }
   getToday() {
@@ -122,17 +125,15 @@ export class OverviewComponent implements OnInit {
   }
 
   getMonth() {
-    this.punchService.getMonth()
-      .subscribe(data =>
-        this.monthpunches = data.punches
-      );
+    this.punchService.getMonth().subscribe(response =>
+      this.punchMonthVm = response
+    );
   }
 
   getYear() {
-    this.punchService.getYear()
-      .subscribe(data =>
-        this.yearpunches = data.punches
-      );
+    this.punchService.getYear().subscribe(response =>
+      this.punchYearVm = response
+    );
   }
 
   handleError(err: string) {

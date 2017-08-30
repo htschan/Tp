@@ -63,6 +63,8 @@ import { RegistrationComponent } from './pages/registration/registration.compone
 import { OverviewComponent } from './pages/overview/overview.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { LogoutComponent } from './pages/logout/logout.component';
+import { MonthNamePipe } from './pipes/monthname.pipe';
+import { DayNamePipe } from './pipes/day-name.pipe';
 
 @NgModule({
   declarations: [
@@ -75,7 +77,9 @@ import { LogoutComponent } from './pages/logout/logout.component';
     MainComponent,
     OverviewComponent,
     ProfileComponent,
-    LogoutComponent
+    LogoutComponent,
+    MonthNamePipe,
+    DayNamePipe
   ],
   imports: [
     BrowserModule,

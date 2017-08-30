@@ -13,7 +13,7 @@
       <md-tab-group (selectChange)="tabChanged($event)" class="punchpane">
         <md-tab label="Heute" id="tab1">
           <md-grid-list cols="4" rowHeight="3:1">
-            <md-grid-tile col-3>{{punchDayVm?.date | date:"EEE dd.MM.yyyy"}}</md-grid-tile>
+            <md-grid-tile col-3>{{punchDayVm?.date.getDay() | dayName}} {{punchDayVm?.date | date:"dd.MM.yyyy"}}</md-grid-tile>
             <md-grid-tile col-3>Tagestotal: {{punchDayVm?.daySum | number: "1.2-2"}} h</md-grid-tile>
           </md-grid-list>
           <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of punchDayVm?.punchRow">
@@ -28,26 +28,30 @@
             <md-grid-tile col-3>Wochentotal {{punchWeekVm?.weekSum | number: "1.2-2"}}</md-grid-tile>
           </md-grid-list>
           <md-grid-list cols="4" rowHeight="2:1" *ngFor="let day of punchWeekVm?.punchDays">
-            <md-grid-tile col-6>{{day?.date | date:"EEE dd.MM.yyyy"}}</md-grid-tile>
-            <md-grid-tile col-3 >{{day.daySum | number: "1.2-2"}} h</md-grid-tile>
+            <md-grid-tile col-6>{{day?.date.getDay() | dayName}} {{day?.date | date:"dd.MM.yyyy"}}</md-grid-tile>
+            <md-grid-tile col-3 >{{day?.daySum | number: "1.2-2"}} h</md-grid-tile>
           </md-grid-list>
         </md-tab>
         <md-tab label="Monat">
           <md-grid-list cols="4" rowHeight="3:1">
-            <md-grid-tile col-3>Monat {{monthpunches?.month}}</md-grid-tile>
-            <md-grid-tile col-3>{{monthpunches?.year}}</md-grid-tile>
+            <md-grid-tile col-3>{{punchMonthVm?.month | monthName}}</md-grid-tile>
+            <md-grid-tile col-3>{{punchMonthVm?.year}}</md-grid-tile>
+            <md-grid-tile col-3>Total {{punchMonthVm?.monthSum | number: "1.2-2"}} h</md-grid-tile>
           </md-grid-list>
-          <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of monthpunches?.punches">
-            <md-grid-tile col-3>{{row.daytotal | number: "1.2-2"}}</md-grid-tile>
+          <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of punchMonthVm?.punchDays">
+            <md-grid-tile col-3>{{row?.daySum | number: "1.2-2"}}</md-grid-tile>
+            <md-grid-tile col-3>{{row?.daySum | number: "1.2-2"}}</md-grid-tile>
             <!-- <md-grid-tile col-3 *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</md-grid-tile> -->
           </md-grid-list>
         </md-tab>
         <md-tab label="Jahr">
           <md-grid-list cols="4" rowHeight="3:1">
-            <md-grid-tile col-3>Jahr {{yearpunches?.year}}</md-grid-tile>
+            <md-grid-tile col-3>Jahr {{punchYearVm?.year}}</md-grid-tile>
+            <md-grid-tile col-3>Total {{punchYearVm?.yearSum | number: "1.2-2"}} h</md-grid-tile>
           </md-grid-list>
-          <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of yearpunches?.punches">
-            <md-grid-tile col-3>{{row.month | number: "1.2-2"}}</md-grid-tile>
+          <md-grid-list cols="6" rowHeight="2:1" *ngFor="let row of punchYearVm?.punchMonths">
+            <md-grid-tile col-3>{{row.month | monthName }}</md-grid-tile>
+            <md-grid-tile col-3>{{row.monthSum | number: "1.2-2"}}</md-grid-tile>
             <!-- <md-grid-tile col-3 *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</md-grid-tile> -->
           </md-grid-list>
         </md-tab>
