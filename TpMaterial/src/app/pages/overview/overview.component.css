@@ -11,3 +11,7 @@
     bottom: 16px;
   }
   
+.scroll-content{
+    height: 50vh; 
+    overflow-y: auto;
+}
