@@ -64,7 +64,7 @@ import { OverviewComponent } from './pages/overview/overview.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { LogoutComponent } from './pages/logout/logout.component';
 import { MonthNamePipe } from './pipes/monthname.pipe';
-import { DayNamePipe } from './pipes/day-name.pipe';
+import { DayNamePipe } from './pipes/dayName.pipe';
 
 @NgModule({
   declarations: [
