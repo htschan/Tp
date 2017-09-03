@@ -28,6 +28,12 @@ export interface ITpClient {
      */
     authenticate(credentials: CredentialDto): Observable<AuthResponse | null>;
     /**
+     * Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]
+     * @refreshtokenparameter Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
+     * @return AuthResponse
+     */
+    refreshtoken(refreshtokenparameter: RefreshTokenDto): Observable<AuthResponse | null>;
+    /**
      * Einen Benutzer registrieren [AllowAnonymous]
      * @registerDto Registrierungsinformationen
      * @return Die Operation war erfolgreich. Der Benutzer erhält eine E-Mail mit einem Bestätigungslink.
@@ -177,6 +183,52 @@ export class TpClient implements ITpClient {
     }
 
     protected processAuthenticate(response: Response): Observable<AuthResponse | null> {
+        const status = response.status; 
+
+        {
+            const _responseText = response.text();
+            let result: AuthResponse | null = null;
+            let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result = resultData ? AuthResponse.fromJS(resultData) : new AuthResponse();
+            return Observable.of(result);
+        }
+    }
+
+    /**
+     * Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]
+     * @refreshtokenparameter Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
+     * @return AuthResponse
+     */
+    refreshtoken(refreshtokenparameter: RefreshTokenDto): Observable<AuthResponse | null> {
+        let url_ = this.baseUrl + "/refreshtoken";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(refreshtokenparameter);
+        
+        let options_ = {
+            body: content_,
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request(url_, options_).flatMap((response_) => {
+            return this.processRefreshtoken(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof Response) {
+                try {
+                    return this.processRefreshtoken(response_);
+                } catch (e) {
+                    return <Observable<AuthResponse>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<AuthResponse>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processRefreshtoken(response: Response): Observable<AuthResponse | null> {
         const status = response.status; 
 
         {
@@ -1131,6 +1183,8 @@ export class AuthResponse implements IAuthResponse {
     id?: string | undefined;
     /** Ein Authentifizierungstoken mit dem alle folgenden Aufrufe authentifiziert werden. */
     token?: string | undefined;
+    /** Ein RefreshToken mit dem der token erneuert werden kann. */
+    refreshtoken?: string | undefined;
 
     constructor(data?: IAuthResponse) {
         if (data) {
@@ -1147,6 +1201,7 @@ export class AuthResponse implements IAuthResponse {
             this.validFor = data["validFor"];
             this.id = data["id"];
             this.token = data["token"];
+            this.refreshtoken = data["refreshtoken"];
         }
     }
 
@@ -1162,6 +1217,7 @@ export class AuthResponse implements IAuthResponse {
         data["validFor"] = this.validFor;
         data["id"] = this.id;
         data["token"] = this.token;
+        data["refreshtoken"] = this.refreshtoken;
         return data; 
     }
 }
@@ -1174,11 +1230,15 @@ export interface IAuthResponse {
     id?: string | undefined;
     /** Ein Authentifizierungstoken mit dem alle folgenden Aufrufe authentifiziert werden. */
     token?: string | undefined;
+    /** Ein RefreshToken mit dem der token erneuert werden kann. */
+    refreshtoken?: string | undefined;
 }
 
 export class CredentialDto implements ICredentialDto {
+    /** Der Client-Typ 'web', 'ionic' */
+    client_type?: string | undefined;
     /** Die E-Mail Adresse 1 .. 160 Zeichen. Wird benötigt für die Bestätigung der Kontoerstellung. */
-    email?: string | undefined;
+    username?: string | undefined;
     /** Das Passwort 1 .. 80 Zeichen. Wird für die Anmeldung benötigt. */
     password?: string | undefined;
 
@@ -1193,7 +1253,8 @@ export class CredentialDto implements ICredentialDto {
 
     init(data?: any) {
         if (data) {
-            this.email = data["email"];
+            this.client_type = data["client_type"];
+            this.username = data["username"];
             this.password = data["password"];
         }
     }
@@ -1206,17 +1267,57 @@ export class CredentialDto implements ICredentialDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
+        data["client_type"] = this.client_type;
+        data["username"] = this.username;
         data["password"] = this.password;
         return data; 
     }
 }
 
 export interface ICredentialDto {
+    /** Der Client-Typ 'web', 'ionic' */
+    client_type?: string | undefined;
     /** Die E-Mail Adresse 1 .. 160 Zeichen. Wird benötigt für die Bestätigung der Kontoerstellung. */
-    email?: string | undefined;
+    username?: string | undefined;
     /** Das Passwort 1 .. 80 Zeichen. Wird für die Anmeldung benötigt. */
     password?: string | undefined;
+}
+
+export class RefreshTokenDto implements IRefreshTokenDto {
+    /** Der Refresh Token */
+    refresh_token?: string | undefined;
+
+    constructor(data?: IRefreshTokenDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.refresh_token = data["refresh_token"];
+        }
+    }
+
+    static fromJS(data: any): RefreshTokenDto {
+        let result = new RefreshTokenDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["refresh_token"] = this.refresh_token;
+        return data; 
+    }
+}
+
+export interface IRefreshTokenDto {
+    /** Der Refresh Token */
+    refresh_token?: string | undefined;
 }
 
 export class RegisterDto implements IRegisterDto {

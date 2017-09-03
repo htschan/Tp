@@ -62,10 +62,14 @@ Create the database
 After making furhter changes
 `# dotnet ef migrations add`
 
-Follow this article for User authentication with Angular and ASP.NET Core
+Follow this article for User authentication with Angular and ASP.NET Core with Refresh Token
 (using JWT-Token authentication and ASP.NET Core Identity)
+http://www.c-sharpcorner.com/article/handle-refresh-token-using-asp-net-core-2-0-and-json-web-token/
+
+/* obsolete
 https://fullstackmark.com/post/10/user-authentication-with-angular-and-asp-net-core#create-new-users
 https://goblincoding.com/2016/07/03/issuing-and-authenticating-jwt-tokens-in-asp-net-core-webapi-part-i/
+/*
 
 # ASP.NET Core Security
 https://docs.microsoft.com/en-us/aspnet/core/security/

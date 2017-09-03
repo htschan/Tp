@@ -13,9 +13,10 @@ export class PunchService {
     punch(dir: string): Observable<PunchDayVm> {
         return dir === "In" ? this.tpClient.punchIn().map(dayResponse => {
             return new PunchDayVm(dayResponse.punches);
-        }) : this.tpClient.punchOut().map(dayResponse => {
-            return new PunchDayVm(dayResponse.punches);
-        });
+        },
+            e => console.log("error punchin")) : this.tpClient.punchOut().map(dayResponse => {
+                return new PunchDayVm(dayResponse.punches);
+            });
     }
 
     getToday(): Observable<PunchDayVm> {

@@ -39,6 +39,25 @@ namespace TpDotNetCore.Domain.UserConfiguration.Repositories
             }
         }
 
+        public AppUser FindById(string userId)
+        {
+            try
+            {
+                var value = _appDbContext.AppUsers.FirstOrDefault(b => b.Id == userId);
+                if (value == null)
+                    throw new RepositoryException(StatusCodes.Status404NotFound, $"User Id {userId} not found");
+                return value;
+            }
+            catch (RepositoryException)
+            {
+                throw;
+            }
+            catch (System.Exception exception)
+            {
+                throw new RepositoryException(StatusCodes.Status400BadRequest, $"FindByName {userId} threw an exception: {exception.Message}", exception);
+            }
+        }
+
         public System.Collections.Generic.IList<AppUser> GetAll()
         {
             throw new NotImplementedException();

@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using TpDotNetCore.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace TpDotNetCore.Controllers
 {
@@ -20,6 +21,10 @@ namespace TpDotNetCore.Controllers
         /// <param name="credentials">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
         /// <returns>AuthResponse</returns>
         System.Threading.Tasks.Task<SwaggerResponse<AuthResponse>> AuthenticateAsync(CredentialDto credentials);
+        /// <summary>Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]</summary>
+        /// <param name="refreshtokenparameter">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
+        /// <returns>AuthResponse</returns>
+        System.Threading.Tasks.Task<SwaggerResponse<AuthResponse>> RefreshtokenAsync(RefreshTokenDto refreshtokenparameter);
         /// <summary>Einen Benutzer registrieren [AllowAnonymous]</summary>
         /// <param name="registerDto">Registrierungsinformationen</param>
         /// <returns>Die Operation war erfolgreich. Der Benutzer erhält eine E-Mail mit einem Bestätigungslink.</returns>
@@ -96,7 +101,19 @@ namespace TpDotNetCore.Controllers
         {
             _implementation = implementation; 
         }
-    
+    	private IActionResult HandleInvalidModelState(ModelStateDictionary model)
+        {
+            var errors = "";
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    errors += error.ErrorMessage + "; ";
+                }
+            }
+            var authResponse = new { Status = new { Success = false, Result = errors.TrimEnd(new[] { ';', ' ' }) } };
+            return new ObjectResult(authResponse) { StatusCode = 404 };
+          }
         /// <summary>Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]</summary>
         /// <param name="credentials">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
         /// <returns>AuthResponse</returns>
@@ -104,8 +121,24 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("authenticate")]
         public async System.Threading.Tasks.Task<IActionResult> Authenticate([FromBody]CredentialDto credentials)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.AuthenticateAsync(credentials);
+            foreach (var header in result.Headers)
+                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+            if (result.StatusCode == 200)
+                return Ok(result.Result);
+            else
+                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+        }
+        /// <summary>Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]</summary>
+        /// <param name="refreshtokenparameter">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
+        /// <returns>AuthResponse</returns>
+        [AllowAnonymous]    
+        [HttpPost, Route("refreshtoken")]
+        public async System.Threading.Tasks.Task<IActionResult> Refreshtoken([FromBody]RefreshTokenDto refreshtokenparameter)
+        {    
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
+            var result = await _implementation.RefreshtokenAsync(refreshtokenparameter);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)
@@ -120,7 +153,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("register")]
         public async System.Threading.Tasks.Task<IActionResult> RegisterUser([FromBody]RegisterDto registerDto)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.RegisterUserAsync(registerDto);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -152,7 +185,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("recoverPassword")]
         public async System.Threading.Tasks.Task<IActionResult> RecoverPassword([FromBody]RecoverPasswordParams recoverPasswordParams)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.RecoverPasswordAsync(recoverPasswordParams);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -168,7 +201,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("recoverUsername")]
         public async System.Threading.Tasks.Task<IActionResult> RecoverUsername([FromBody]RecoverUsernameParams recoverUsernameParams)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.RecoverUsernameAsync(recoverUsernameParams);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -184,7 +217,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("setPassword")]
         public async System.Threading.Tasks.Task<IActionResult> SetPassword([FromBody]SetPasswordParams setPasswordParams)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.SetPasswordAsync(setPasswordParams);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -312,7 +345,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("punches/punch/In")]
         public async System.Threading.Tasks.Task<IActionResult> PunchIn()
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchInAsync();
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -327,7 +360,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("punches/punch/Out")]
         public async System.Threading.Tasks.Task<IActionResult> PunchOut()
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchOutAsync();
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -342,7 +375,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("punchModify")]
         public async System.Threading.Tasks.Task<IActionResult> PunchModify([FromBody]ModifyPunchDto modifyPunchDto)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchModifyAsync(modifyPunchDto);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -371,7 +404,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("punchModifyAdmin")]
         public async System.Threading.Tasks.Task<IActionResult> PunchModifyAdmin([FromBody]ModifyPunchAdminDto modifyPunchAdminDto)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchModifyAdminAsync(modifyPunchAdminDto);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -386,7 +419,7 @@ namespace TpDotNetCore.Controllers
         [HttpPost, Route("punchSetStatusAdmin")]
         public async System.Threading.Tasks.Task<IActionResult> PunchSetStatusAdmin([FromBody]SetStatusAdminDto setStatusAdminDto)
         {    
-            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchSetStatusAdminAsync(setStatusAdminDto);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
@@ -406,6 +439,7 @@ namespace TpDotNetCore.Controllers
         private int? _validFor;
         private string _id;
         private string _token;
+        private string _refreshtoken;
     
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public OpResult Status
@@ -466,6 +500,21 @@ namespace TpDotNetCore.Controllers
             }
         }
     
+        /// <summary>Ein RefreshToken mit dem der token erneuert werden kann.</summary>
+        [Newtonsoft.Json.JsonProperty("refreshtoken", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Refreshtoken
+        {
+            get { return _refreshtoken; }
+            set 
+            {
+                if (_refreshtoken != value)
+                {
+                    _refreshtoken = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
     
         public string ToJson() 
@@ -489,19 +538,35 @@ namespace TpDotNetCore.Controllers
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
     public partial class CredentialDto : System.ComponentModel.INotifyPropertyChanged
     {
-        private string _email;
+        private string _client_type;
+        private string _username;
         private string _password;
     
-        /// <summary>Die E-Mail Adresse 1 .. 160 Zeichen. Wird benötigt für die Bestätigung der Kontoerstellung.</summary>
-        [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Email
+        /// <summary>Der Client-Typ 'web', 'ionic'</summary>
+        [Newtonsoft.Json.JsonProperty("client_type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Client_type
         {
-            get { return _email; }
+            get { return _client_type; }
             set 
             {
-                if (_email != value)
+                if (_client_type != value)
                 {
-                    _email = value; 
+                    _client_type = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>Die E-Mail Adresse 1 .. 160 Zeichen. Wird benötigt für die Bestätigung der Kontoerstellung.</summary>
+        [Newtonsoft.Json.JsonProperty("username", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Username
+        {
+            get { return _username; }
+            set 
+            {
+                if (_username != value)
+                {
+                    _username = value; 
                     RaisePropertyChanged();
                 }
             }
@@ -532,6 +597,46 @@ namespace TpDotNetCore.Controllers
         public static CredentialDto FromJson(string data)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<CredentialDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class RefreshTokenDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private string _refresh_token;
+    
+        /// <summary>Der Refresh Token</summary>
+        [Newtonsoft.Json.JsonProperty("refresh_token", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Refresh_token
+        {
+            get { return _refresh_token; }
+            set 
+            {
+                if (_refresh_token != value)
+                {
+                    _refresh_token = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static RefreshTokenDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<RefreshTokenDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)

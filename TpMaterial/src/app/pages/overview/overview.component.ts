@@ -30,7 +30,8 @@ export class OverviewComponent implements OnInit {
     this.punchService.punch('In')
       .subscribe(response => {
         this.punchDayVm = response;
-      });
+      },
+      error => console.log("errrrrrr"));
   }
 
   leave() {

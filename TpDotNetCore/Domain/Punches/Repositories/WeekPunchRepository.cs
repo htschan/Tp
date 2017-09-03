@@ -39,7 +39,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
         {
             try
             {
-                var user = _appUserRepository.FindByName(userId);
+                var user = _appUserRepository.FindById(userId);
                 if (user == null)
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 

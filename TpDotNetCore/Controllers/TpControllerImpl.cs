@@ -70,7 +70,7 @@ namespace TpDotNetCore.Controllers
                     new SwaggerResponse<AuthResponse>(
                         StatusCodes.Status200OK,
                         headers,
-                        new AuthResponse { Token = authResponse.authToken, ValidFor = authResponse.expiresIn, Id = authResponse.id, Status = new OpResult { Success = true, Result = "Authentication successful" } }));
+                        new AuthResponse { Token = authResponse.authToken, ValidFor = authResponse.expiresIn, Id = authResponse.id, Refreshtoken = authResponse.refreshToken, Status = new OpResult { Success = true, Result = "Authentication successful" } }));
             }
             catch (RepositoryException exception)
             {
@@ -78,7 +78,29 @@ namespace TpDotNetCore.Controllers
                     new SwaggerResponse<AuthResponse>(
                         exception.StatusCode,
                         headers,
-                        new AuthResponse { Token = "failed to auth", Status = new OpResult { Success = false, Result = "Authenication failed" } }, exception.Message));
+                        new AuthResponse { Token = "", Status = new OpResult { Success = false, Result = "Authenication failed" } }, exception.Message));
+            }
+        }
+
+        public Task<SwaggerResponse<AuthResponse>> RefreshtokenAsync(RefreshTokenDto refreshtokenparameter)
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                var authResponse = _appUser.RefreshToken(refreshtokenparameter);
+                return Task.FromResult(
+                    new SwaggerResponse<AuthResponse>(
+                        StatusCodes.Status200OK,
+                        headers,
+                        new AuthResponse { Token = authResponse.authToken, ValidFor = authResponse.expiresIn, Id = authResponse.id, Refreshtoken = authResponse.refreshToken, Status = new OpResult { Success = true, Result = "RefreshToken successful" } }));
+            }
+            catch (RepositoryException exception)
+            {
+                return Task.FromResult(
+                    new SwaggerResponse<AuthResponse>(
+                        exception.StatusCode,
+                        headers,
+                        new AuthResponse { Token = "failed to refresh", Status = new OpResult { Success = false, Result = "RefreshToken failed" } }, exception.Message));
             }
         }
 
@@ -132,7 +154,7 @@ namespace TpDotNetCore.Controllers
         public Task<SwaggerResponse<GetProfileResponse>> GetMyProfileAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
             var profile = _userManager.FindByEmailAsync(userId).Result;
             if (profile == null)
             {
@@ -158,7 +180,7 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
                 var response = _dayPunchRepository.GetCurrent(userId);
                 return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
@@ -174,7 +196,7 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
                 var response = _weekPunchRepository.GetCurrent(userId);
                 return Task.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status200OK, headers, response));
             }
@@ -190,7 +212,7 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
                 var response = _monthPunchRepository.GetCurrent(userId);
                 return Task.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
             }
@@ -206,7 +228,7 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
                 var response = _yearPunchRepository.GetCurrent(userId);
                 return Task.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, response));
             }
@@ -232,7 +254,7 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
                 var punchIdentity = _mapper.Map<Punch>(modifyPunchDto);
 
                 _punchService.UpdatePunch(punchIdentity, userId);
@@ -250,7 +272,7 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
                 var punchIdentity = _mapper.Map<Punch>(deletePunchDto);
 
                 _punchService.DeletePunch(punchIdentity, userId);
@@ -280,7 +302,11 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
+                foreach (var cl in _httpContextAccessor.HttpContext.User.Claims)
+                {
+                    System.Console.WriteLine(cl.Subject.Name);
+                }
                 _punchRepository.Punch(userId, direction);
                 var response = _dayPunchRepository.GetCurrent(userId);
                 return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));

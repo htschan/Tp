@@ -14,8 +14,10 @@ namespace TpDotNetCore.Data
 
         // public DbSet<User> Users { get; set; }
 
-        public DbSet<AppUser> AppUsers { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         
+        public DbSet<AppUser> AppUsers { get; set; }
+
         public DbSet<Punch> Punches { get; set; }
 
         public DbSet<DayPunch> DayPunches { get; set; }

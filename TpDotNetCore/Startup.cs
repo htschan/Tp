@@ -1,12 +1,7 @@
-using System;
 using System.Text;
-using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SpaServices.Webpack;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,21 +12,18 @@ using Microsoft.AspNetCore.Rewrite;
 using Swashbuckle.AspNetCore.Swagger;
 using TpDotNetCore.Data;
 using TpDotNetCore.Helpers;
-using TpDotNetCore.Extensions;
 using TpDotNetCore.Auth;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Domain.Punches.Repositories;
 using TpDotNetCore.Domain.Punches;
+using Microsoft.AspNetCore.Identity;
 
 namespace TpDotNetCore
 {
-    public class Startup
+    public partial class Startup
     {
-        private const string SecretKey = "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH"; // todo: get this from somewhere secure
-        private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
-
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -78,6 +70,7 @@ namespace TpDotNetCore
             services.AddSingleton<ITimeService, TimeService>();
             services.AddTransient<ITpController, TpControllerImpl>();
             services.AddTransient<AppUser>();
+            services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IAppUserRepository, AppUserRepository>();
             services.AddTransient<IPunchRepository, PunchRepository>();
             services.AddTransient<IDayPunchRepository, DayPunchRepository>();
@@ -85,18 +78,6 @@ namespace TpDotNetCore
             services.AddTransient<IMonthPunchRepository, MonthPunchRepository>();
             services.AddTransient<IYearPunchRepository, YearPunchRepository>();
             services.AddTransient<IPunchService, PunchService>();
-
-            // jwt wire up
-            // Get options from app settings
-            var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
-
-            // Configure JwtIssuerOptions
-            services.Configure<JwtIssuerOptions>(options =>
-            {
-                options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
-                options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
-                options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
-            });
 
             // api user claim policy
             services.AddAuthorization(options =>
@@ -121,6 +102,8 @@ namespace TpDotNetCore
             services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
 
             services.AddAutoMapper();
+
+            ConfigureJwtAuthService(services);
 
             // Add framework services.
             services.AddMvc();
@@ -148,30 +131,8 @@ namespace TpDotNetCore
 
             dbInitializer.Initialize();
 
-            var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)],
+            app.UseAuthentication();
 
-                ValidateAudience = true,
-                ValidAudience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)],
-
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = _signingKey,
-
-                RequireExpirationTime = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            app.UseJwtBearerAuthentication(new JwtBearerOptions
-            {
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
-                TokenValidationParameters = tokenValidationParameters
-            });
-            
             app.UseMvc();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.

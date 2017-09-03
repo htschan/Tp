@@ -44,7 +44,8 @@
         "System.Linq",
         "Microsoft.AspNetCore.Mvc",
         "TpDotNetCore.Helpers",
-        "Microsoft.AspNetCore.Authorization"
+        "Microsoft.AspNetCore.Authorization",
+		"Microsoft.AspNetCore.Mvc.ModelBinding"
       ],
       "generateOptionalParameters": false,
       "requiredPropertiesMustBeDefined": true,

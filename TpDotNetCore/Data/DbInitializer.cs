@@ -87,7 +87,7 @@ namespace TpDotNetCore.Data
             }
 
             // create some punches for every user
-            for (var date = new DateTime(2015, 1, 1); date <= new DateTime(2017, 6, 16); date += TimeSpan.FromDays(1))
+            for (var date = new DateTime(2015, 1, 1); date <= DateTime.Now - TimeSpan.FromDays(1); date += TimeSpan.FromDays(1))
             {
                 if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
                     continue;

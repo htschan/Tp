@@ -61,7 +61,7 @@ export class AuthService {
         if (username === null || password === null) {
             return Observable.throw("Bad credentials");
         }
-        return this.tpClient.authenticate({ "email": username, "password": password } as CredentialDto)
+        return this.tpClient.authenticate({ "username": username, "password": password, client_type: "web" } as CredentialDto)
             .do(data => {
                 if (data instanceof AuthResponse && data.status.success) {
                     console.log('Data: ' + data);
@@ -70,7 +70,8 @@ export class AuthService {
                     // this.events.publish('user:login');
                     // return this.getMyProfile();
                 } else {
-                    this.logout();
+                    //this.logout();
+                    throw data;
                 }
             },
             e => console.log("OnError " + e),

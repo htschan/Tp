@@ -52,6 +52,26 @@ paths:
           description: AuthResponse
           schema:
             $ref: '#/definitions/AuthResponse'
+  /refreshtoken:
+    post:
+      description:
+        Ein Benutzer erneuert den Token
+      summary: Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]
+      operationId: refreshtoken
+      parameters:
+        - name: refreshtokenparameter
+          in: body
+          required: true
+          description: Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
+          schema:
+            $ref: '#/definitions/RefreshTokenDto'
+      tags:
+        - Authentication
+      responses:
+        default:
+          description: AuthResponse
+          schema:
+            $ref: '#/definitions/AuthResponse'
   /register:
     post:
       description:
@@ -484,16 +504,29 @@ definitions:
         type: string
         description: 
           Ein Authentifizierungstoken mit dem alle folgenden Aufrufe authentifiziert werden.
+      refreshtoken:
+        type: string
+        description: 
+          Ein RefreshToken mit dem der token erneuert werden kann.
   CredentialDto:
     type: object
     properties:
-      email:
+      client_type:
+        type: string
+        description: Der Client-Typ 'web', 'ionic'
+      username:
         type: string
         format: email
         description: Die E-Mail Adresse 1 .. 160 Zeichen. Wird benötigt für die Bestätigung der Kontoerstellung.
       password:
         type: string
         description: Das Passwort 1 .. 80 Zeichen. Wird für die Anmeldung benötigt.
+  RefreshTokenDto:
+    type: object
+    properties:
+      refresh_token:
+        type: string
+        description: Der Refresh Token
   RegisterDto:
     type: object
     properties:
