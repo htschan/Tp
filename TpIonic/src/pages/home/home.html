@@ -19,8 +19,8 @@
       <h1>Heute</h1>
       <ion-grid>
         <ion-row>
-          <ion-col col-4>{{punchDayVm?.date | date:"EEE dd.MM.yyyy"}}</ion-col>
-          <ion-col col-4>{{punchDayVm?.daySum | number: "1.2-2"}}</ion-col>
+          <ion-col col-4>{{punchDayVm?.date.getDay() | dayName}} {{punchDayVm?.date | date:"dd.MM.yyyy"}}</ion-col>
+          <ion-col col-4>Tagestotal: {{punchDayVm?.daySum | number: "1.2-2"}} h</ion-col>
         </ion-row>
         <ion-row *ngFor="let row of punchDayVm?.punchRow">
           <ion-col col-3 (click)="editPunch(row?.enter)">{{row?.enter?.timedec | number: "1.2-2"}}</ion-col>
@@ -41,7 +41,7 @@
           <ion-col col-4>Wochentotal {{punchWeekVm?.weekSum | number: "1.2-2"}}</ion-col>
         </ion-row>
         <ion-row *ngFor="let day of punchWeekVm?.punchDays">
-          <ion-col col-4>{{day?.date | date:"EEE dd.MM.yyyy"}}</ion-col>
+          <ion-col col-4>{{day?.date.getDay() | dayName}} {{day?.date | date:"dd.MM.yyyy"}}</ion-col>
           <ion-col col-4>{{day.daySum | number: "1.2-2"}} h</ion-col>
         </ion-row>
       </ion-grid>
@@ -51,11 +51,27 @@
       <h1>Monat</h1>
       <ion-grid>
         <ion-row>
-          <ion-col col-4>Monat {{monthpunches?.month}}</ion-col>
-          <ion-col col-4>{{monthpunches?.year}}</ion-col>
+          <ion-col col-4>{{punchMonthVm?.month | monthName}}</ion-col>
+          <ion-col col-4>{{punchMonthVm?.year}}</ion-col>
+          <ion-col col-4>Total {{punchMonthVm?.monthSum | number: "1.2-2"}} h</ion-col>
         </ion-row>
-        <ion-row *ngFor="let row of monthpunches?.punches">
-          <ion-col *ngFor="let pu of row?.punches">{{pu?.timedec | number: "1.2-2"}}</ion-col>
+        <ion-row *ngFor="let row of punchMonthVm?.punchDays">
+          <ion-col>{{row?.date | date:"dd.MM.yyyy"}}</ion-col>
+          <ion-col>{{row?.daySum | number: "1.2-2"}}</ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-slide>
+
+    <ion-slide>
+      <h1>Jahr</h1>
+      <ion-grid>
+        <ion-row>
+          <ion-col col-4>Jahr {{punchYearVm?.year}}</ion-col>
+          <ion-col col-4>Total {{punchYearVm?.yearSum | number:"1.2-2"}}</ion-col>
+        </ion-row>
+        <ion-row *ngFor="let row of punchYearVm?.punchMonths">
+          <ion-col>{{row.month | monthName }}</ion-col>
+          <ion-col>{{row.monthSum | number: "1.2-2"}}</ion-col>
         </ion-row>
       </ion-grid>
     </ion-slide>

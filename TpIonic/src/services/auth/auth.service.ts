@@ -23,7 +23,7 @@ export class AuthService {
     constructor(private tpClient: TpClient, zone: NgZone, public events: Events, private http: Http, private storage: Storage) {
         this.zoneImpl = zone;
         storage.ready()
-            // Check if there is a profile saved in local storage
+            // Check if there is a profile saved in storage
             .then(() => this.storage.get('profile').then(profile => {
                 this.userProfile = JSON.parse(profile);
             }));
@@ -61,7 +61,7 @@ export class AuthService {
         if (username === null || password === null) {
             return Observable.throw("Bad credentials");
         }
-        return this.tpClient.authenticate({ "email": username, "password": password } as CredentialDto)
+        return this.tpClient.authenticate({ "username": username, "password": password, client_type: "web" } as CredentialDto)
             .do(data => {
                 if (data instanceof AuthResponse && data.status.success) {
                     console.log('Data: ' + data);
@@ -164,7 +164,7 @@ export class AuthService {
 
     public getNewJwt() {
         // Get a new JWT from Auth0 using the refresh token saved
-        // in local storage
+        // in storage
         this.storage.get('refresh_token').then(token => {
             console.log("refresh");
         }).catch(error => {

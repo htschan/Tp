@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Events, Slides, ModalController, ToastController } from 'ionic-angular';
-import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm } from '../../services/puncher/punch.service';
-import { MonthPunchesDto, PunchDto, OpResult } from '../../services/api.g';
+import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
+import { PunchDto, OpResult } from '../../services/api.g';
 import { PunchEditModal } from '../punchedit/punchedit';
 
 @Component({
@@ -13,7 +13,8 @@ export class HomePage {
   title: String = ' ';
   punchDayVm: PunchDayVm;
   punchWeekVm: PunchWeekVm;
-  monthpunches: MonthPunchesDto;
+  punchMonthVm: PunchMonthVm;
+  punchYearVm: PunchYearVm;
 
   constructor(public events: Events,
     private modalCtrl: ModalController,
@@ -99,6 +100,9 @@ export class HomePage {
       case 2:
         this.getMonth();
         break;
+      case 3:
+        this.getYear();
+        break;
     }
   }
 
@@ -116,8 +120,15 @@ export class HomePage {
 
   getMonth() {
     this.punchService.getMonth()
-      .subscribe(data =>
-        this.monthpunches = data.punches
+      .subscribe(response =>
+        this.punchMonthVm = response
+      );
+  }
+
+  getYear() {
+    this.punchService.getYear()
+      .subscribe(response =>
+        this.punchYearVm = response
       );
   }
 

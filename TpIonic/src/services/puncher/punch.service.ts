@@ -2,7 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
-import { TpClient, MonthResponse, YearResponse, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto } from '../../services/api.g';
+import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto } from '../../services/api.g';
 
 @Injectable()
 export class PunchService {
@@ -30,12 +30,16 @@ export class PunchService {
         });
     }
 
-    getMonth(): Observable<MonthResponse> {
-        return this.tpClient.getThisMonth();
+    getMonth(): Observable<PunchMonthVm> {
+        return this.tpClient.getThisMonth().map(monthResponse => {
+            return new PunchMonthVm(monthResponse.punches);
+        });
     }
 
-    getYear(): Observable<YearResponse> {
-        return this.tpClient.getThisYear();
+    getYear(): Observable<PunchYearVm> {
+        return this.tpClient.getThisYear().map(yearResponse => {
+            return new PunchYearVm(yearResponse.punches);
+        });
     }
 
     updatePunch(punchVm: PunchVm): Observable<PunchResponse> {
@@ -101,8 +105,8 @@ export class PunchRowVm {
 
 export class PunchDayVm {
 
-    constructor(dayPunchesDto: DayPunchesDto) {
-        this.setDayPunches(dayPunchesDto);
+    constructor(dto: DayPunchesDto) {
+        this.setDayPunches(dto);
     }
 
     setDayPunches(dto: DayPunchesDto) {
@@ -123,8 +127,8 @@ export class PunchDayVm {
 
 export class PunchWeekVm {
 
-    constructor(dayPunchesDto: DayPunchesDto) {
-        this.setWeekPunches(dayPunchesDto);
+    constructor(dto: DayPunchesDto) {
+        this.setWeekPunches(dto);
     }
 
     setWeekPunches(dto: WeekPunchesDto) {
@@ -140,5 +144,47 @@ export class PunchWeekVm {
     punchDays?: PunchDayVm[] = [];
     weekSum: number = 0.0;
     week: number;
+    year: number;
+}
+
+export class PunchMonthVm {
+
+    constructor(dto: MonthPunchesDto) {
+        this.setMonthPunches(dto);
+    }
+
+    setMonthPunches(dto: MonthPunchesDto) {
+        for (let dayPunchesDto of dto.punches) {
+            let vm = new PunchDayVm(dayPunchesDto);
+            this.monthSum += vm.daySum;
+            this.punchDays.push(vm);
+        }
+        this.month = dto.month;
+        this.year = dto.year;
+    }
+
+    punchDays?: PunchDayVm[] = [];
+    monthSum: number = 0.0;
+    month: number;
+    year: number;
+}
+
+export class PunchYearVm {
+
+    constructor(dto: YearPunchesDto) {
+        this.setYearPunches(dto);
+    }
+
+    setYearPunches(dto: YearPunchesDto) {
+        for (let monthPunchesDto of dto.punches) {
+            let vm = new PunchMonthVm(monthPunchesDto);
+            this.yearSum += vm.monthSum;
+            this.punchMonths.push(vm);
+        }
+        this.year = dto.year;
+    }
+
+    punchMonths?: PunchMonthVm[] = [];
+    yearSum: number = 0.0;
     year: number;
 }

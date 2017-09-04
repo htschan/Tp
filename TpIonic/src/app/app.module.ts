@@ -20,7 +20,8 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { ProfilePage } from '../pages/profile/profile';
 import { LoginPage } from '../pages/login/login';
 import { RegisterPage } from '../pages/register/register';
-
+import { MonthNamePipe } from '../pipes/monthname.pipe';
+import { DayNamePipe } from '../pipes/dayName.pipe';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,9 @@ import { RegisterPage } from '../pages/register/register';
     TabsPage,
     ProfilePage,
     LoginPage,
-    RegisterPage
+    RegisterPage,
+    MonthNamePipe,
+    DayNamePipe
   ],
   imports: [
     BrowserModule,
