@@ -45,24 +45,17 @@ namespace TpDotNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddCors(options =>
-            // {
-            //     options.AddPolicy("CorsDevPolicy", builder =>
-            //     {
-            //         builder.AllowAnyOrigin()
-            //         .AllowAnyMethod()
-            //         .AllowAnyHeader()
-            //         .AllowCredentials();
-            //     });
-            // });
-
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsDevPolicy", builder =>
                 {
-                    builder.WithOrigins("https://timepuncher.ch", "http://localhost");
+                    builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
                 });
             });
+
             services.AddOptions();
             // Register the IConfiguration instance which TpConfigOptions binds against.
             services.Configure<TpMailConfigOptions>(Configuration.GetSection("TpMailConfigOptions"));

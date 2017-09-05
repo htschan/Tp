@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using TpDotNetCore.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Cors;
 
 namespace TpDotNetCore.Controllers
 {
@@ -92,6 +93,7 @@ namespace TpDotNetCore.Controllers
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "11.3.3.0")]
+    [EnableCors("AllowAllHeaders")]
     [Route("api/v1")]
     public partial class TpController : Microsoft.AspNetCore.Mvc.Controller 
     {
