@@ -93,7 +93,7 @@ namespace TpDotNetCore.Controllers
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "11.3.3.0")]
-    [EnableCors("AllowAllHeaders")]
+    [EnableCors("CorsDevPolicy")]
     [Route("api/v1")]
     public partial class TpController : Microsoft.AspNetCore.Mvc.Controller 
     {
