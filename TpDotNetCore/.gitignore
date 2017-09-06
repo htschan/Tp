@@ -8,6 +8,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.sqlite
 
 timepuncher.appsettings.server.json
 
