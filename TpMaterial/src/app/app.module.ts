@@ -42,7 +42,6 @@ import {
   MdTooltipModule,
   StyleModule
 } from '@angular/material';
-import { CdkTableModule } from '@angular/cdk';
 import { httpFactory } from './http/http.factory';
 import { IonicStorageModule } from '@ionic/storage';
 import { TpClientConfig } from './timepuncher-client-config';
@@ -148,7 +147,6 @@ import { DayNamePipe } from './pipes/dayName.pipe';
     MdToolbarModule,
     MdTooltipModule,
     MdNativeDateModule,
-    CdkTableModule,
     StyleModule
   ]
 })
