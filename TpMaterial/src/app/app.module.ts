@@ -2,47 +2,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { ApplicationRef, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from '@angular/material';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { Storage } from '@ionic/storage';
-import 'hammerjs';
-import {
-  MdAutocompleteModule,
-  MdButtonModule,
-  MdButtonToggleModule,
-  MdCardModule,
-  MdCheckboxModule,
-  MdChipsModule,
-  MdCoreModule,
-  MdTableModule,
-  MdDatepickerModule,
-  MdDialogModule,
-  MdExpansionModule,
-  // MdFormFieldModule, 
-  MdGridListModule,
-  MdIconModule,
-  MdInputModule,
-  MdListModule,
-  MdMenuModule,
-  MdNativeDateModule,
-  MdPaginatorModule,
-  MdProgressBarModule,
-  MdProgressSpinnerModule,
-  MdRadioModule,
-  MdRippleModule,
-  MdSelectModule,
-  MdSidenavModule,
-  MdSliderModule,
-  MdSlideToggleModule,
-  MdSnackBarModule,
-  MdSortModule,
-  MdTabsModule,
-  MdToolbarModule,
-  MdTooltipModule,
-  StyleModule
-} from '@angular/material';
-import { httpFactory } from './http/http.factory';
+import { CoreModule } from '../app/core/core.module';
+import { SharedModule } from '../app/shared/shared.module';
+
+import { httpFactory } from './core/http/http.factory';
 import { IonicStorageModule } from '@ionic/storage';
 import { TpClientConfig } from './timepuncher-client-config';
 import { AppComponent } from './app.component';
@@ -50,7 +14,7 @@ import { DialogComponent } from './dialog/dialog.component';
 import { PunchEditComponent } from './dialog/punchedit.component';
 import { AlertDirective } from './directives/alert/alert.directive';
 import { AppRoutingModule } from './app.routing';
-import { AuthGuard } from './http/auth.guard';
+import { AuthGuard } from './core/http/auth.guard';
 import { TpClient, API_BASE_URL } from './services/api.g';
 import { AuthService } from './services/auth/auth.service';
 import { AlertService } from './services/alert/alert.service';
@@ -82,13 +46,10 @@ import { DayNamePipe } from './pipes/dayName.pipe';
   ],
   imports: [
     BrowserModule,
+    CoreModule,
+    SharedModule,
     FormsModule,
     HttpModule,
-    MaterialModule,
-    FlexLayoutModule,
-    BrowserAnimationsModule,
-    MdButtonModule,
-    MdCheckboxModule,
     MainRoutingModule,
     AppRoutingModule,
     IonicStorageModule.forRoot({
@@ -115,39 +76,6 @@ import { DayNamePipe } from './pipes/dayName.pipe';
   entryComponents: [DialogComponent, PunchEditComponent],
   bootstrap: [AppComponent],
   exports: [
-    MdAutocompleteModule,
-    MdButtonModule,
-    MdButtonToggleModule,
-    MdCardModule,
-    MdCheckboxModule,
-    MdChipsModule,
-    MdTableModule,
-    MdDatepickerModule,
-    MdDialogModule,
-    MdExpansionModule,
-    // MdFormFieldModule,
-    MdGridListModule,
-    MdIconModule,
-    MdInputModule,
-    MdListModule,
-    MdMenuModule,
-    MdCoreModule,
-    MdPaginatorModule,
-    MdProgressBarModule,
-    MdProgressSpinnerModule,
-    MdRadioModule,
-    MdRippleModule,
-    MdSelectModule,
-    MdSidenavModule,
-    MdSlideToggleModule,
-    MdSliderModule,
-    MdSnackBarModule,
-    MdSortModule,
-    MdTabsModule,
-    MdToolbarModule,
-    MdTooltipModule,
-    MdNativeDateModule,
-    StyleModule
   ]
 })
 export class AppModule { }
