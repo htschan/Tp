@@ -28,6 +28,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { LogoutComponent } from './pages/logout/logout.component';
 import { MonthNamePipe } from './pipes/monthname.pipe';
 import { DayNamePipe } from './pipes/dayName.pipe';
+import { WeekNumPipe } from './pipes/weekNum.pipe';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { DayNamePipe } from './pipes/dayName.pipe';
     ProfileComponent,
     LogoutComponent,
     MonthNamePipe,
-    DayNamePipe
+    DayNamePipe,
+    WeekNumPipe
   ],
   imports: [
     BrowserModule,
