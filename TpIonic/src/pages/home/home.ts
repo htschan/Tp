@@ -107,26 +107,26 @@ export class HomePage {
   }
 
   getToday() {
-    this.punchService.getToday().subscribe(response => {
+    this.punchService.getDay(null, null, null).subscribe(response => {
       this.punchDayVm = response;
     });
   }
 
   getWeek() {
-    this.punchService.getWeek().subscribe(response =>
+    this.punchService.getWeek(null, null).subscribe(response =>
       this.punchWeekVm = response
     );
   }
 
   getMonth() {
-    this.punchService.getMonth()
+    this.punchService.getMonth(null, null)
       .subscribe(response =>
         this.punchMonthVm = response
       );
   }
 
   getYear() {
-    this.punchService.getYear()
+    this.punchService.getYear(null)
       .subscribe(response =>
         this.punchYearVm = response
       );
