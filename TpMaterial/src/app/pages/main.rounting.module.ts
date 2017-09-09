@@ -11,10 +11,10 @@ const mainRoutes: Routes = [
     {
         path: 'main', component: MainComponent, canActivate: [AuthGuard],
         children: [
-            { path: 'overview', component: OverviewComponent,/* canActivate: [AuthGuard] */ },
-            { path: 'profile', component: ProfileComponent,/* canActivate: [AuthGuard] */ },
-            { path: 'logout', component: LogoutComponent,/* canActivate: [AuthGuard] */ },
-            { path: '**', redirectTo: 'main/overview' }            
+            { path: 'overview', component: OverviewComponent, canActivate: [AuthGuard] },
+            { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+            { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
+            { path: '**', redirectTo: 'main/overview' }
         ]
     }
 ];

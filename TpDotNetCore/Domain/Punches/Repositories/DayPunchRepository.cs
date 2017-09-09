@@ -32,7 +32,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             throw new NotImplementedException();
         }
 
-        public DayResponse GetCurrent(string userId)
+        public DayResponse GetDay(string userId, double? day, double? month, double? year)
         {
             try
             {
@@ -41,11 +41,15 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
                 var dt = DateTime.Now;
+                var selectDay = day.HasValue ? Convert.ToInt32(day) : dt.Day;
+                var selectMonth = month.HasValue ? Convert.ToInt32(month) : dt.Month;
+                var selectYear = year.HasValue ? Convert.ToInt32(year) : dt.Year;
+
                 var punches = _appDbContext.Punches
                     .Where(p => p.User.Id == user.Id)
-                    .Where(p => p.DayPunch.Day == dt.Day)
-                    .Where(p => p.MonthPunch.Month == dt.Month)
-                    .Where(p => p.YearPunch.Year == dt.Year)
+                    .Where(p => p.DayPunch.Day == selectDay)
+                    .Where(p => p.MonthPunch.Month == selectMonth)
+                    .Where(p => p.YearPunch.Year == selectYear)
                     .ToList();
                 var response = new DayResponse
                 {

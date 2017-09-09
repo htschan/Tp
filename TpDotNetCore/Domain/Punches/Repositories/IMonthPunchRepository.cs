@@ -4,6 +4,6 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 {
     public interface IMonthPunchRepository : IBasePunchRepository<PunchDto, MonthResponse>
     {
-         
+        MonthResponse GetMonth(string userId, double? month, double? year);
     }
 }

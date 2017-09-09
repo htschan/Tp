@@ -35,7 +35,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             throw new NotImplementedException();
         }
 
-        public MonthResponse GetCurrent(string userId)
+        public MonthResponse GetMonth(string userId, double? month, double? year)
         {
             try
             {
@@ -44,10 +44,13 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
                 var dt = DateTime.Now;
+                var selectMonth = month.HasValue ? Convert.ToInt32(month) : dt.Month;
+                var selectedYear = year.HasValue ? Convert.ToInt32(year) : dt.Year;
+
                 var groupedPunches = _appDbContext.Punches
                     .Where(p => p.User.Id == user.Id)
-                    .Where(p => p.MonthPunch.Month == dt.Month)
-                    .Where(p => p.YearPunch.Year == dt.Year)
+                    .Where(p => p.MonthPunch.Month == selectMonth)
+                    .Where(p => p.YearPunch.Year == selectedYear)
                     .GroupBy(p => p.DayPunch.Day)
                     .ToList();
 

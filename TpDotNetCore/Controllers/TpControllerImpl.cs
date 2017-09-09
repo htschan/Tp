@@ -175,66 +175,66 @@ namespace TpDotNetCore.Controllers
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<DayResponse>> GetTodayAsync()
+        public Task<SwaggerResponse<DayResponse>> GetDayAsync(double? day, double? month, double? year)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _dayPunchRepository.GetCurrent(userId);
+                var response = _dayPunchRepository.GetDay(userId, day, month, year);
                 return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
-                var response = new DayResponse { Status = new OpResult { Success = false, Result = "Failed to get Today's punches" } };
+                var response = new DayResponse { Status = new OpResult { Success = false, Result = $"Failed to get day {day} punches" } };
                 return HandleException<DayResponse>(exception, headers, response);
             }
         }
 
-        public Task<SwaggerResponse<WeekResponse>> GetThisWeekAsync()
+        public Task<SwaggerResponse<WeekResponse>> GetWeekAsync(double? week, double? year)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _weekPunchRepository.GetCurrent(userId);
+                var response = _weekPunchRepository.GetWeek(userId, week, year);
                 return Task.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
-                var response = new WeekResponse { Status = new OpResult { Success = false, Result = "Failed to get Week's punches" } };
+                var response = new WeekResponse { Status = new OpResult { Success = false, Result = $"Failed to get week {week} punches" } };
                 return HandleException<WeekResponse>(exception, headers, response);
             }
         }
 
-        public Task<SwaggerResponse<MonthResponse>> GetThisMonthAsync()
+        public Task<SwaggerResponse<MonthResponse>> GetMonthAsync(double? month, double? year)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _monthPunchRepository.GetCurrent(userId);
+                var response = _monthPunchRepository.GetMonth(userId, month, year);
                 return Task.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
-                var response = new MonthResponse { Status = new OpResult { Success = false, Result = "Failed to get Month's punches" } };
+                var response = new MonthResponse { Status = new OpResult { Success = false, Result = $"Failed to get month {month} punches" } };
                 return HandleException<MonthResponse>(exception, headers, response);
             }
         }
 
-        public Task<SwaggerResponse<YearResponse>> GetThisYearAsync()
+        public Task<SwaggerResponse<YearResponse>> GetYearAsync(double? year)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _yearPunchRepository.GetCurrent(userId);
+                var response = _yearPunchRepository.GetYear(userId, year);
                 return Task.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
             {
-                var response = new YearResponse { Status = new OpResult { Success = false, Result = "Failed to get Year's punches" } };
+                var response = new YearResponse { Status = new OpResult { Success = false, Result = $"Failed to get year {year} punches" } };
                 return HandleException<YearResponse>(exception, headers, response);
             }
         }
@@ -308,7 +308,7 @@ namespace TpDotNetCore.Controllers
                     System.Console.WriteLine(cl.Subject.Name);
                 }
                 _punchRepository.Punch(userId, direction);
-                var response = _dayPunchRepository.GetCurrent(userId);
+                var response = _dayPunchRepository.GetDay(userId, null, null, null);
                 return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)

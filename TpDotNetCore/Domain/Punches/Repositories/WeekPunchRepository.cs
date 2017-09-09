@@ -35,7 +35,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             throw new NotImplementedException();
         }
 
-        public WeekResponse GetCurrent(string userId)
+        public WeekResponse GetWeek(string userId, double? week, double? year)
         {
             try
             {
@@ -44,10 +44,12 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
                 var dt = DateTime.Now;
-                var week = _timeService.GetWeekNumber(dt);
+                var selectWeek = week.HasValue ? Convert.ToInt32(week) : _timeService.GetWeekNumber(dt);
+                var selectYear = year.HasValue ? Convert.ToInt32(year) : dt.Year;
+
                 var punches = _appDbContext.Punches
                     .Where(p => p.User.Id == user.Id)
-                    .Where(p => p.WeekPunch.Week == week)
+                    .Where(p => p.WeekPunch.Week == selectWeek)
                     .Where(p => p.YearPunch.Year == dt.Year)
                     .GroupBy(p => p.DayPunch.Day)
                     .ToList();

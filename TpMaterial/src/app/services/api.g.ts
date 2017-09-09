@@ -86,25 +86,33 @@ export interface ITpClient {
      */
     getPunches(): Observable<PunchDto[] | null>;
     /**
-     * Retrieves all punches of current user of today
+     * Retrieves all punches of current user of selected day
+     * @day The day selector [1 .. 31]
+     * @month The month number selector [1 .. 12]
+     * @year The year number selector [2015 .. 2099]
      * @return An day punches object
      */
-    getToday(): Observable<DayResponse | null>;
+    getDay(day: number | undefined, month: number | undefined, year: number | undefined): Observable<DayResponse | null>;
     /**
-     * Retrieves all punches of current user current week
+     * Retrieves all punches of current user selected week
+     * @week The week number selector
+     * @year The year number selector [2015 .. 2099]
      * @return A week punches object
      */
-    getThisWeek(): Observable<WeekResponse | null>;
+    getWeek(week: number | undefined, year: number | undefined): Observable<WeekResponse | null>;
     /**
-     * Retrieves all punches of current user of current month
+     * Retrieves all punches of current user of selected month
+     * @month The month number selector [1 .. 12]
+     * @year The year number selector [2015 .. 2099]
      * @return A month punches object
      */
-    getThisMonth(): Observable<MonthResponse | null>;
+    getMonth(month: number | undefined, year: number | undefined): Observable<MonthResponse | null>;
     /**
-     * Retrieves all punches of current user of current year
+     * Retrieves all punches of current user of selected year
+     * @year The year number selector [2015 .. 2099]
      * @return A year punches object
      */
-    getThisYear(): Observable<YearResponse | null>;
+    getYear(year: number | undefined): Observable<YearResponse | null>;
     /**
      * Erzeugt einen Zeitstempel
      * @return Liefert die Tagesstempel zurück
@@ -707,11 +715,20 @@ export class TpClient implements ITpClient {
     }
 
     /**
-     * Retrieves all punches of current user of today
+     * Retrieves all punches of current user of selected day
+     * @day The day selector [1 .. 31]
+     * @month The month number selector [1 .. 12]
+     * @year The year number selector [2015 .. 2099]
      * @return An day punches object
      */
-    getToday(): Observable<DayResponse | null> {
-        let url_ = this.baseUrl + "/punches/today";
+    getDay(day: number | undefined, month: number | undefined, year: number | undefined): Observable<DayResponse | null> {
+        let url_ = this.baseUrl + "/punches/day?";
+        if (day !== undefined)
+            url_ += "day=" + encodeURIComponent("" + day) + "&"; 
+        if (month !== undefined)
+            url_ += "month=" + encodeURIComponent("" + month) + "&"; 
+        if (year !== undefined)
+            url_ += "year=" + encodeURIComponent("" + year) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = {
@@ -723,11 +740,11 @@ export class TpClient implements ITpClient {
         };
 
         return this.http.request(url_, options_).flatMap((response_) => {
-            return this.processGetToday(response_);
+            return this.processGetDay(response_);
         }).catch((response_: any) => {
             if (response_ instanceof Response) {
                 try {
-                    return this.processGetToday(response_);
+                    return this.processGetDay(response_);
                 } catch (e) {
                     return <Observable<DayResponse>><any>Observable.throw(e);
                 }
@@ -736,7 +753,7 @@ export class TpClient implements ITpClient {
         });
     }
 
-    protected processGetToday(response: Response): Observable<DayResponse | null> {
+    protected processGetDay(response: Response): Observable<DayResponse | null> {
         const status = response.status; 
 
         if (status === 200) {
@@ -755,11 +772,17 @@ export class TpClient implements ITpClient {
     }
 
     /**
-     * Retrieves all punches of current user current week
+     * Retrieves all punches of current user selected week
+     * @week The week number selector
+     * @year The year number selector [2015 .. 2099]
      * @return A week punches object
      */
-    getThisWeek(): Observable<WeekResponse | null> {
-        let url_ = this.baseUrl + "/punches/thisweek";
+    getWeek(week: number | undefined, year: number | undefined): Observable<WeekResponse | null> {
+        let url_ = this.baseUrl + "/punches/week?";
+        if (week !== undefined)
+            url_ += "week=" + encodeURIComponent("" + week) + "&"; 
+        if (year !== undefined)
+            url_ += "year=" + encodeURIComponent("" + year) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = {
@@ -771,11 +794,11 @@ export class TpClient implements ITpClient {
         };
 
         return this.http.request(url_, options_).flatMap((response_) => {
-            return this.processGetThisWeek(response_);
+            return this.processGetWeek(response_);
         }).catch((response_: any) => {
             if (response_ instanceof Response) {
                 try {
-                    return this.processGetThisWeek(response_);
+                    return this.processGetWeek(response_);
                 } catch (e) {
                     return <Observable<WeekResponse>><any>Observable.throw(e);
                 }
@@ -784,7 +807,7 @@ export class TpClient implements ITpClient {
         });
     }
 
-    protected processGetThisWeek(response: Response): Observable<WeekResponse | null> {
+    protected processGetWeek(response: Response): Observable<WeekResponse | null> {
         const status = response.status; 
 
         if (status === 200) {
@@ -803,11 +826,17 @@ export class TpClient implements ITpClient {
     }
 
     /**
-     * Retrieves all punches of current user of current month
+     * Retrieves all punches of current user of selected month
+     * @month The month number selector [1 .. 12]
+     * @year The year number selector [2015 .. 2099]
      * @return A month punches object
      */
-    getThisMonth(): Observable<MonthResponse | null> {
-        let url_ = this.baseUrl + "/punches/thismonth";
+    getMonth(month: number | undefined, year: number | undefined): Observable<MonthResponse | null> {
+        let url_ = this.baseUrl + "/punches/month?";
+        if (month !== undefined)
+            url_ += "month=" + encodeURIComponent("" + month) + "&"; 
+        if (year !== undefined)
+            url_ += "year=" + encodeURIComponent("" + year) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = {
@@ -819,11 +848,11 @@ export class TpClient implements ITpClient {
         };
 
         return this.http.request(url_, options_).flatMap((response_) => {
-            return this.processGetThisMonth(response_);
+            return this.processGetMonth(response_);
         }).catch((response_: any) => {
             if (response_ instanceof Response) {
                 try {
-                    return this.processGetThisMonth(response_);
+                    return this.processGetMonth(response_);
                 } catch (e) {
                     return <Observable<MonthResponse>><any>Observable.throw(e);
                 }
@@ -832,7 +861,7 @@ export class TpClient implements ITpClient {
         });
     }
 
-    protected processGetThisMonth(response: Response): Observable<MonthResponse | null> {
+    protected processGetMonth(response: Response): Observable<MonthResponse | null> {
         const status = response.status; 
 
         if (status === 200) {
@@ -851,11 +880,14 @@ export class TpClient implements ITpClient {
     }
 
     /**
-     * Retrieves all punches of current user of current year
+     * Retrieves all punches of current user of selected year
+     * @year The year number selector [2015 .. 2099]
      * @return A year punches object
      */
-    getThisYear(): Observable<YearResponse | null> {
-        let url_ = this.baseUrl + "/punches/thisyear";
+    getYear(year: number | undefined): Observable<YearResponse | null> {
+        let url_ = this.baseUrl + "/punches/year?";
+        if (year !== undefined)
+            url_ += "year=" + encodeURIComponent("" + year) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = {
@@ -867,11 +899,11 @@ export class TpClient implements ITpClient {
         };
 
         return this.http.request(url_, options_).flatMap((response_) => {
-            return this.processGetThisYear(response_);
+            return this.processGetYear(response_);
         }).catch((response_: any) => {
             if (response_ instanceof Response) {
                 try {
-                    return this.processGetThisYear(response_);
+                    return this.processGetYear(response_);
                 } catch (e) {
                     return <Observable<YearResponse>><any>Observable.throw(e);
                 }
@@ -880,7 +912,7 @@ export class TpClient implements ITpClient {
         });
     }
 
-    protected processGetThisYear(response: Response): Observable<YearResponse | null> {
+    protected processGetYear(response: Response): Observable<YearResponse | null> {
         const status = response.status; 
 
         if (status === 200) {
