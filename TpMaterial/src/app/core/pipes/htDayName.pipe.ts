@@ -1,9 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'dayName'
+  name: 'htDayName'
 })
-export class DayNamePipe implements PipeTransform {
+export class HtDayNamePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
     let dayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];

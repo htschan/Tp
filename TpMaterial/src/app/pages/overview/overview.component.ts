@@ -5,8 +5,8 @@ import { MdTabChangeEvent } from '@angular/material';
 
 import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
 import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult, YearPunchesDto } from '../../services/api.g';
-import { MonthNamePipe } from '../../pipes/monthName.pipe';
-import { WeekNumPipe } from '../../pipes/weeknum.pipe';
+import { HtMonthNamePipe } from '../../core/pipes/htmonthname.pipe';
+import { HtWeekNumPipe } from '../../core/pipes/htweeknum.pipe';
 import { PunchEditComponent } from '../../dialog/punchedit.component';
 
 @Component({
@@ -33,7 +33,7 @@ export class OverviewComponent implements OnInit {
     let dt = new Date();
     this.year = dt.getFullYear();
     this.month = dt.getMonth();
-    let pipe = new MonthNamePipe();
+    let pipe = new HtMonthNamePipe();
     for (let i = 1; i < 13; i++) {
       this.months.push({ monthNum: i, monthName: pipe.transform(i) })
     }
@@ -141,7 +141,7 @@ export class OverviewComponent implements OnInit {
   }
 
   weekChanged() {
-    let w = new WeekNumPipe();
+    let w = new HtWeekNumPipe();
     this.punchService.getWeek(w.transform(this.week), this.year).subscribe(response =>
       this.punchWeekVm = response
     );
