@@ -78,7 +78,7 @@ namespace TpDotNetCore.Controllers
                     new SwaggerResponse<AuthResponse>(
                         exception.StatusCode,
                         headers,
-                        new AuthResponse { Token = "", Status = new OpResult { Success = false, Result = "Authenication failed" } }, exception.Message));
+                        new AuthResponse { Token = "", Status = new OpResult { Success = false, Result = "Authentication failed" } }, exception.Message));
             }
         }
 
