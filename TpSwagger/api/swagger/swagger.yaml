@@ -290,16 +290,36 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/OpResult'
-  /punches/today:
+  /punches/day:
     get:
       description: |
-        Get all punches of today for current user
-      summary: Retrieves all punches of current user of today
-      operationId: getToday
+        Get all punches of selected day for current user
+        If no day selector specified, return today
+      summary: Retrieves all punches of current user of selected day
+      operationId: getDay
       produces:
         - application/json
       tags:
         - Punches
+      parameters:
+        - name: day
+          in: query
+          description: The day selector [1 .. 31]
+          required: False
+          type: number
+          format: integer
+        - name: month
+          in: query
+          description: The month number selector [1 .. 12]
+          required: False
+          type: number
+          format: integer
+        - name: year
+          in: query
+          description: The year number selector [2015 .. 2099]
+          required: False
+          type: number
+          format: integer
       responses:
         200:
           description: An day punches object
@@ -309,16 +329,30 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/OpResult'
-  /punches/thisweek:
+  /punches/week:
     get:
       description: |
-        Get all punches of current week for current user
-      summary: Retrieves all punches of current user current week
-      operationId: getThisWeek
+        Get all punches of selected week and year for current user
+        If no week selector specified, return current week
+      summary: Retrieves all punches of current user selected week
+      operationId: getWeek
       produces:
         - application/json
       tags:
         - Punches
+      parameters:
+        - name: week
+          in: query
+          description: The week number selector
+          required: False
+          type: number
+          format: integer
+        - name: year
+          in: query
+          description: The year number selector [2015 .. 2099]
+          required: False
+          type: number
+          format: integer
       responses:
         200:
           description: A week punches object
@@ -328,16 +362,30 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/OpResult'
-  /punches/thismonth:
+  /punches/month:
     get:
       description: |
-        Get all punches of today for current user
-      summary: Retrieves all punches of current user of current month
-      operationId: getThisMonth
+        Get all punches of selected month and year for current user
+        If no month selector specified, return current month
+      summary: Retrieves all punches of current user of selected month
+      operationId: getMonth
       produces:
         - application/json
       tags:
         - Punches
+      parameters:
+        - name: month
+          in: query
+          description: The month number selector [1 .. 12] 
+          required: False
+          type: number
+          format: integer
+        - name: year
+          in: query
+          description: The year number selector [2015 .. 2099]
+          required: False
+          type: number
+          format: integer
       responses:
         200:
           description: A month punches object
@@ -347,16 +395,24 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/OpResult'
-  /punches/thisyear:
+  /punches/year:
     get:
       description: |
-        Get all punches of current year for current user
-      summary: Retrieves all punches of current user of current year
-      operationId: getThisYear
+        Get all punches of selected year for current user
+        If no year selector specified, return current year
+      summary: Retrieves all punches of current user of selected year
+      operationId: getYear
       produces:
         - application/json
       tags:
         - Punches
+      parameters:
+        - name: year
+          in: query
+          description: The year number selector [2015 .. 2099] 
+          required: False
+          type: number
+          format: integer
       responses:
         200:
           description: A year punches object

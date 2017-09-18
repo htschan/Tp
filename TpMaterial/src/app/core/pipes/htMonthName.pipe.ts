@@ -1,9 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'monthName'
+  name: 'htMonthName'
 })
-export class MonthNamePipe implements PipeTransform {
+export class HtMonthNamePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
     let monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',

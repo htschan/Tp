@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { AuthGuard } from '../http/auth.guard';
+import { AuthGuard } from '../core/http/auth.guard';
 import { MainComponent } from './main/main.component';
 import { OverviewComponent } from './overview/overview.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -11,10 +11,10 @@ const mainRoutes: Routes = [
     {
         path: 'main', component: MainComponent, canActivate: [AuthGuard],
         children: [
-            { path: 'overview', component: OverviewComponent,/* canActivate: [AuthGuard] */ },
-            { path: 'profile', component: ProfileComponent,/* canActivate: [AuthGuard] */ },
-            { path: 'logout', component: LogoutComponent,/* canActivate: [AuthGuard] */ },
-            { path: '**', redirectTo: 'main/overview' }            
+            { path: 'overview', component: OverviewComponent, canActivate: [AuthGuard] },
+            { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+            { path: 'logout', component: LogoutComponent, canActivate: [AuthGuard] },
+            { path: '**', redirectTo: 'main/overview' }
         ]
     }
 ];

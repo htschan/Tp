@@ -13,7 +13,7 @@
       <md-tab-group (selectChange)="tabChanged($event)">
         <md-tab label="Heute" id="tab1">
           <md-grid-list cols="4" rowHeight="3em">
-            <md-grid-tile col-3>{{punchDayVm?.date.getDay() | dayName}} {{punchDayVm?.date | date:"dd.MM.yyyy"}}</md-grid-tile>
+            <md-grid-tile col-3>{{punchDayVm?.date.getDay() | htDayName}} {{punchDayVm?.date | date:"dd.MM.yyyy"}}</md-grid-tile>
             <md-grid-tile col-3>Tagestotal: {{punchDayVm?.daySum | number: "1.2-2"}} h</md-grid-tile>
           </md-grid-list>
           <md-card>
@@ -27,14 +27,17 @@
           </md-card>
         </md-tab>
         <md-tab label="Woche">
-          <md-grid-list cols="2" rowHeight="3em">
-            <md-grid-tile col-3>Kalenderwoche {{punchWeekVm?.week}}/{{punchWeekVm?.year}}</md-grid-tile>
-            <md-grid-tile col-3>Wochentotal {{punchWeekVm?.weekSum | number: "1.2-2"}}</md-grid-tile>
+          <md-grid-list cols="3" rowHeight="3em">
+            <md-grid-tile colspan="1">
+              <input mdInput type="week" placeholder="Woche" [(ngModel)]="week" (change)="weekChanged()">
+            </md-grid-tile>
+            <md-grid-tile>Kalenderwoche {{punchWeekVm?.week}}/{{punchWeekVm?.year}}</md-grid-tile>
+            <md-grid-tile>Wochentotal {{punchWeekVm?.weekSum | number: "1.2-2"}}</md-grid-tile>
           </md-grid-list>
           <md-card>
             <md-card-content class="scroll-content">
               <md-grid-list cols="4" rowHeight="2em" *ngFor="let day of punchWeekVm?.punchDays">
-                <md-grid-tile colspan="2"><span style="position: absolute; left: 5px">{{day?.date.getDay() | dayName}} {{day?.date | date:"dd.MM.yyyy"}}</span></md-grid-tile>
+                <md-grid-tile colspan="2"><span style="position: absolute; left: 5px">{{day?.date.getDay() | htDayName}} {{day?.date | date:"dd.MM.yyyy"}}</span></md-grid-tile>
                 <md-grid-tile>{{day?.daySum | number: "1.2-2"}} h</md-grid-tile>
                 <md-grid-tile></md-grid-tile>
               </md-grid-list>
@@ -42,10 +45,22 @@
           </md-card>
         </md-tab>
         <md-tab label="Monat">
-          <md-grid-list cols="4" rowHeight="3em">
-            <md-grid-tile col-3>{{punchMonthVm?.month | monthName}}</md-grid-tile>
-            <md-grid-tile col-3>{{punchMonthVm?.year}}</md-grid-tile>
-            <md-grid-tile col-3>Total {{punchMonthVm?.monthSum | number: "1.2-2"}} h</md-grid-tile>
+          <md-grid-list cols="3" rowHeight="3em">
+            <md-grid-tile colspan="1">
+              <md-select placeholder="Monat" [(ngModel)]="month" (change)="monthChanged()">
+                <md-option *ngFor="let month of months" [value]="month.monthNum">
+                  {{ month.monthName }}
+                </md-option>
+              </md-select>
+            </md-grid-tile>
+            <md-grid-tile colspan="1">
+              <md-select placeholder="Jahr" [(ngModel)]="year" (change)="monthChanged()">
+                <md-option *ngFor="let year of years" [value]="year">
+                  {{ year }}
+                </md-option>
+              </md-select>
+            </md-grid-tile>
+            <md-grid-tile>Total {{punchMonthVm?.monthSum | number: "1.2-2"}} h</md-grid-tile>
           </md-grid-list>
           <md-card>
             <md-card-content class="scroll-content">
@@ -57,14 +72,20 @@
           </md-card>
         </md-tab>
         <md-tab label="Jahr">
-          <md-grid-list cols="4" rowHeight="3em">
-            <md-grid-tile col-3>Jahr {{punchYearVm?.year}}</md-grid-tile>
-            <md-grid-tile col-3>Total {{punchYearVm?.yearSum | number: "1.2-2"}} h</md-grid-tile>
+          <md-grid-list cols="3" rowHeight="3em">
+            <md-grid-tile colspan="1">
+              <md-select placeholder="Jahr" [(ngModel)]="year" (change)="yearChanged()">
+                <md-option *ngFor="let year of years" [value]="year">
+                  {{ year }}
+                </md-option>
+              </md-select>
+            </md-grid-tile>
+            <md-grid-tile colspan="1">Total {{punchYearVm?.yearSum | number: "1.2-2"}} h</md-grid-tile>
           </md-grid-list>
           <md-card>
             <md-card-content class="scroll-content">
               <md-grid-list cols="6" rowHeight="2em" *ngFor="let row of punchYearVm?.punchMonths">
-                <md-grid-tile col-3>{{row.month | monthName }}</md-grid-tile>
+                <md-grid-tile col-3>{{row.month | htMonthName }}</md-grid-tile>
                 <md-grid-tile col-3>{{row.monthSum | number: "1.2-2"}}</md-grid-tile>
               </md-grid-list>
             </md-card-content>

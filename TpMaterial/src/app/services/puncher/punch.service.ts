@@ -2,7 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
-import { TpClient, DayResponse, WeekResponse, MonthResponse, YearResponse, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto } from '../../services/api.g';
+import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto } from '../../services/api.g';
 
 @Injectable()
 export class PunchService {
@@ -19,26 +19,26 @@ export class PunchService {
             });
     }
 
-    getToday(): Observable<PunchDayVm> {
-        return this.tpClient.getToday().map(dayResponse => {
+    getToday(day: number | undefined, month: number | undefined, year: number | undefined): Observable<PunchDayVm> {
+        return this.tpClient.getDay(day, month, year).map(dayResponse => {
             return new PunchDayVm(dayResponse.punches);
         });
     }
 
-    getWeek(): Observable<PunchWeekVm> {
-        return this.tpClient.getThisWeek().map(weekResponse => {
+    getWeek(week: number | undefined, year: number | undefined): Observable<PunchWeekVm> {
+        return this.tpClient.getWeek(week, year).map(weekResponse => {
             return new PunchWeekVm(weekResponse.punches);
         });
     }
 
-    getMonth(): Observable<PunchMonthVm> {
-        return this.tpClient.getThisMonth().map(monthResponse => {
+    getMonth(month: number | undefined, year: number | undefined): Observable<PunchMonthVm> {
+        return this.tpClient.getMonth(month, year).map(monthResponse => {
             return new PunchMonthVm(monthResponse.punches);
         });
     }
 
-    getYear(): Observable<PunchYearVm> {
-        return this.tpClient.getThisYear().map(yearResponse => {
+    getYear(year: number | undefined): Observable<PunchYearVm> {
+        return this.tpClient.getYear(year).map(yearResponse => {
             return new PunchYearVm(yearResponse.punches);
         });
     }

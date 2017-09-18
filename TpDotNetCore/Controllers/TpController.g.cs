@@ -59,18 +59,26 @@ namespace TpDotNetCore.Controllers
         /// <summary>Retrieves all punches of current user</summary>
         /// <returns>An array of products</returns>
         System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.List<PunchDto>>> GetPunchesAsync();
-        /// <summary>Retrieves all punches of current user of today</summary>
+        /// <summary>Retrieves all punches of current user of selected day</summary>
+        /// <param name="day">The day selector [1 .. 31]</param>
+        /// <param name="month">The month number selector [1 .. 12]</param>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>An day punches object</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<DayResponse>> GetTodayAsync();
-        /// <summary>Retrieves all punches of current user current week</summary>
+        System.Threading.Tasks.Task<SwaggerResponse<DayResponse>> GetDayAsync(double? day, double? month, double? year);
+        /// <summary>Retrieves all punches of current user selected week</summary>
+        /// <param name="week">The week number selector</param>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A week punches object</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<WeekResponse>> GetThisWeekAsync();
-        /// <summary>Retrieves all punches of current user of current month</summary>
+        System.Threading.Tasks.Task<SwaggerResponse<WeekResponse>> GetWeekAsync(double? week, double? year);
+        /// <summary>Retrieves all punches of current user of selected month</summary>
+        /// <param name="month">The month number selector [1 .. 12]</param>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A month punches object</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<MonthResponse>> GetThisMonthAsync();
-        /// <summary>Retrieves all punches of current user of current year</summary>
+        System.Threading.Tasks.Task<SwaggerResponse<MonthResponse>> GetMonthAsync(double? month, double? year);
+        /// <summary>Retrieves all punches of current user of selected year</summary>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A year punches object</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<YearResponse>> GetThisYearAsync();
+        System.Threading.Tasks.Task<SwaggerResponse<YearResponse>> GetYearAsync(double? year);
         /// <summary>Erzeugt einen Zeitstempel</summary>
         /// <returns>Liefert die Tagesstempel zurück</returns>
         System.Threading.Tasks.Task<SwaggerResponse<DayResponse>> PunchInAsync();
@@ -283,13 +291,16 @@ namespace TpDotNetCore.Controllers
             else
                 return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
         }
-        /// <summary>Retrieves all punches of current user of today</summary>
+        /// <summary>Retrieves all punches of current user of selected day</summary>
+        /// <param name="day">The day selector [1 .. 31]</param>
+        /// <param name="month">The month number selector [1 .. 12]</param>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>An day punches object</returns>
         
-        [HttpGet, Route("punches/today")]
-        public async System.Threading.Tasks.Task<IActionResult> GetToday()
+        [HttpGet, Route("punches/day")]
+        public async System.Threading.Tasks.Task<IActionResult> GetDay([FromQuery]double? day, [FromQuery]double? month, [FromQuery]double? year)
         {    
-            var result = await _implementation.GetTodayAsync();
+            var result = await _implementation.GetDayAsync(day, month, year);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)
@@ -297,13 +308,15 @@ namespace TpDotNetCore.Controllers
             else
                 return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
         }
-        /// <summary>Retrieves all punches of current user current week</summary>
+        /// <summary>Retrieves all punches of current user selected week</summary>
+        /// <param name="week">The week number selector</param>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A week punches object</returns>
         
-        [HttpGet, Route("punches/thisweek")]
-        public async System.Threading.Tasks.Task<IActionResult> GetThisWeek()
+        [HttpGet, Route("punches/week")]
+        public async System.Threading.Tasks.Task<IActionResult> GetWeek([FromQuery]double? week, [FromQuery]double? year)
         {    
-            var result = await _implementation.GetThisWeekAsync();
+            var result = await _implementation.GetWeekAsync(week, year);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)
@@ -311,13 +324,15 @@ namespace TpDotNetCore.Controllers
             else
                 return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
         }
-        /// <summary>Retrieves all punches of current user of current month</summary>
+        /// <summary>Retrieves all punches of current user of selected month</summary>
+        /// <param name="month">The month number selector [1 .. 12]</param>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A month punches object</returns>
         
-        [HttpGet, Route("punches/thismonth")]
-        public async System.Threading.Tasks.Task<IActionResult> GetThisMonth()
+        [HttpGet, Route("punches/month")]
+        public async System.Threading.Tasks.Task<IActionResult> GetMonth([FromQuery]double? month, [FromQuery]double? year)
         {    
-            var result = await _implementation.GetThisMonthAsync();
+            var result = await _implementation.GetMonthAsync(month, year);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)
@@ -325,13 +340,14 @@ namespace TpDotNetCore.Controllers
             else
                 return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
         }
-        /// <summary>Retrieves all punches of current user of current year</summary>
+        /// <summary>Retrieves all punches of current user of selected year</summary>
+        /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A year punches object</returns>
         
-        [HttpGet, Route("punches/thisyear")]
-        public async System.Threading.Tasks.Task<IActionResult> GetThisYear()
+        [HttpGet, Route("punches/year")]
+        public async System.Threading.Tasks.Task<IActionResult> GetYear([FromQuery]double? year)
         {    
-            var result = await _implementation.GetThisYearAsync();
+            var result = await _implementation.GetYearAsync(year);
             foreach (var header in result.Headers)
                 ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
             if (result.StatusCode == 200)

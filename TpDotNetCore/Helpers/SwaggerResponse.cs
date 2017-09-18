@@ -1,13 +1,15 @@
 
+using System.Collections.Generic;
+
 namespace TpDotNetCore.Helpers
 {
     public class SwaggerResponse
     {
         public int StatusCode { get; private set; }
 
-        public System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
+        public Dictionary<string, IEnumerable<string>> Headers { get; private set; }
 
-        public SwaggerResponse(int statusCode, System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>> headers)
+        public SwaggerResponse(int statusCode, Dictionary<string, IEnumerable<string>> headers)
         {
             StatusCode = statusCode;
             Headers = headers;

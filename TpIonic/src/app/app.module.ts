@@ -20,7 +20,7 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { ProfilePage } from '../pages/profile/profile';
 import { LoginPage } from '../pages/login/login';
 import { RegisterPage } from '../pages/register/register';
-import { MonthNamePipe } from '../pipes/monthname.pipe';
+import { MonthNamePipe } from '../pipes/monthName.pipe';
 import { DayNamePipe } from '../pipes/dayName.pipe';
 
 @NgModule({
