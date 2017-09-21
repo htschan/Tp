@@ -7,7 +7,7 @@ import { JwtHelper, tokenNotExpired } from 'angular2-jwt';
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { TpClientConfig } from '../../timepuncher-client-config';
-import { TpClient, AuthResponse, CredentialDto } from '../../services/api.g';
+import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto } from '../../services/api.g';
 
 const registerUrl: string = `${TpClientConfig.baserurl}api/v1/accounts`;
 
@@ -24,10 +24,17 @@ export class AuthService {
         this.zoneImpl = zone;
         storage.ready()
             // Check if there is a profile saved in storage
-            .then(() => this.storage.get('profile').then(profile => {
-                this.userProfile = JSON.parse(profile);
-            }));
-        this.getToken().then(token => this.idToken = token);
+            .then(() => this.storage.get('profile')
+                .then(profile => {
+                    this.userProfile = JSON.parse(profile);
+                }))
+            .then(() => {
+                this.getToken().then(token => {
+                    this.idToken = token;
+                    if (this.idToken)
+                        this.startupTokenRefresh();
+                });
+            });
     }
 
     public getAuthenticated(): Promise<boolean> {
@@ -63,16 +70,15 @@ export class AuthService {
         }
         return this.tpClient.authenticate({ "username": username, "password": password, client_type: "web" } as CredentialDto)
             .do(data => {
-                if (data instanceof AuthResponse && data.status.success) {
-                    console.log('Data: ' + data);
-                    this.storage.set('id_token', data.token);
-                    this.idToken = data.token;
-                    // this.events.publish('user:login');
-                    // return this.getMyProfile();
-                } else {
-                    //this.logout();
-                    throw data;
-                }
+                this.storeAuth(data)
+                    .then(() =>
+                        this.startupTokenRefresh())
+                    .catch(() => {
+                        this.logout();
+                        throw data;
+                    });
+                // this.events.publish('user:login');
+                // return this.getMyProfile();
             },
             e => console.log("OnError " + e),
             () => console.log("Authenticate complete"));
@@ -130,7 +136,7 @@ export class AuthService {
     public startupTokenRefresh() {
         // If the user is authenticated, use the token stream
         // provided by angular2-jwt and flatMap the token
-        if (this.authenticated()) {
+        this.getAuthenticated().then(authenticated => {
             let source = Observable.of(this.idToken).flatMap(
                 token => {
                     // Get the expiry time to generate
@@ -153,7 +159,7 @@ export class AuthService {
                 this.getNewJwt();
                 this.scheduleRefresh();
             });
-        }
+        })
     }
 
     public unscheduleRefresh() {
@@ -167,9 +173,24 @@ export class AuthService {
         // Get a new JWT from Auth0 using the refresh token saved
         // in storage
         this.storage.get('refresh_token').then(token => {
-            console.log("refresh");
+            let refreshTokenDto = new RefreshTokenDto();
+            refreshTokenDto.init({ refresh_token: token });
+            this.tpClient.refreshtoken(refreshTokenDto).subscribe(response => {
+                this.storeAuth(response);
+            })
         }).catch(error => {
             console.log(error);
         });
+    }
+
+    private storeAuth(authInfo: AuthResponse): Promise<string> {
+        if (authInfo instanceof AuthResponse && authInfo.status.success) {
+            return Promise.all([
+                this.storage.set('id_token', authInfo.token),
+                this.storage.set('refresh_token', authInfo.refreshtoken)
+            ]).then(() => this.idToken = authInfo.token);
+        }
+        else
+            return Promise.reject("storeAuth failed");
     }
 }

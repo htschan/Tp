@@ -65,6 +65,7 @@ After making furhter changes
 Follow this article for User authentication with Angular and ASP.NET Core with Refresh Token
 (using JWT-Token authentication and ASP.NET Core Identity)
 http://www.c-sharpcorner.com/article/handle-refresh-token-using-asp-net-core-2-0-and-json-web-token/
+https://blog.ionic.io/ionic-2-and-auth0/
 
 /* obsolete
 https://fullstackmark.com/post/10/user-authentication-with-angular-and-asp-net-core#create-new-users

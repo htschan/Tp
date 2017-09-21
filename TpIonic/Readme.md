@@ -50,6 +50,8 @@ $ npm install @types/request@0.0.30 --save-dev --save-exact
 Configuration Sample Auth0 here:
 https://auth0.com/docs/quickstart/native/ionic2
 
+JWT Token Refresh with auth0
+https://blog.ionic.io/ionic-2-and-auth0/
 
 # CORS and local debugging with ASP.NET Core
 
