@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using TpDotNetCore.Data;
-using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Domain.UserConfiguration.Repositories
@@ -33,7 +32,7 @@ namespace TpDotNetCore.Domain.UserConfiguration.Repositories
             {
                 throw;
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"FindByName {userName} threw an exception: {exception.Message}", exception);
             }
@@ -52,7 +51,7 @@ namespace TpDotNetCore.Domain.UserConfiguration.Repositories
             {
                 throw;
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"FindByName {userId} threw an exception: {exception.Message}", exception);
             }

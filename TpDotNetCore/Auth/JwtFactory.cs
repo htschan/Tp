@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -23,28 +25,37 @@ namespace TpDotNetCore.Auth
 
         public async Task<string> GenerateEncodedToken(string clientId, ClaimsIdentity identity)
         {
-            var claims = new[]
-         {
+            var claims = new List<Claim>
+            {
                  new Claim(JwtRegisteredClaimNames.NameId, clientId),
                  new Claim(JwtRegisteredClaimNames.Sub, clientId),
                  new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
                  new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
-                 identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Rol),
                  identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Id)
              };
+            foreach (var roleClaim in identity.FindAll(ClaimTypes.Role))
+            {
+                claims.Add(roleClaim);
+            }
 
             // Create the JWT security token and encode it.
             var jwt = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
-                claims: claims,
+                claims: claims.ToArray(),
                 notBefore: _jwtOptions.NotBefore,
                 expires: _jwtOptions.Expiration,
                 signingCredentials: _jwtOptions.SigningCredentials);
 
-            _logger.LogInformation(LoggerEvents.GENERATE_JWT, $"Generate JWT " 
+            var roles = jwt.Payload[ClaimTypes.Role] as List<object>;
+            var roleString = "";
+            if (roles != null)
+            {
+                roleString = roles.Aggregate(roleString, (current, role) => current + (role as string));
+            }
+            _logger.LogInformation(LoggerEvents.GENERATE_JWT, $"Generate JWT "
                     + $"sub: {(string)jwt.Payload["sub"]} "
-                    + $"rol: {(string)jwt.Payload["rol"]} "
+                    + $"rol: {roleString} "
                     + $"nbf: {GetDateTimeFromUnix((long)jwt.Payload["nbf"])} "
                     + $"iat: {GetDateTimeFromUnix((long)jwt.Payload["iat"])} "
                     + $"exp: {GetDateTimeFromUnix((long)jwt.Payload["exp"])}");
@@ -58,13 +69,11 @@ namespace TpDotNetCore.Auth
             return DateTimeOffset.FromUnixTimeSeconds(unixtime).UtcDateTime.ToLocalTime();
         }
 
-        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)
+        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id, IList<string> roles)
         {
-            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
-            {
-                new Claim(Helpers.Constants.Strings.JwtClaimIdentifiers.Id, id),
-                new Claim(Helpers.Constants.Strings.JwtClaimIdentifiers.Rol, Helpers.Constants.Strings.JwtClaims.ApiAccess)
-            });
+            var claims = new List<Claim> {new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id)};
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), claims);
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>

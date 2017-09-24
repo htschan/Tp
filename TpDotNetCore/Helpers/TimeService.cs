@@ -7,7 +7,7 @@ namespace TpDotNetCore.Helpers
     {
         public decimal GetDecimalHour(DateTime dt)
         {
-            return (decimal)dt.Hour + (decimal)(dt.Minute / 60.0) + (decimal)(dt.Second / 3600.0);
+            return dt.Hour + (decimal)(dt.Minute / 60.0) + (decimal)(dt.Second / 3600.0);
         }
         public int GetWeekNumber(DateTime dt)
         {

@@ -1,8 +1,6 @@
-using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,6 +17,7 @@ using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Domain.Punches.Repositories;
 using TpDotNetCore.Domain.Punches;
+using System.Security.Claims;
 
 namespace TpDotNetCore
 {
@@ -33,11 +32,6 @@ namespace TpDotNetCore
                 .AddJsonFile($"tp.appsettings.server.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-
-            using (var client = new TpContext())
-            {
-                client.Database.EnsureCreated();
-            }
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -70,6 +64,8 @@ namespace TpDotNetCore
             services.AddSingleton<ITimeService, TimeService>();
             services.AddTransient<ITpController, TpControllerImpl>();
             services.AddTransient<AppUser>();
+            services.AddTransient<AppRole>();
+            services.AddTransient<AppUserManager>();
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IAppUserRepository, AppUserRepository>();
             services.AddTransient<IPunchRepository, PunchRepository>();
@@ -82,10 +78,11 @@ namespace TpDotNetCore
             // api user claim policy
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
+                options.AddPolicy("RequireApiUserRole", policy => policy.RequireClaim(ClaimTypes.Role, Constants.Strings.JwtClaims.ApiAccess));
+                options.AddPolicy("RequireApiAdminRole", policy => policy.RequireClaim(ClaimTypes.Role, Constants.Strings.JwtClaims.ApiAccessAdmin));
             });
 
-            services.AddIdentity<AppUser, IdentityRole>
+            services.AddIdentity<AppUser, AppRole>
                 (o =>
                 {
                     // configure identity options

@@ -5,7 +5,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace TpDotNetCore.Helpers
 {
-    public class Rewriter : Microsoft.AspNetCore.Rewrite.IRule
+    public class Rewriter : IRule
     {
         public int StatusCode { get; } = (int)HttpStatusCode.MovedPermanently;
         public bool ExcludeLocalhost { get; set; } = true;

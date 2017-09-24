@@ -1,4 +1,3 @@
-using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Repositories;
 
 namespace TpDotNetCore.Domain.UserConfiguration.Repositories

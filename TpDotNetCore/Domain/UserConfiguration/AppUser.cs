@@ -1,8 +1,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,7 +9,6 @@ using TpDotNetCore.Controllers;
 using TpDotNetCore.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 
@@ -141,7 +138,8 @@ namespace TpDotNetCore.Domain.UserConfiguration
                     // check the credentials  
                     if (await _userManager.CheckPasswordAsync(userToVerify, password))
                     {
-                        return await Task.FromResult((identity: _jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id), userId: userToVerify.Id, message: ""));
+                        var rolesList = await _userManager.GetRolesAsync(userToVerify);
+                        return await Task.FromResult((identity: _jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, rolesList), userId: userToVerify.Id, message: ""));
                     }
                 }
             }
@@ -159,7 +157,8 @@ namespace TpDotNetCore.Domain.UserConfiguration
 
                 if (userToVerify != null)
                 {
-                    return await Task.FromResult((identity: _jwtFactory.GenerateClaimsIdentity(userToVerify.UserName, userToVerify.Id), userId: userToVerify.Id, message: ""));
+                    var rolesList = await _userManager.GetRolesAsync(userToVerify);
+                    return await Task.FromResult((identity: _jwtFactory.GenerateClaimsIdentity(userToVerify.UserName, userToVerify.Id, rolesList), userId: userToVerify.Id, message: ""));
                 }
             }
 

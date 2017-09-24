@@ -12,11 +12,11 @@ namespace TpDotNetCore.Data
 
         public TpContext(DbContextOptions options) : base(options) { }
 
-        // public DbSet<User> Users { get; set; }
-
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         
         public DbSet<AppUser> AppUsers { get; set; }
+
+		public DbSet<AppRole> AppRoles { get; set; }
 
         public DbSet<Punch> Punches { get; set; }
 

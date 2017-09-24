@@ -1,7 +1,7 @@
 using FluentValidation;
-using FluentValidation.Attributes;
+using TpDotNetCore.Controllers;
 
-namespace TpDotNetCore.Controllers
+namespace TpDotNetCore.ViewModels.Validations
 {
     public class RefreshTokenVmValidator : AbstractValidator<RefreshTokenDto>
     {

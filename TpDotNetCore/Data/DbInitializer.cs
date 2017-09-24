@@ -2,25 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.Punches;
 using TpDotNetCore.Helpers;
+using static TpDotNetCore.Helpers.Constants.Strings;
 
 namespace TpDotNetCore.Data
 {
     public class DbInitializer : IDisposable
     {
         private readonly TpContext _context;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly AppUserManager _appUserManager;
         private readonly IMapper _mapper;
         private readonly ITimeService _timeService;
         private readonly Random _random;
 
-        public DbInitializer(TpContext context, UserManager<AppUser> userManager, IMapper mapper, ITimeService timeService)
+        public DbInitializer(TpContext context, AppUserManager appUserManager, IMapper mapper, ITimeService timeService)
         {
             _context = context;
-            _userManager = userManager;
+            _appUserManager = appUserManager;
             _mapper = mapper;
             _timeService = timeService;
             _random = new Random((int)DateTime.Now.Ticks);
@@ -42,6 +42,9 @@ namespace TpDotNetCore.Data
             var monthDict = new Dictionary<int, MonthPunch>();
             var yearDict = new Dictionary<int, YearPunch>();
 
+            await _appUserManager.CreateRole(JwtClaims.ApiAccess);
+            await _appUserManager.CreateRole(JwtClaims.ApiAccessAdmin);
+
             // create some users
             var users = new[]
             {
@@ -54,10 +57,12 @@ namespace TpDotNetCore.Data
             for (var i = 0; i < users.Length; i++)
             {
                 var userIdentity = _mapper.Map<AppUser>(users[i]);
-                userIdentity.EmailConfirmed = true;
-                var user = await _userManager.CreateAsync(userIdentity, "axil311");
+                await _appUserManager.CreateUser(userIdentity, "axil311", new List<string> { JwtClaims.ApiAccess });
                 userDict.Add(i, userIdentity);
             }
+            var adminUser = new Controllers.RegisterDto { Firstname = "Admin", Name = "Timepuncher", Email = "admin@timepuncher.ch" };
+            var adminUserIdentity = _mapper.Map<AppUser>(adminUser);
+            await _appUserManager.CreateUser(adminUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccess, JwtClaims.ApiAccessAdmin });
             _context.SaveChanges();
 
             // create the punch dimensions

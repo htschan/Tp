@@ -8,8 +8,10 @@ namespace TpDotNetCore.Extensions
         {
             if (punchRowDto.Enter != null && punchRowDto.Leave != null)
             {
-                punchRowDto.RowTotal = punchRowDto.Leave.Timedec.Value - punchRowDto.Enter.Timedec.Value;
-                return punchRowDto.RowTotal.Value;
+                if (punchRowDto.Leave.Timedec != null)
+                    if (punchRowDto.Enter.Timedec != null)
+                        punchRowDto.RowTotal = punchRowDto.Leave.Timedec.Value - punchRowDto.Enter.Timedec.Value;
+                if (punchRowDto.RowTotal != null) return punchRowDto.RowTotal.Value;
             }
             return 0.0;
         }

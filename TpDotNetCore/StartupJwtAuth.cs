@@ -48,7 +48,8 @@ namespace TpDotNetCore
                       options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                       options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                   })
-                  .AddJwtBearer(build => {
+                  .AddJwtBearer(build =>
+                  {
                       //o.Authority = "";
                       //o.Audience = "";
                       build.TokenValidationParameters = tokenValidationParameters;

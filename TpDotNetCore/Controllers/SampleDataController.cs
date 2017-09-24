@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TpDotNetCore.Controllers
 {
-   // [Authorize(Policy = "ApiUser")]
+    [Authorize(Policy = "RequireApiUserRole")]
     [Route("api/v1/[controller]")]
     public class SampleDataController : Controller
     {

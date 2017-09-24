@@ -14,14 +14,14 @@ namespace TpDotNetCore.Extensions
                 throw new System.ArgumentNullException(nameof(dayPunchesDto));
             }
 
-            double dayTotal = 0.0;
+            var dayTotal = 0.0;
             dayPunchesDto.Punches = new List<PunchRowDto>();
             var dayPunchesArray = punchArray.OrderBy(dp => dp.TimeDec).ToArray();
             var i = 0;
             do
             {
                 var row = new PunchRowDto();
-                if (punchArray.Count() > 0)
+                if (punchArray.Any())
                 {
                     var punch = dayPunchesArray[i];
                     if (punch.Direction)
