@@ -77,7 +77,7 @@ node {
 			echo 'Failed to start TpDotNetCore AppPool'
 		}
 		/* TpIonic */
-		dir(${IONIC_SITE_LOCATION}){
+		dir('${IONIC_SITE_LOCATION}'){
 			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -include *.js *css')
 			if ( status3 == 0){
 				echo 'TpIonic site location cleanup done'
@@ -99,7 +99,7 @@ node {
 			}
 		}
 		/* TpMaterial */
-		dir(${MATERIAL_SITE_LOCATION}){
+		dir('${MATERIAL_SITE_LOCATION}'){
 			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -include *.bundle.js *.bundle.css')
 			if ( status3 == 0){
 				echo 'TpMaterial site location cleanup done'
