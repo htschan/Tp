@@ -12,8 +12,8 @@ node {
         
     }
     stage('prime'){
-        def status1 = powershell(returnStatus: true, script: 'Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
-		if ( status1 == 0){
+        def status0 = powershell(returnStatus: true, script: 'Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
+		if ( status0 == 0){
 			echo 'Copy config TpMaterial file ok'
 		}
 		else {
