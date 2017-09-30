@@ -78,22 +78,13 @@ node {
 		}
 		/* TpIonic */
 		dir('TpIonic'){
-			def status3 = powershell(returnStatus: true, script: 'Get-ChildItem -recurse $env:IONIC_SITE_LOCATION')
+			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -path $env:IONIC_SITE_LOCATION -include *.js *css')
 			if ( status3 == 0){
 				echo 'TpIonic site location cleanup done'
 			}
 			else {
 				echo 'Failed to cleanup TpIonic site location'
 			}
-/*
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -include *.js *css')
-			if ( status3 == 0){
-				echo 'TpIonic site location cleanup done'
-			}
-			else {
-				echo 'Failed to cleanup TpIonic site location'
-			}
-			*/
 		}
 		dir('TpIonic'){
 			bat '(robocopy www %IONIC_SITE_LOCATION% /e /r:1 /unicode) ^& IF %ERRORLEVEL% LEQ 1 exit 0'
@@ -109,22 +100,13 @@ node {
 		}
 		/* TpMaterial */
 		dir('TpMaterial'){
-			def status3 = powershell(returnStatus: true, script: 'Get-ChildItem -recurse $env:MATERIAL_SITE_LOCATION')
+			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:MATERIAL_SITE_LOCATION -include *.bundle.js *.bundle.css')
 			if ( status3 == 0){
 				echo 'TpMaterial site location cleanup done'
 			}
 			else {
 				echo 'Failed to cleanup TpMaterial site location'
 			}
-		/*
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -include *.bundle.js *.bundle.css')
-			if ( status3 == 0){
-				echo 'TpMaterial site location cleanup done'
-			}
-			else {
-				echo 'Failed to cleanup TpMaterial site location'
-			}
-			*/
 		}
 		dir('TpMaterial'){
 			bat '(robocopy dist *.* %MATERIAL_SITE_LOCATION% /e /r:1 /unicode) ^& IF %ERRORLEVEL% LEQ 1 exit 0'
