@@ -2,13 +2,12 @@
 
 node {
     stage('prime'){
-        def status = powershell(returnStatus: true, script: 'Write-Output "Hello, World!"')
-		if ( status == 0){
-			echo 'Hello world ok'
-		}
-        def status1 = powershell(returnStatus: true, script: 'Copy-Item c:\sites\configdata\timepuncher-client-config-timepuncher.ch.ts '$env:TP_WORKSPACE'%TP_WORKSPACE%\TpMaterial\src\app\timepuncher-client-config.ts')
+        def status1 = powershell(returnStatus: true, script: 'Copy-Item c:/sites/configdata/timepuncher-client-config-timepuncher.ch.ts $env:TP_WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
 		if ( status1 == 0){
 			echo 'Copy ok'
+		}
+		else {
+			echo 'Copy failed'
 		}
     }
     stage('prepare'){
@@ -29,9 +28,6 @@ node {
     stage('build'){
         dir('TpMaterial'){
             bat 'ng build --prod'
-        }
-        dir('TpDotNetCire'){
-            bat 'dotnet run'
         }
     }
 }
