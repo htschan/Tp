@@ -24,7 +24,7 @@ node {
 			echo 'Copy config TpIonic file ok'
 		}
 		else {
-			echo 'Copy config TpIoinic file failed'
+			echo 'Copy config TpIonic file failed'
 		}
     }
     stage('install'){
@@ -50,7 +50,7 @@ node {
         }
     }
 	stage('deploy'){
-/* TpDotNetCore */
+		/* TpDotNetCore */
         def status1 = powershell(returnStatus: true, script: 'Stop-WebAppPool -Name "TpDotNetCore"')
 		if ( status1 == 0){
 			echo 'TpDotNetCore AppPool stopped'
@@ -68,7 +68,7 @@ node {
 		else {
 			echo 'Failed to start TpDotNetCore AppPool'
 		}
-/* TpIonic */
+		/* TpIonic */
 		dir(${IONIC_SITE_LOCATION}){
 			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -include *.js *css')
 			if ( status3 == 0){
@@ -90,7 +90,7 @@ node {
 				echo 'Copy web.config file TpIonic failed'
 			}
 		}
-/* TpMaterial */
+		/* TpMaterial */
 		dir(${MATERIAL_SITE_LOCATION}){
 			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -include *.bundle.js *.bundle.css')
 			if ( status3 == 0){
