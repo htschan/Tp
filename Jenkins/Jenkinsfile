@@ -1,6 +1,10 @@
 #!/usr/bin/env groovy
 
 node {
+    stage('scmstage'){
+        git changelog: false, poll: false, url: 'C:\\sites\\Bonobo.Git.Server\\App_Data\\Repositories\\Tp'    
+        
+    }
     stage('prime'){
         def status1 = powershell(returnStatus: true, script: 'Copy-Item c:/sites/configdata/timepuncher-client-config-timepuncher.ch.ts $env:TP_WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
 		if ( status1 == 0){
@@ -9,10 +13,6 @@ node {
 		else {
 			echo 'Copy failed'
 		}
-    }
-    stage('prepare'){
-        git changelog: false, poll: false, url: 'C:\\sites\\Bonobo.Git.Server\\App_Data\\Repositories\\Tp'    
-        
     }
     stage('install'){
         dir('TpMaterial') {
