@@ -3,6 +3,14 @@
 /*
 	Jenkins Pipeline
 	Build and Deploy Timepuncher
+	
+	Required environment variables:
+	
+	THE_REPO=<git repository url>
+	PROJECT_CONFIG=<path to config data on build server>
+	BACKEND_SITE_LOCATION=<path to backend site directory>
+	IONIC_SITE_LOCATION=<path to ionic client site directory>
+	MATERIAL_SITE_LOCATION=<path to the material client site directory>
 
 */
 
@@ -59,7 +67,7 @@ node {
 			echo 'Failed to stop TpDotNetCore AppPool'
 		}
 		dir('TpDotNetCore'){
-			bat 'dot net publish --configuration "Release" --output ${BACKEND_SITE_LOCATION}'
+			bat 'dotnet publish --configuration "Release" --output ${BACKEND_SITE_LOCATION}'
 		}
         def status2 = powershell(returnStatus: true, script: 'Start-WebAppPool -Name "TpDotNetCore"')
 		if ( status2 == 0){
