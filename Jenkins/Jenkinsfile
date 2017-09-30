@@ -2,11 +2,11 @@
 
 node {
     stage('scmstage'){
-        git changelog: false, poll: false, url: 'C:\\sites\\Bonobo.Git.Server\\App_Data\\Repositories\\Tp'    
+        git changelog: false, poll: false, url: '${THE_REPO}'    
         
     }
     stage('prime'){
-        def status1 = powershell(returnStatus: true, script: 'Copy-Item c:/sites/configdata/timepuncher-client-config-timepuncher.ch.ts $env:TP_WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
+        def status1 = powershell(returnStatus: true, script: 'Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
 		if ( status1 == 0){
 			echo 'Copy ok'
 		}
