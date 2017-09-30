@@ -67,7 +67,7 @@ node {
 			echo 'Failed to stop TpDotNetCore AppPool'
 		}
 		dir('TpDotNetCore'){
-			bat 'dotnet publish --configuration "Release" --output ${BACKEND_SITE_LOCATION}'
+			bat 'dotnet publish --configuration "Release" --output %BACKEND_SITE_LOCATION%'
 		}
         def status2 = powershell(returnStatus: true, script: 'Start-WebAppPool -Name "TpDotNetCore"')
 		if ( status2 == 0){
@@ -78,7 +78,7 @@ node {
 		}
 		/* TpIonic */
 		dir('TpIonic'){
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item * -path $env:IONIC_SITE_LOCATION -include *.js *css')
+			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:IONIC_SITE_LOCATION -include *.js *css')
 			if ( status3 == 0){
 				echo 'TpIonic site location cleanup done'
 			}
