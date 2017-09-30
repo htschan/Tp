@@ -78,7 +78,7 @@ node {
 		}
 		/* TpIonic */
 		dir('TpIonic'){
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:IONIC_SITE_LOCATION -include *.js *css')
+			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:IONIC_SITE_LOCATION/*.* -include *.js *.css')
 			if ( status3 == 0){
 				echo 'TpIonic site location cleanup done'
 			}
@@ -100,7 +100,7 @@ node {
 		}
 		/* TpMaterial */
 		dir('TpMaterial'){
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:MATERIAL_SITE_LOCATION -include *.bundle.js *.bundle.css')
+			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:MATERIAL_SITE_LOCATION/*.* -include *.bundle.js *.bundle.css')
 			if ( status3 == 0){
 				echo 'TpMaterial site location cleanup done'
 			}
