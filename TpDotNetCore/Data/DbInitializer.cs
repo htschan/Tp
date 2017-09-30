@@ -43,6 +43,7 @@ namespace TpDotNetCore.Data
             var yearDict = new Dictionary<int, YearPunch>();
 
             await _appUserManager.CreateRole(JwtClaims.ApiAccess);
+            await _appUserManager.CreateRole(JwtClaims.ApiAccessPower);
             await _appUserManager.CreateRole(JwtClaims.ApiAccessAdmin);
 
             // create some users
@@ -60,9 +61,15 @@ namespace TpDotNetCore.Data
                 await _appUserManager.CreateUser(userIdentity, "axil311", new List<string> { JwtClaims.ApiAccess });
                 userDict.Add(i, userIdentity);
             }
+
+            var powerUser = new Controllers.RegisterDto { Firstname = "Power", Name = "Timepuncher", Email = "pwer@timepuncher.ch" };
+            var powerUserIdentity = _mapper.Map<AppUser>(powerUser);
+            await _appUserManager.CreateUser(powerUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccess, JwtClaims.ApiAccessPower });
+
             var adminUser = new Controllers.RegisterDto { Firstname = "Admin", Name = "Timepuncher", Email = "admin@timepuncher.ch" };
             var adminUserIdentity = _mapper.Map<AppUser>(adminUser);
             await _appUserManager.CreateUser(adminUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccess, JwtClaims.ApiAccessAdmin });
+            
             _context.SaveChanges();
 
             // create the punch dimensions

@@ -11,6 +11,8 @@ import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto } from '../../se
 
 const registerUrl: string = `${TpClientConfig.baserurl}api/v1/accounts`;
 
+export enum RoleEnum { UserRole, AdminRole }
+
 @Injectable()
 export class AuthService {
 
@@ -19,6 +21,7 @@ export class AuthService {
     userProfile: Object;
     zoneImpl: NgZone;
     idToken: string;
+    initialized = false;
 
     constructor(private tpClient: TpClient, zone: NgZone/*, public events: Events*/, private http: Http, private storage: Storage) {
         this.zoneImpl = zone;
@@ -30,6 +33,8 @@ export class AuthService {
                 }))
             .then(() => {
                 this.getToken().then(token => {
+                    this.getNewJwt();
+                    this.initialized = true;
                     this.idToken = token;
                     if (this.idToken)
                         this.startupTokenRefresh();
@@ -41,7 +46,7 @@ export class AuthService {
         return this.getToken()
             .then(token => {
                 return token === null ? Promise.resolve(false)
-                    : Promise.resolve(tokenNotExpired('id_token', token));
+                    : this.initialized ? Promise.resolve(tokenNotExpired('id_token', token)) : this.getNewJwt();
             })
             .catch(() => { return Promise.resolve(false); });
     }
@@ -54,6 +59,28 @@ export class AuthService {
             .do(profileVm => {
                 this.storage.set("profile", JSON.stringify(profileVm));
             });
+    }
+
+    public hasRole(role: RoleEnum): Promise<boolean> {
+        return this.getToken()
+            .then(token => {
+                let roleName = "";
+                switch (role) {
+                    case RoleEnum.UserRole:
+                        roleName = "api_access";
+                        break;
+                    case RoleEnum.AdminRole:
+                        roleName = "api_access_admin";
+                        break;
+                }
+                let decodedToken = this.jwtHelper.decodeToken(token);
+                let roles = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+                if (roles.indexOf(roleName) >= 0) {
+                    return Promise.resolve(true);
+                }
+                return Promise.resolve(false);
+            })
+            .catch(() => { return Promise.resolve(false); });
     }
 
     public authenticated(): boolean {
@@ -169,17 +196,19 @@ export class AuthService {
         }
     }
 
-    public getNewJwt() {
-        // Get a new JWT from Auth0 using the refresh token saved
+    public getNewJwt(): Promise<boolean> {
+        // Get a new JWT using the refresh token saved
         // in storage
-        this.storage.get('refresh_token').then(token => {
+        return this.storage.get('refresh_token').then(token => {
             let refreshTokenDto = new RefreshTokenDto();
             refreshTokenDto.init({ refresh_token: token });
-            this.tpClient.refreshtoken(refreshTokenDto).subscribe(response => {
-                this.storeAuth(response);
-            })
+            return this.tpClient.refreshtoken(refreshTokenDto)
+            .do(response => this.storeAuth(response))
+            .map(response => response !== null)
+            .toPromise()
         }).catch(error => {
             console.log(error);
+            return Promise.reject("error");
         });
     }
 

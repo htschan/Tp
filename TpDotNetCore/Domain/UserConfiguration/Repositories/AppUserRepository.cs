@@ -59,7 +59,21 @@ namespace TpDotNetCore.Domain.UserConfiguration.Repositories
 
         public System.Collections.Generic.IList<AppUser> GetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var value = _appDbContext.AppUsers;
+                if (value == null)
+                    throw new RepositoryException(StatusCodes.Status404NotFound, $"Users not found");
+                return value.ToList();
+            }
+            catch (RepositoryException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetAll threw an exception: {exception.Message}", exception);
+            }
         }
 
         public void Insert(AppUser entity)

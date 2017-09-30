@@ -48,10 +48,14 @@ paths:
       tags:
         - Authentication
       responses:
-        default:
-          description: AuthResponse
+        200:
+          description: Returns nothing
           schema:
             $ref: '#/definitions/AuthResponse'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/OpResult'
   /refreshtoken:
     post:
       description:
@@ -268,6 +272,41 @@ paths:
           description: Unerwarteter Fehler
           schema:
             $ref: '#/definitions/OpResult'
+###########                                 Administration    ###########            
+  /admin/users:
+    get:
+      description:
+        Get all users
+      summary: Get the list of users [Authorize(Policy = "RequireApiAdminRole")]
+      operationId: adminGetUsers
+      tags:
+        - Administration
+      responses:
+        200:
+          description: Returns nothing
+          schema:
+            $ref: '#/definitions/UsersDto'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/OpResult'            
+  /admin/sessions:
+    get:
+      description:
+        Get all sessions
+      summary: Get the list of sessions [Authorize(Policy = "RequireApiAdminRole")]
+      operationId: adminGetSessions
+      tags:
+        - Administration
+      responses:
+        200:
+          description: Returns nothing
+          schema:
+            $ref: '#/definitions/SessionsDto'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/OpResult'              
   /punches:
     get:
       description: |
@@ -735,7 +774,69 @@ definitions:
         type: string
       status:
         type: string
-
+  UsersDto:
+    type: object
+    properties:
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/UserDto'
+  UserDto:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Then user id
+      firstName:
+        type: string
+        description: The first name of user
+      lastName:
+        type: string
+        description: The last name of user
+      email:
+        type: string
+        description: The email of the user
+      emailConfirmed:
+        type: boolean
+        description: The confirmed status of the user registration
+      accessFailedCount:
+        type: number
+        description: The number of failed access attempts
+      roleNames:
+        type: array
+        items:
+          $ref: '#/definitions/RoleDto'
+  RoleDto:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of role
+  SessionsDto:
+    type: object
+    properties:
+      sessions:
+        type: array
+        items:
+          $ref: '#/definitions/SessionDto'
+  SessionDto:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Then sessions id
+      userid:
+        type: string
+        description: The userid associated with the session
+      email:
+        type: string
+        description: the email of the user
+      created:
+        type: string
+        description: The timestamp of the creation
+      isStop:
+        type: boolean
+        description: True if the session is stopped
 ################################################################################
 #                                 Sub - Definitions                            #
 ################################################################################              

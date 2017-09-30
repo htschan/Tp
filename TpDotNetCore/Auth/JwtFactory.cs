@@ -72,7 +72,10 @@ namespace TpDotNetCore.Auth
         public ClaimsIdentity GenerateClaimsIdentity(string userName, string id, IList<string> roles)
         {
             var claims = new List<Claim> {new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id)};
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
             return new ClaimsIdentity(new GenericIdentity(userName, "Token"), claims);
         }
 

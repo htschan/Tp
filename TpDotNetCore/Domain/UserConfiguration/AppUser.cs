@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TpDotNetCore.Domain.UserConfiguration
 {
@@ -35,6 +36,8 @@ namespace TpDotNetCore.Domain.UserConfiguration
         // Extended Properties
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        [NotMapped]
+        public List<string> RoleNames { get; set; }
 
         public (string id, string authToken, int expiresIn, string refreshToken) Authenticate(CredentialDto credentials)
         {
@@ -46,7 +49,6 @@ namespace TpDotNetCore.Domain.UserConfiguration
             var refreshToken = Guid.NewGuid().ToString().Replace("-", "");
             var identity = GetClaimsIdentity(credentials.Username, credentials.Password).Result;
             var claimsIdentity = identity.claimsIdentiy;
-            var headers = new Dictionary<string, IEnumerable<string>>();
             if (identity.claimsIdentiy == null)
             {
                 throw new RepositoryException(StatusCodes.Status404NotFound, identity.message);

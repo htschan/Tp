@@ -24,7 +24,7 @@ export interface ITpClient {
     /**
      * Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]
      * @credentials Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
-     * @return AuthResponse
+     * @return Returns nothing
      */
     authenticate(credentials: CredentialDto): Observable<AuthResponse | null>;
     /**
@@ -80,6 +80,16 @@ export interface ITpClient {
      * @return Die Operation war erfolgreich.
      */
     getProfile(userid: string): Observable<GetProfileResponse | null>;
+    /**
+     * Get the list of users [Authorize(Policy = "RequireApiAdminRole")]
+     * @return Returns nothing
+     */
+    adminGetUsers(): Observable<UsersDto | null>;
+    /**
+     * Get the list of sessions [Authorize(Policy = "RequireApiAdminRole")]
+     * @return Returns nothing
+     */
+    adminGetSessions(): Observable<SessionsDto | null>;
     /**
      * Retrieves all punches of current user
      * @return An array of products
@@ -159,7 +169,7 @@ export class TpClient implements ITpClient {
     /**
      * Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]
      * @credentials Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
-     * @return AuthResponse
+     * @return Returns nothing
      */
     authenticate(credentials: CredentialDto): Observable<AuthResponse | null> {
         let url_ = this.baseUrl + "/authenticate";
@@ -193,12 +203,18 @@ export class TpClient implements ITpClient {
     protected processAuthenticate(response: Response): Observable<AuthResponse | null> {
         const status = response.status; 
 
-        {
+        if (status === 200) {
             const _responseText = response.text();
-            let result: AuthResponse | null = null;
+            let result200: AuthResponse | null = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? AuthResponse.fromJS(resultData200) : new AuthResponse();
+            return Observable.of(result200);
+        } else {
+            const _responseText = response.text();
+            let result: OpResult | null = null;
             let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result = resultData ? AuthResponse.fromJS(resultData) : new AuthResponse();
-            return Observable.of(result);
+            result = resultData ? OpResult.fromJS(resultData) : new OpResult();
+            return throwException("A server error occurred.", status, _responseText, result);
         }
     }
 
@@ -652,6 +668,102 @@ export class TpClient implements ITpClient {
             let result200: GetProfileResponse | null = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = resultData200 ? GetProfileResponse.fromJS(resultData200) : new GetProfileResponse();
+            return Observable.of(result200);
+        } else {
+            const _responseText = response.text();
+            let result: OpResult | null = null;
+            let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result = resultData ? OpResult.fromJS(resultData) : new OpResult();
+            return throwException("A server error occurred.", status, _responseText, result);
+        }
+    }
+
+    /**
+     * Get the list of users [Authorize(Policy = "RequireApiAdminRole")]
+     * @return Returns nothing
+     */
+    adminGetUsers(): Observable<UsersDto | null> {
+        let url_ = this.baseUrl + "/admin/users";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = {
+            method: "get",
+            headers: new Headers({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request(url_, options_).flatMap((response_) => {
+            return this.processAdminGetUsers(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof Response) {
+                try {
+                    return this.processAdminGetUsers(response_);
+                } catch (e) {
+                    return <Observable<UsersDto>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<UsersDto>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processAdminGetUsers(response: Response): Observable<UsersDto | null> {
+        const status = response.status; 
+
+        if (status === 200) {
+            const _responseText = response.text();
+            let result200: UsersDto | null = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? UsersDto.fromJS(resultData200) : new UsersDto();
+            return Observable.of(result200);
+        } else {
+            const _responseText = response.text();
+            let result: OpResult | null = null;
+            let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result = resultData ? OpResult.fromJS(resultData) : new OpResult();
+            return throwException("A server error occurred.", status, _responseText, result);
+        }
+    }
+
+    /**
+     * Get the list of sessions [Authorize(Policy = "RequireApiAdminRole")]
+     * @return Returns nothing
+     */
+    adminGetSessions(): Observable<SessionsDto | null> {
+        let url_ = this.baseUrl + "/admin/sessions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = {
+            method: "get",
+            headers: new Headers({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request(url_, options_).flatMap((response_) => {
+            return this.processAdminGetSessions(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof Response) {
+                try {
+                    return this.processAdminGetSessions(response_);
+                } catch (e) {
+                    return <Observable<SessionsDto>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<SessionsDto>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processAdminGetSessions(response: Response): Observable<SessionsDto | null> {
+        const status = response.status; 
+
+        if (status === 200) {
+            const _responseText = response.text();
+            let result200: SessionsDto | null = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? SessionsDto.fromJS(resultData200) : new SessionsDto();
             return Observable.of(result200);
         } else {
             const _responseText = response.text();
@@ -2144,6 +2256,269 @@ export class SetStatusAdminDto implements ISetStatusAdminDto {
 export interface ISetStatusAdminDto {
     userid?: string | undefined;
     status?: string | undefined;
+}
+
+export class UsersDto implements IUsersDto {
+    users?: UserDto[] | undefined;
+
+    constructor(data?: IUsersDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            if (data["users"] && data["users"].constructor === Array) {
+                this.users = [];
+                for (let item of data["users"])
+                    this.users.push(UserDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UsersDto {
+        let result = new UsersDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.users && this.users.constructor === Array) {
+            data["users"] = [];
+            for (let item of this.users)
+                data["users"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IUsersDto {
+    users?: UserDto[] | undefined;
+}
+
+export class UserDto implements IUserDto {
+    /** Then user id */
+    id?: string | undefined;
+    /** The first name of user */
+    firstName?: string | undefined;
+    /** The last name of user */
+    lastName?: string | undefined;
+    /** The email of the user */
+    email?: string | undefined;
+    /** The confirmed status of the user registration */
+    emailConfirmed?: boolean | undefined;
+    /** The number of failed access attempts */
+    accessFailedCount?: number | undefined;
+    roleNames?: RoleDto[] | undefined;
+
+    constructor(data?: IUserDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.firstName = data["firstName"];
+            this.lastName = data["lastName"];
+            this.email = data["email"];
+            this.emailConfirmed = data["emailConfirmed"];
+            this.accessFailedCount = data["accessFailedCount"];
+            if (data["roleNames"] && data["roleNames"].constructor === Array) {
+                this.roleNames = [];
+                for (let item of data["roleNames"])
+                    this.roleNames.push(RoleDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UserDto {
+        let result = new UserDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["email"] = this.email;
+        data["emailConfirmed"] = this.emailConfirmed;
+        data["accessFailedCount"] = this.accessFailedCount;
+        if (this.roleNames && this.roleNames.constructor === Array) {
+            data["roleNames"] = [];
+            for (let item of this.roleNames)
+                data["roleNames"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IUserDto {
+    /** Then user id */
+    id?: string | undefined;
+    /** The first name of user */
+    firstName?: string | undefined;
+    /** The last name of user */
+    lastName?: string | undefined;
+    /** The email of the user */
+    email?: string | undefined;
+    /** The confirmed status of the user registration */
+    emailConfirmed?: boolean | undefined;
+    /** The number of failed access attempts */
+    accessFailedCount?: number | undefined;
+    roleNames?: RoleDto[] | undefined;
+}
+
+export class RoleDto implements IRoleDto {
+    /** Name of role */
+    name?: string | undefined;
+
+    constructor(data?: IRoleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.name = data["name"];
+        }
+    }
+
+    static fromJS(data: any): RoleDto {
+        let result = new RoleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        return data; 
+    }
+}
+
+export interface IRoleDto {
+    /** Name of role */
+    name?: string | undefined;
+}
+
+export class SessionsDto implements ISessionsDto {
+    sessions?: SessionDto[] | undefined;
+
+    constructor(data?: ISessionsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            if (data["sessions"] && data["sessions"].constructor === Array) {
+                this.sessions = [];
+                for (let item of data["sessions"])
+                    this.sessions.push(SessionDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SessionsDto {
+        let result = new SessionsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.sessions && this.sessions.constructor === Array) {
+            data["sessions"] = [];
+            for (let item of this.sessions)
+                data["sessions"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface ISessionsDto {
+    sessions?: SessionDto[] | undefined;
+}
+
+export class SessionDto implements ISessionDto {
+    /** Then sessions id */
+    id?: string | undefined;
+    /** The userid associated with the session */
+    userid?: string | undefined;
+    /** the email of the user */
+    email?: string | undefined;
+    /** The timestamp of the creation */
+    created?: string | undefined;
+    /** True if the session is stopped */
+    isStop?: boolean | undefined;
+
+    constructor(data?: ISessionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.userid = data["userid"];
+            this.email = data["email"];
+            this.created = data["created"];
+            this.isStop = data["isStop"];
+        }
+    }
+
+    static fromJS(data: any): SessionDto {
+        let result = new SessionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["userid"] = this.userid;
+        data["email"] = this.email;
+        data["created"] = this.created;
+        data["isStop"] = this.isStop;
+        return data; 
+    }
+}
+
+export interface ISessionDto {
+    /** Then sessions id */
+    id?: string | undefined;
+    /** The userid associated with the session */
+    userid?: string | undefined;
+    /** the email of the user */
+    email?: string | undefined;
+    /** The timestamp of the creation */
+    created?: string | undefined;
+    /** True if the session is stopped */
+    isStop?: boolean | undefined;
 }
 
 export class YearPunchesDto implements IYearPunchesDto {

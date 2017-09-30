@@ -19,7 +19,7 @@ namespace TpDotNetCore.Controllers
     {
         /// <summary>Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]</summary>
         /// <param name="credentials">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
-        /// <returns>AuthResponse</returns>
+        /// <returns>Returns nothing</returns>
         System.Threading.Tasks.Task<SwaggerResponse<AuthResponse>> AuthenticateAsync(CredentialDto credentials);
         /// <summary>Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]</summary>
         /// <param name="refreshtokenparameter">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
@@ -56,6 +56,12 @@ namespace TpDotNetCore.Controllers
         /// <param name="userid">User Id</param>
         /// <returns>Die Operation war erfolgreich.</returns>
         System.Threading.Tasks.Task<SwaggerResponse<GetProfileResponse>> GetProfileAsync(string userid);
+        /// <summary>Get the list of users [Authorize(Policy = "RequireApiAdminRole")]</summary>
+        /// <returns>Returns nothing</returns>
+        System.Threading.Tasks.Task<SwaggerResponse<UsersDto>> AdminGetUsersAsync();
+        /// <summary>Get the list of sessions [Authorize(Policy = "RequireApiAdminRole")]</summary>
+        /// <returns>Returns nothing</returns>
+        System.Threading.Tasks.Task<SwaggerResponse<SessionsDto>> AdminGetSessionsAsync();
         /// <summary>Retrieves all punches of current user</summary>
         /// <returns>An array of products</returns>
         System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.List<PunchDto>>> GetPunchesAsync();
@@ -124,8 +130,8 @@ namespace TpDotNetCore.Controllers
           }
         /// <summary>Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]</summary>
         /// <param name="credentials">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
-        /// <returns>AuthResponse</returns>
-        [AllowAnonymous]    
+        /// <returns>Returns nothing</returns>
+        [AllowAnonymous]
         [HttpPost, Route("authenticate")]
         public async System.Threading.Tasks.Task<IActionResult> Authenticate([FromBody]CredentialDto credentials)
         {    
@@ -141,7 +147,7 @@ namespace TpDotNetCore.Controllers
         /// <summary>Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]</summary>
         /// <param name="refreshtokenparameter">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
         /// <returns>AuthResponse</returns>
-        [AllowAnonymous]    
+        [AllowAnonymous]
         [HttpPost, Route("refreshtoken")]
         public async System.Threading.Tasks.Task<IActionResult> Refreshtoken([FromBody]RefreshTokenDto refreshtokenparameter)
         {    
@@ -157,7 +163,7 @@ namespace TpDotNetCore.Controllers
         /// <summary>Einen Benutzer registrieren [AllowAnonymous]</summary>
         /// <param name="registerDto">Registrierungsinformationen</param>
         /// <returns>Die Operation war erfolgreich. Der Benutzer erhält eine E-Mail mit einem Bestätigungslink.</returns>
-        [AllowAnonymous]    
+        [AllowAnonymous]
         [HttpPost, Route("register")]
         public async System.Threading.Tasks.Task<IActionResult> RegisterUser([FromBody]RegisterDto registerDto)
         {    
@@ -174,7 +180,7 @@ namespace TpDotNetCore.Controllers
         /// <param name="id">Userid</param>
         /// <param name="cnf">Confirmationtoken</param>
         /// <returns>Die Operation war erfolgreich.</returns>
-        [AllowAnonymous]    
+        [AllowAnonymous]
         [HttpGet, Route("confirm")]
         public async System.Threading.Tasks.Task<IActionResult> ConfirmRegister([FromQuery]string id, [FromQuery]string cnf)
         {    
@@ -189,7 +195,7 @@ namespace TpDotNetCore.Controllers
         /// <summary>Passwort wiederherstellen [AllowAnonymous]</summary>
         /// <param name="recoverPasswordParams">Wiederherstellungsparameter</param>
         /// <returns>Die Operation war erfolgreich. Der Benutzer erhält eine E-Mail mit einem Passwortresetcode.</returns>
-        [AllowAnonymous]    
+        [AllowAnonymous]
         [HttpPost, Route("recoverPassword")]
         public async System.Threading.Tasks.Task<IActionResult> RecoverPassword([FromBody]RecoverPasswordParams recoverPasswordParams)
         {    
@@ -205,7 +211,7 @@ namespace TpDotNetCore.Controllers
         /// <summary>Abfrage des Usernamens [AllowAnonymous]</summary>
         /// <param name="recoverUsernameParams">Wiederherstellungsparameter</param>
         /// <returns>Die Operation war erfolgreich. Der Benutzer erhält eine E-Mail mit seinem Benutzernamen.</returns>
-        [AllowAnonymous]    
+        [AllowAnonymous]
         [HttpPost, Route("recoverUsername")]
         public async System.Threading.Tasks.Task<IActionResult> RecoverUsername([FromBody]RecoverUsernameParams recoverUsernameParams)
         {    
@@ -221,7 +227,7 @@ namespace TpDotNetCore.Controllers
         /// <summary>Ein Benutzer setzt ein neues Passwort [AllowAnonymous]</summary>
         /// <param name="setPasswordParams">Wiederherstellungsparameter</param>
         /// <returns>Die Operation war erfolgreich.</returns>
-        [AllowAnonymous]    
+        [AllowAnonymous]
         [HttpPost, Route("setPassword")]
         public async System.Threading.Tasks.Task<IActionResult> SetPassword([FromBody]SetPasswordParams setPasswordParams)
         {    
@@ -236,7 +242,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Abfrage aller Profile</summary>
         /// <returns>Die Operation war erfolgreich.</returns>
-        
         [HttpGet, Route("profiles")]
         public async System.Threading.Tasks.Task<IActionResult> GetProfiles()
         {    
@@ -250,7 +255,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Abfrage des eigenen Profils</summary>
         /// <returns>Die Operation war erfolgreich.</returns>
-        
         [HttpGet, Route("profiles/myprofile")]
         public async System.Threading.Tasks.Task<IActionResult> GetMyProfile()
         {    
@@ -265,7 +269,6 @@ namespace TpDotNetCore.Controllers
         /// <summary>Abfrage eines Benutzerprofiles</summary>
         /// <param name="userid">User Id</param>
         /// <returns>Die Operation war erfolgreich.</returns>
-        
         [HttpGet, Route("profiles/{userid}")]
         public async System.Threading.Tasks.Task<IActionResult> GetProfile([FromRoute]string userid)
         {    
@@ -277,9 +280,36 @@ namespace TpDotNetCore.Controllers
             else
                 return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
         }
+        /// <summary>Get the list of users [Authorize(Policy = "RequireApiAdminRole")]</summary>
+        /// <returns>Returns nothing</returns>
+        [Authorize(Policy = "RequireApiAdminRole")]
+        [HttpGet, Route("admin/users")]
+        public async System.Threading.Tasks.Task<IActionResult> AdminGetUsers()
+        {    
+            var result = await _implementation.AdminGetUsersAsync();
+            foreach (var header in result.Headers)
+                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+            if (result.StatusCode == 200)
+                return Ok(result.Result);
+            else
+                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+        }
+        /// <summary>Get the list of sessions [Authorize(Policy = "RequireApiAdminRole")]</summary>
+        /// <returns>Returns nothing</returns>
+        [Authorize(Policy = "RequireApiAdminRole")]
+        [HttpGet, Route("admin/sessions")]
+        public async System.Threading.Tasks.Task<IActionResult> AdminGetSessions()
+        {    
+            var result = await _implementation.AdminGetSessionsAsync();
+            foreach (var header in result.Headers)
+                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+            if (result.StatusCode == 200)
+                return Ok(result.Result);
+            else
+                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+        }
         /// <summary>Retrieves all punches of current user</summary>
         /// <returns>An array of products</returns>
-        
         [HttpGet, Route("punches")]
         public async System.Threading.Tasks.Task<IActionResult> GetPunches()
         {    
@@ -296,7 +326,6 @@ namespace TpDotNetCore.Controllers
         /// <param name="month">The month number selector [1 .. 12]</param>
         /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>An day punches object</returns>
-        
         [HttpGet, Route("punches/day")]
         public async System.Threading.Tasks.Task<IActionResult> GetDay([FromQuery]double? day, [FromQuery]double? month, [FromQuery]double? year)
         {    
@@ -312,7 +341,6 @@ namespace TpDotNetCore.Controllers
         /// <param name="week">The week number selector</param>
         /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A week punches object</returns>
-        
         [HttpGet, Route("punches/week")]
         public async System.Threading.Tasks.Task<IActionResult> GetWeek([FromQuery]double? week, [FromQuery]double? year)
         {    
@@ -328,7 +356,6 @@ namespace TpDotNetCore.Controllers
         /// <param name="month">The month number selector [1 .. 12]</param>
         /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A month punches object</returns>
-        
         [HttpGet, Route("punches/month")]
         public async System.Threading.Tasks.Task<IActionResult> GetMonth([FromQuery]double? month, [FromQuery]double? year)
         {    
@@ -343,7 +370,6 @@ namespace TpDotNetCore.Controllers
         /// <summary>Retrieves all punches of current user of selected year</summary>
         /// <param name="year">The year number selector [2015 .. 2099]</param>
         /// <returns>A year punches object</returns>
-        
         [HttpGet, Route("punches/year")]
         public async System.Threading.Tasks.Task<IActionResult> GetYear([FromQuery]double? year)
         {    
@@ -357,7 +383,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Erzeugt einen Zeitstempel</summary>
         /// <returns>Liefert die Tagesstempel zurück</returns>
-        
         [HttpPost, Route("punches/punch/In")]
         public async System.Threading.Tasks.Task<IActionResult> PunchIn()
         {    
@@ -372,7 +397,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Erzeugt einen Zeitstempel</summary>
         /// <returns>Liefert die Tagesstempel zurück</returns>
-        
         [HttpPost, Route("punches/punch/Out")]
         public async System.Threading.Tasks.Task<IActionResult> PunchOut()
         {    
@@ -387,7 +411,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Modifiziert einen Zeitstempel</summary>
         /// <returns>Unexpected error</returns>
-        
         [HttpPost, Route("punchModify")]
         public async System.Threading.Tasks.Task<IActionResult> PunchModify([FromBody]ModifyPunchDto modifyPunchDto)
         {    
@@ -402,7 +425,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Löscht einen Zeitstempel</summary>
         /// <returns>Unexpected error</returns>
-        
         [HttpDelete, Route("punchDelete")]
         public async System.Threading.Tasks.Task<IActionResult> PunchDelete([FromBody]DeletePunchDto deletePunchDto)
         {    
@@ -416,7 +438,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Modifiziert einen Zeitstempel</summary>
         /// <returns>Unexpected error</returns>
-        
         [HttpPost, Route("punchModifyAdmin")]
         public async System.Threading.Tasks.Task<IActionResult> PunchModifyAdmin([FromBody]ModifyPunchAdminDto modifyPunchAdminDto)
         {    
@@ -431,7 +452,6 @@ namespace TpDotNetCore.Controllers
         }
         /// <summary>Setzt den Status der Monatsabrechung</summary>
         /// <returns>Unexpected error</returns>
-        
         [HttpPost, Route("punchSetStatusAdmin")]
         public async System.Threading.Tasks.Task<IActionResult> PunchSetStatusAdmin([FromBody]SetStatusAdminDto setStatusAdminDto)
         {    
@@ -1714,6 +1734,363 @@ namespace TpDotNetCore.Controllers
         public static SetStatusAdminDto FromJson(string data)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<SetStatusAdminDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class UsersDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private System.Collections.Generic.List<UserDto> _users;
+    
+        [Newtonsoft.Json.JsonProperty("users", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.List<UserDto> Users
+        {
+            get { return _users; }
+            set 
+            {
+                if (_users != value)
+                {
+                    _users = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static UsersDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<UsersDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class UserDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private string _id;
+        private string _firstName;
+        private string _lastName;
+        private string _email;
+        private bool? _emailConfirmed;
+        private double? _accessFailedCount;
+        private System.Collections.Generic.List<RoleDto> _roleNames;
+    
+        /// <summary>Then user id</summary>
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id
+        {
+            get { return _id; }
+            set 
+            {
+                if (_id != value)
+                {
+                    _id = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The first name of user</summary>
+        [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FirstName
+        {
+            get { return _firstName; }
+            set 
+            {
+                if (_firstName != value)
+                {
+                    _firstName = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The last name of user</summary>
+        [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string LastName
+        {
+            get { return _lastName; }
+            set 
+            {
+                if (_lastName != value)
+                {
+                    _lastName = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The email of the user</summary>
+        [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Email
+        {
+            get { return _email; }
+            set 
+            {
+                if (_email != value)
+                {
+                    _email = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The confirmed status of the user registration</summary>
+        [Newtonsoft.Json.JsonProperty("emailConfirmed", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? EmailConfirmed
+        {
+            get { return _emailConfirmed; }
+            set 
+            {
+                if (_emailConfirmed != value)
+                {
+                    _emailConfirmed = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The number of failed access attempts</summary>
+        [Newtonsoft.Json.JsonProperty("accessFailedCount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double? AccessFailedCount
+        {
+            get { return _accessFailedCount; }
+            set 
+            {
+                if (_accessFailedCount != value)
+                {
+                    _accessFailedCount = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("roleNames", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.List<RoleDto> RoleNames
+        {
+            get { return _roleNames; }
+            set 
+            {
+                if (_roleNames != value)
+                {
+                    _roleNames = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static UserDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<UserDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class RoleDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private string _name;
+    
+        /// <summary>Name of role</summary>
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name
+        {
+            get { return _name; }
+            set 
+            {
+                if (_name != value)
+                {
+                    _name = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static RoleDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<RoleDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class SessionsDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private System.Collections.Generic.List<SessionDto> _sessions;
+    
+        [Newtonsoft.Json.JsonProperty("sessions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.List<SessionDto> Sessions
+        {
+            get { return _sessions; }
+            set 
+            {
+                if (_sessions != value)
+                {
+                    _sessions = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static SessionsDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<SessionsDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.4.2.0")]
+    public partial class SessionDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private string _id;
+        private string _userid;
+        private string _email;
+        private string _created;
+        private bool? _isStop;
+    
+        /// <summary>Then sessions id</summary>
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id
+        {
+            get { return _id; }
+            set 
+            {
+                if (_id != value)
+                {
+                    _id = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The userid associated with the session</summary>
+        [Newtonsoft.Json.JsonProperty("userid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Userid
+        {
+            get { return _userid; }
+            set 
+            {
+                if (_userid != value)
+                {
+                    _userid = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>the email of the user</summary>
+        [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Email
+        {
+            get { return _email; }
+            set 
+            {
+                if (_email != value)
+                {
+                    _email = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The timestamp of the creation</summary>
+        [Newtonsoft.Json.JsonProperty("created", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Created
+        {
+            get { return _created; }
+            set 
+            {
+                if (_created != value)
+                {
+                    _created = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>True if the session is stopped</summary>
+        [Newtonsoft.Json.JsonProperty("isStop", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool? IsStop
+        {
+            get { return _isStop; }
+            set 
+            {
+                if (_isStop != value)
+                {
+                    _isStop = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static SessionDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<SessionDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)

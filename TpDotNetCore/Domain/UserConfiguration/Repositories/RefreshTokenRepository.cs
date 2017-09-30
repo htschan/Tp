@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using TpDotNetCore.Data;
+using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Domain.UserConfiguration.Repositories
 {
@@ -32,22 +35,39 @@ namespace TpDotNetCore.Domain.UserConfiguration.Repositories
             }
         }
 
-        public void Delete(IRefreshTokenRepository entity)
+        public void Delete(RefreshToken entity)
         {
             throw new System.NotImplementedException();
         }
 
-        public IList<IRefreshTokenRepository> GetAll()
+        public IList<RefreshToken> GetAll()
+        {
+            using (var db = new TpContext())
+            {
+                try
+                {
+                    var value = db.RefreshTokens;
+                    if (value == null)
+                        throw new RepositoryException(StatusCodes.Status404NotFound, $"Sessions not found");
+                    return value.ToList();
+                }
+                catch (RepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetAll threw an exception: {exception.Message}", exception);
+                }
+            }
+        }
+
+        public void Insert(RefreshToken entity)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Insert(IRefreshTokenRepository entity)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Update(IRefreshTokenRepository entity)
+        public void Update(RefreshToken entity)
         {
             throw new System.NotImplementedException();
         }

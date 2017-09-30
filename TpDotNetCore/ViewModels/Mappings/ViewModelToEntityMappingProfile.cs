@@ -15,6 +15,14 @@ namespace TpDotNetCore.ViewModels.Mappings
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Punchid));
             // CreateMap<Punch, DeletePunchDto>()
             //     .ForMember(dest => dest.Punchid, opt => opt.MapFrom(src => src.Id));
+			CreateMap<AppUser, UserDto>()
+                .ReverseMap();
+            CreateMap<string, RoleDto>()
+                .ForMember(s => s.Name, map => map.MapFrom(vm => vm))
+                .ReverseMap();
+            CreateMap<RefreshToken, SessionDto>()
+                .ForMember(s => s.Userid, map => map.MapFrom(vm => vm.ClientId))
+                .ForMember(s => s.Email, map => map.MapFrom(vm => vm.ClientName));
         }
     }
 }

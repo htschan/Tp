@@ -16,7 +16,6 @@ namespace TpDotNetCore.Data
         
         public DbSet<AppUser> AppUsers { get; set; }
 
-		public DbSet<AppRole> AppRoles { get; set; }
 
         public DbSet<Punch> Punches { get; set; }
 

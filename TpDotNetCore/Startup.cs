@@ -64,7 +64,7 @@ namespace TpDotNetCore
             services.AddSingleton<ITimeService, TimeService>();
             services.AddTransient<ITpController, TpControllerImpl>();
             services.AddTransient<AppUser>();
-            services.AddTransient<AppRole>();
+            services.AddTransient<IdentityRole>();
             services.AddTransient<AppUserManager>();
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IAppUserRepository, AppUserRepository>();
@@ -82,7 +82,7 @@ namespace TpDotNetCore
                 options.AddPolicy("RequireApiAdminRole", policy => policy.RequireClaim(ClaimTypes.Role, Constants.Strings.JwtClaims.ApiAccessAdmin));
             });
 
-            services.AddIdentity<AppUser, AppRole>
+            services.AddIdentity<AppUser, IdentityRole>
                 (o =>
                 {
                     // configure identity options

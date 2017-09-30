@@ -14,21 +14,29 @@
   </md-toolbar>
 
   <md-sidenav-container>
-    <md-sidenav #sidenav mode="{{media.isActive('gt-xs') ? 'side' : 'over'}}" align="begin" >
+    <md-sidenav #sidenav mode="{{media.isActive('gt-xs') ? 'side' : 'over'}}" align="begin">
       <!-- sidenav content -->
       <md-nav-list>
-          <md-list-item>
-              <md-icon md-list-icon color="accent">info</md-icon>
-              <a md-line routerLink="/main/overview">Overview</a>
-           </md-list-item>
-           <md-list-item>
-              <md-icon md-list-icon color="accent">folder</md-icon>
-               <a md-line routerLink="/main/profile">Profile</a>
-           </md-list-item>
-           <md-list-item>
-              <md-icon md-list-icon color="accent">folder</md-icon>
-              <a md-line routerLink="/main/logout">Logout</a>
-           </md-list-item>
+        <md-list-item>
+          <md-icon md-list-icon color="accent">info</md-icon>
+          <a md-line routerLink="/main/overview">Overview</a>
+        </md-list-item>
+        <md-list-item>
+          <md-icon md-list-icon color="accent">info</md-icon>
+          <a md-line routerLink="/main/timeadmin">TimeAdmin</a>
+        </md-list-item>
+        <md-list-item>
+          <md-icon md-list-icon color="accent">info</md-icon>
+          <a md-line routerLink="/main/sysadmin">SysAdmin</a>
+        </md-list-item>
+        <md-list-item>
+          <md-icon md-list-icon color="accent">folder</md-icon>
+          <a md-line routerLink="/main/profile">Profile</a>
+        </md-list-item>
+        <md-list-item>
+          <md-icon md-list-icon color="accent">folder</md-icon>
+          <a md-line routerLink="/main/logout">Logout</a>
+        </md-list-item>
       </md-nav-list>
     </md-sidenav>
     <div class="my-content">
