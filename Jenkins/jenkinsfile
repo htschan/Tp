@@ -1,0 +1,30 @@
+
+node {
+    stage('prime'){
+        
+
+    }
+    stage('prepare'){
+        git changelog: false, poll: false, url: 'C:\\sites\\Bonobo.Git.Server\\App_Data\\Repositories\\Tp'    
+        
+    }
+    stage('install'){
+        dir('TpMaterial') {
+            bat 'npm install'
+        }
+        dir('TpDotNetCore') {
+            bat 'dotnet restore'
+        }
+        dir('TpIonic') {
+            bat 'npm install'
+        }
+    }
+    stage('build'){
+        dir('TpMaterial'){
+            bat 'ng build --prod'
+        }
+        dir('TpDotNetCire'){
+            bat 'dotnet run'
+        }
+    }
+}
