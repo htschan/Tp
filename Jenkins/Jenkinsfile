@@ -78,7 +78,7 @@ node {
 		}
 		/* TpIonic */
 		dir('TpIonic'){
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path c:/sites/TpIonic/*.* -recurse -include *.js *.css')
+			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:IONIC_SITE_LOCATION/*.* -recurse -include *.js,*.css')
 			if ( status3 == 0){
 				echo 'TpIonic site location cleanup done'
 			}
