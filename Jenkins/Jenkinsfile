@@ -100,8 +100,8 @@ node {
 		}
 		/* TpMaterial */
 		dir('TpMaterial'){
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path c:/sitest/TpMaterial/*.* -recurse -include *.bundle.js *.bundle.css')
-			if ( status3 == 0){
+			def status5 = powershell(returnStatus: true, script: 'Remove-Item -path c:/sites/TpMaterial/*.* -recurse -include *.bundle.js *.bundle.css')
+			if ( status5 == 0){
 				echo 'TpMaterial site location cleanup done'
 			}
 			else {
@@ -112,8 +112,8 @@ node {
 			bat '(robocopy dist *.* %MATERIAL_SITE_LOCATION% /e /r:1 /unicode) ^& IF %ERRORLEVEL% LEQ 1 exit 0'
 		}
 		dir('TpMaterial'){
-			def status4 = powershell(returnStatus: true, script: 'Copy-Item web.config $env:MATERIAL_SITE_LOCATION/web.config')
-			if ( status4 == 0){
+			def status6 = powershell(returnStatus: true, script: 'Copy-Item web.config $env:MATERIAL_SITE_LOCATION/web.config')
+			if ( status6 == 0){
 				echo 'Copy web.config TpMaterial file ok'
 			}
 			else {
