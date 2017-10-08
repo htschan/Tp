@@ -12,16 +12,14 @@ namespace TpDotNetCore.Domain.UserConfiguration
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IAppUserRepository _appUserRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IMapper _mapper;
 
-        public AppUserManager(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IAppUserRepository appUserRepository, IRefreshTokenRepository refreshTokenRepository)
+        public AppUserManager(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IRefreshTokenRepository refreshTokenRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
-            _appUserRepository = appUserRepository;
             _refreshTokenRepository = refreshTokenRepository;
         }
 

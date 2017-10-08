@@ -39,3 +39,45 @@ https://github.com/NSwag/NSwag/wiki/NSwagStudio
 
 `nswag run`
 
+# Generating code for APS.NET Core
+
+## GUI / Settings Parameter
+
+This option turns on the ASP.NET Core generation
+
+x Generate ASP.NET Core
+
+When this option is set, the behavior of the code generator is as follows:
+
+swagger.yaml
+
+### summary Operation Attribute extension
+  AuthenticationAttibute: [AllowAnonymous]
+    Specify anonymous access for operation
+  AuthorizeAttribute:  [Authorize(Policy = "RequireApiAdminRole")]
+    Specify required authorization policy for method where "[Authorize(Policy" is the keyword
+
+### Generate model binding attribute
+  Decorate method parameters with ModelBinding Attributes, e.g, [FromBody], [FromRoute] etc.
+
+### File Upload
+
+#### Single file upload
+      parameters:
+        - name: document
+          in: formData
+          description: The content of the file
+          required: true
+          type: file
+
+#### Multiple file upload
+      parameters:
+        - name: document
+          in: formData
+          description: The content of the file
+          required: true
+          type: file
+          collectionFormat: multi
+
+
+

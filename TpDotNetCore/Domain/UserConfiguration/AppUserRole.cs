@@ -1,7 +1,6 @@
-using Mat.Domain.UserConfiguration;
 using Microsoft.AspNetCore.Identity;
 
-namespace Mat.Domain.UserConfiguration
+namespace TpDotNetCore.Domain.UserConfiguration
 {
     public class AppUserRole : IdentityUserRole<string>
     {

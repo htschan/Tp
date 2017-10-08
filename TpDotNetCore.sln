@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TpDotNetCore", "TpDotNetCore\TpDotNetCore.csproj", "{727BBA85-5997-475B-B1DF-BB4375E5A287}"
 EndProject
@@ -28,6 +28,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TpIonic", "TpIonic\", "{FE5
 		SlnRelativePath = "TpIonic\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TpMaterial", "TpMaterial\", "{A27CCFCC-D628-4731-A2E0-DD7D149F1D76}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv2.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_50315"
+		Debug.AspNetCompiler.PhysicalPath = "TpMaterial\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50315\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_50315"
+		Release.AspNetCompiler.PhysicalPath = "TpMaterial\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50315\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "50315"
+		SlnRelativePath = "TpMaterial\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,8 +67,15 @@ Global
 		{FE50ACAB-E3F7-4528-ACFB-5DD61A396E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE50ACAB-E3F7-4528-ACFB-5DD61A396E56}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{FE50ACAB-E3F7-4528-ACFB-5DD61A396E56}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{A27CCFCC-D628-4731-A2E0-DD7D149F1D76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A27CCFCC-D628-4731-A2E0-DD7D149F1D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A27CCFCC-D628-4731-A2E0-DD7D149F1D76}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{A27CCFCC-D628-4731-A2E0-DD7D149F1D76}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {26347332-7AFE-404F-A9D7-0E3317045098}
 	EndGlobalSection
 EndGlobal
