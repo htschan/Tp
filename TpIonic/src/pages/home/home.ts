@@ -106,6 +106,14 @@ export class HomePage {
     }
   }
 
+  dayBackward() {
+    
+  }
+
+  dayForward(){
+
+  }
+
   getToday() {
     this.punchService.getDay(null, null, null).subscribe(response => {
       this.punchDayVm = response;

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { ObservableMedia, MediaChange } from "@angular/flex-layout";
-import { MdSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material';
 import { Observable } from "rxjs/Observable";
 import { Subscription } from "rxjs/Subscription";
 
@@ -12,7 +12,7 @@ import { Subscription } from "rxjs/Subscription";
 })
 export class MainComponent implements OnInit, OnDestroy {
 
-  @ViewChild("sidenav") sidenav: MdSidenav;
+  @ViewChild("sidenav") sidenav: MatSidenav;
   isDarkTheme = false;
   mediaInfo = "";
   mediaSubscription: Subscription;

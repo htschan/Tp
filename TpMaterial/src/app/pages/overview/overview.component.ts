@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MdIconRegistry, MdDialog } from '@angular/material';
+import { MatIconRegistry, MatDialog } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MdTabChangeEvent } from '@angular/material';
+import { MatTabChangeEvent } from '@angular/material';
 
 import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
 import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult, YearPunchesDto } from '../../services/api.g';
@@ -26,7 +26,7 @@ export class OverviewComponent implements OnInit {
   month;
   week: Date;
 
-  constructor(iconRegistry: MdIconRegistry, sanitizer: DomSanitizer, private dialog: MdDialog, private punchService: PunchService) { }
+  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, private dialog: MatDialog, private punchService: PunchService) { }
 
   ngOnInit() {
     this.getToday();
@@ -110,7 +110,7 @@ export class OverviewComponent implements OnInit {
       });
   }
 
-  tabChanged(event: MdTabChangeEvent) {
+  tabChanged(event: MatTabChangeEvent) {
     console.log("tabChanged: " + event.index);
     switch (event.index) {
       case 0:

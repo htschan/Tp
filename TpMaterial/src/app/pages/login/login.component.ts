@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MdSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 
 import { AlertService } from '../../services/alert/alert.service';
 import { AuthService } from '../../services/auth/auth.service';
@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
         private router: Router,
         private authenticationService: AuthService,
         public alertService: AlertService,
-        public snackBar: MdSnackBar) { }
+        public snackBar: MatSnackBar) { }
 
     ngOnInit() {
         // reset login status

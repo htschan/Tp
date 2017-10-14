@@ -1,52 +1,52 @@
 <div fxLayout="column" [class.dark-theme]="isDarkTheme">
 
-  <md-toolbar color="primary" fxFlex="60px">
-    <span><button md-button (click)="sidenav.toggle()"><md-icon>menu</md-icon></button></span>
+  <mat-toolbar color="primary" fxFlex="60px">
+    <span><button mat-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button></span>
     <span>Timepuncher - {{mediaInfo}}</span>
 
     <!-- Filler that pushes the menu button to the end of the toolbar -->
     <span fxFlex></span>
 
-    <button md-icon-button [mdMenuTriggerFor]="themeMenu">
-      <md-icon>more_vert</md-icon>
+    <button mat-icon-button [matMenuTriggerFor]="themeMenu">
+      <mat-icon>more_vert</mat-icon>
     </button>
 
-  </md-toolbar>
+  </mat-toolbar>
 
-  <md-sidenav-container>
-    <md-sidenav #sidenav mode="{{media.isActive('gt-xs') ? 'side' : 'over'}}" align="begin">
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav mode="{{media.isActive('gt-xs') ? 'side' : 'over'}}" align="begin">
       <!-- sidenav content -->
-      <md-nav-list>
-        <md-list-item>
-          <md-icon md-list-icon color="accent">info</md-icon>
-          <a md-line routerLink="/main/overview">Overview</a>
-        </md-list-item>
-        <md-list-item>
-          <md-icon md-list-icon color="accent">info</md-icon>
-          <a md-line routerLink="/main/timeadmin">TimeAdmin</a>
-        </md-list-item>
-        <md-list-item>
-          <md-icon md-list-icon color="accent">info</md-icon>
-          <a md-line routerLink="/main/sysadmin">SysAdmin</a>
-        </md-list-item>
-        <md-list-item>
-          <md-icon md-list-icon color="accent">folder</md-icon>
-          <a md-line routerLink="/main/profile">Profile</a>
-        </md-list-item>
-        <md-list-item>
-          <md-icon md-list-icon color="accent">folder</md-icon>
-          <a md-line routerLink="/main/logout">Logout</a>
-        </md-list-item>
-      </md-nav-list>
-    </md-sidenav>
+      <mat-nav-list>
+        <mat-list-item>
+          <mat-icon mat-list-icon color="accent">info</mat-icon>
+          <a mat-line routerLink="/main/overview">Overview</a>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon color="accent">info</mat-icon>
+          <a mat-line routerLink="/main/timeadmin">TimeAdmin</a>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon color="accent">info</mat-icon>
+          <a mat-line routerLink="/main/sysadmin">SysAdmin</a>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon color="accent">folder</mat-icon>
+          <a mat-line routerLink="/main/profile">Profile</a>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon color="accent">folder</mat-icon>
+          <a mat-line routerLink="/main/logout">Logout</a>
+        </mat-list-item>
+      </mat-nav-list>
+    </mat-sidenav>
     <div class="my-content">
       <router-outlet></router-outlet>
     </div>
-  </md-sidenav-container>
+  </mat-sidenav-container>
 
-  <md-menu #themeMenu x-position="before">
-    <button md-menu-item (click)="isDarkTheme = !isDarkTheme">Toggle Theme</button>
-    <button md-menu-item (click)="sidenav.toggle()">Toggle Sidenav</button>
-  </md-menu>
+  <mat-menu #themeMenu x-position="before">
+    <button mat-menu-item (click)="isDarkTheme = !isDarkTheme">Toggle Theme</button>
+    <button mat-menu-item (click)="sidenav.toggle()">Toggle Sidenav</button>
+  </mat-menu>
 
 </div>

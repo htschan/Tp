@@ -1,47 +1,47 @@
 <div fxLayout="column" fxFlex [class.dark-theme]="isDarkTheme" fxLayoutAlign="center center" fxFill>
-    <md-card class="login-card">
-        <md-card-header>
+    <mat-card class="login-card">
+        <mat-card-header>
             Login 
-        </md-card-header>
-        <md-card-content>
+        </mat-card-header>
+        <mat-card-content>
             <form name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
                 <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !username.valid }">
-                    <md-input-container>
+                    <mat-input-container>
                         <input mdInput placeholder="Username" name="username" [(ngModel)]="model.username" #username="ngModel" required>
-                    </md-input-container>
+                    </mat-input-container>
                     <div *ngIf="f.submitted && !username.valid" class="help-block">Username is required</div>
                 </div>
                 <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !password.valid }">
-                    <md-input-container>
+                    <mat-input-container>
                         <input mdInput type="password" placeholder="Password" name="password" [(ngModel)]="model.password" #password="ngModel" required>
-                    </md-input-container>
+                    </mat-input-container>
                     <div *ngIf="f.submitted && !password.valid" class="help-block">Password is required</div>
                 </div>
                 <div class="form-group">
-                    <button md-raised-button [disabled]="loading" color="accent">Login</button>
+                    <button mat-raised-button [disabled]="loading" color="accent">Login</button>
                     <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA=="
                     />
-                    <button md-raised-button [disabled]="loading" [routerLink]="['/register']">Register</button>
+                    <button mat-raised-button [disabled]="loading" [routerLink]="['/register']">Register</button>
                 </div>
             </form>
-        </md-card-content>
-    </md-card>
-    <md-card class="login-card">
-        <md-card-header>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="login-card">
+        <mat-card-header>
             Here are some links to help you start:
-        </md-card-header>
-        <md-card-content>
-            <md-list>
-                <md-list-item>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-list>
+                <mat-list-item>
                     <a target="_blank" href="https://angular.io/tutorial">Tour of Heroes</a>
-                </md-list-item>
-                <md-list-item>
+                </mat-list-item>
+                <mat-list-item>
                     <a target="_blank" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a>
-                </md-list-item>
-                <md-list-item>
+                </mat-list-item>
+                <mat-list-item>
                     <a target="_blank" href="https://blog.angular.io//">Angular blog</a>
-                </md-list-item>
-            </md-list>
-        </md-card-content>
-    </md-card>
+                </mat-list-item>
+            </mat-list>
+        </mat-card-content>
+    </mat-card>
 </div>

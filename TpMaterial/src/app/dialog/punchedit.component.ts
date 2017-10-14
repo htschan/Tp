@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { PunchVm, EditResultEnum } from "../services/puncher/punch.service";
 
 @Component({
@@ -12,7 +12,7 @@ export class PunchEditComponent {
   punchVm: PunchVm;
   title: string;
   
-  constructor(public dialogRef: MdDialogRef<PunchEditComponent>, @Inject(MD_DIALOG_DATA) public dlgData: any) {
+  constructor(public dialogRef: MatDialogRef<PunchEditComponent>, @Inject(MAT_DIALOG_DATA) public dlgData: any) {
     this.punchVm = dlgData.punchVm;
     this.title = dlgData.title;
     this.punchTime = this.punchVm.time.toLocaleTimeString();

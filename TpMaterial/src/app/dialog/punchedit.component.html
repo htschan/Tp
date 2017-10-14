@@ -4,22 +4,22 @@
     <div fxLayout="column" fxLayoutAlign="start center">
       <div>{{dlgData.punchVm?.timedec | number: "1.2-2"}}</div>
       <div>
-        <md-slide-toggle [checked]="dlgData.punchVm.direction">{{dlgData.punchVm?.direction ? "Kommen" : "Gehen"}}</md-slide-toggle>
+        <mat-slide-toggle [checked]="dlgData.punchVm.direction">{{dlgData.punchVm?.direction ? "Kommen" : "Gehen"}}</mat-slide-toggle>
       </div>
       <div>
-        <md-input-container>
+        <mat-input-container>
           <input mdInput placeholder="Time (hh:mm)" [(ngModel)]="punchTime">
-        </md-input-container>
+        </mat-input-container>
       </div>
       <div>
         <div>{{time}}</div>
       </div>
     </div>
-    <md-dialog-actions align="end">
-      <button md-button type="button" (click)="delete()">Löschen</button>
-      <button md-button type="button" color="accent" (click)="save()">Speichern</button>
-      <button md-button type="button" (click)="reset()">Zurücksetzen</button>
-      <button md-button type="button" (click)="dismiss()">Abbrechen</button>
-    </md-dialog-actions>
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" (click)="delete()">Löschen</button>
+      <button mat-button type="button" color="accent" (click)="save()">Speichern</button>
+      <button mat-button type="button" (click)="reset()">Zurücksetzen</button>
+      <button mat-button type="button" (click)="dismiss()">Abbrechen</button>
+    </mat-dialog-actions>
   </div>
 </div>
