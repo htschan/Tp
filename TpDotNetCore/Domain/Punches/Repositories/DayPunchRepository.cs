@@ -58,9 +58,9 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 
                 var dayPunch = new DayPunchesDto();
                 dayPunch.GetRowedDayPunches(punches.OrderBy(dp => dp.TimeDec).ToArray());
-                dayPunch.Day = dt.Day;
-                dayPunch.Month = dt.Month;
-                dayPunch.Year = dt.Year;
+                dayPunch.Day = selectDay;
+                dayPunch.Month = selectMonth;
+                dayPunch.Year = selectYear;
                 response.Punches = dayPunch;
                 return response;
             }

@@ -61,7 +61,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 var yearchPunchVm = new YearPunchesDto();
                 response.Punches = yearchPunchVm;
                 yearchPunchVm.User = user.Id;
-                yearchPunchVm.Year = dt.Year;
+                yearchPunchVm.Year = selectYear;
                 yearchPunchVm.Punches = new List<MonthPunchesDto>();
                 foreach (var groupPunch in groupedPunches)
                 {

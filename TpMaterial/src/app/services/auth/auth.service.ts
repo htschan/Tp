@@ -33,11 +33,12 @@ export class AuthService {
                 }))
             .then(() => {
                 this.getToken().then(token => {
-                    this.getNewJwt();
-                    this.initialized = true;
-                    this.idToken = token;
-                    if (this.idToken)
-                        this.startupTokenRefresh();
+                    this.getNewJwt().then(() => {
+                        this.initialized = true;
+                        this.idToken = token;
+                        if (this.idToken)
+                            this.startupTokenRefresh();
+                    });
                 });
             });
     }
@@ -219,7 +220,7 @@ export class AuthService {
                 this.storage.set('refresh_token', authInfo.refreshtoken)
             ]).then(() => this.idToken = authInfo.token);
         }
-        else
-            return Promise.reject("storeAuth failed");
+        // else
+        //     return Promise.reject("storeAuth failed");
     }
 }

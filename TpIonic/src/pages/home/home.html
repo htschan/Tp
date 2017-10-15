@@ -21,20 +21,20 @@
       <ion-grid>
         <ion-row>
           <ion-col col-2>
-            <ion-icon name="arrow-dropup-circle" color="danger" (click)="dayBackward()"></ion-icon>
+            <ion-icon name="arrow-dropup-circle" color="dark" (click)="getPreviousDay()"></ion-icon>
           </ion-col>
           <ion-col col-2>
-            <ion-icon name="arrow-dropdown-circle" color="danger" (click)="dayForward()"></ion-icon>
+            <ion-icon name="arrow-dropdown-circle" color="dark" (click)="getNextDay()" *ngIf="nextDayAvailable()"></ion-icon>
           </ion-col>
-          <h1>
-            <ion-col>Heute</ion-col>
-          </h1>
+          <ion-col float-right text-right>
+            <h1>Heute</h1>
+          </ion-col>
         </ion-row>
       </ion-grid>
       <ion-grid>
         <ion-row>
-          <ion-col col-4>{{punchDayVm?.date.getDay() | dayName}} {{punchDayVm?.date | date:"dd.MM.yyyy"}}</ion-col>
-          <ion-col col-4>Tagestotal: {{punchDayVm?.daySum | number: "1.2-2"}} h</ion-col>
+          <ion-col col-6>{{punchDayVm?.date.getDay() | dayName}} {{punchDayVm?.date | date:"dd.MM.yyyy"}}</ion-col>
+          <ion-col col-6>Tagestotal: {{punchDayVm?.daySum | number: "1.2-2"}} h</ion-col>
         </ion-row>
         <ion-row *ngFor="let row of punchDayVm?.punchRow">
           <ion-col col-3 (click)="editPunch(row?.enter)">{{row?.enter?.timedec | number: "1.2-2"}}</ion-col>
@@ -50,21 +50,47 @@
     </ion-slide>
 
     <ion-slide>
-      <h1>Woche </h1>
       <ion-grid>
         <ion-row>
-          <ion-col col-8>Kw {{punchWeekVm?.week}}/{{punchWeekVm?.year}}</ion-col>
-          <ion-col col-4>W-tot: {{punchWeekVm?.weekSum | number: "1.2-2"}} h</ion-col>
+          <ion-col col-2>
+            <ion-icon name="arrow-dropup-circle" color="dark" (click)="getPreviousWeek()"></ion-icon>
+          </ion-col>
+          <ion-col col-2>
+            <ion-icon name="arrow-dropdown-circle" color="dark" (click)="getNextWeek()" *ngIf="nextWeekAvailable()"></ion-icon>
+          </ion-col>
+          <ion-col float-right text-right>
+            <h1>Woche </h1>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-grid>
+        <ion-row>
+          <ion-col col-7>Kw {{punchWeekVm?.week}}/{{punchWeekVm?.year}}</ion-col>
+          <ion-col col-5>Total: {{punchWeekVm?.weekSum | number: "1.2-2"}} h</ion-col>
         </ion-row>
         <ion-row *ngFor="let day of punchWeekVm?.punchDays">
-          <ion-col col-8>{{day?.date.getDay() | dayName}} {{day?.date | date:"dd.MM.yyyy"}}</ion-col>
-          <ion-col col-4>{{day.daySum | number: "1.2-2"}} h</ion-col>
+          <ion-col col-7>{{day?.date.getDay() | dayName}} {{day?.date | date:"dd.MM.yyyy"}}</ion-col>
+          <ion-col col-5>{{day.daySum | number: "1.2-2"}} h</ion-col>
         </ion-row>
       </ion-grid>
     </ion-slide>
 
     <ion-slide>
-      <h1>Monat</h1>
+      <ion-grid>
+        <ion-row>
+          <ion-col col-2>
+            <ion-icon name="arrow-dropup-circle" color="dark" (click)="getPreviousMonth()"></ion-icon>
+          </ion-col>
+          <ion-col col-2>
+            <ion-icon name="arrow-dropdown-circle" color="dark" (click)="getNextMonth()" *ngIf="nextMonthAvailable()"></ion-icon>
+          </ion-col>
+          <ion-col float-right text-right>
+            <h1>Monat</h1>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      
       <ion-grid>
         <ion-row>
           <ion-col col-4>{{punchMonthVm?.month | monthName}}</ion-col>
@@ -79,7 +105,19 @@
     </ion-slide>
 
     <ion-slide>
-      <h1>Jahr</h1>
+      <ion-grid>
+        <ion-row>
+          <ion-col col-2>
+            <ion-icon name="arrow-dropup-circle" color="dark" (click)="getPreviousYear()"></ion-icon>
+          </ion-col>
+          <ion-col col-2>
+            <ion-icon name="arrow-dropdown-circle" color="dark" (click)="getNextYear()" *ngIf="nextYearAvailable()"></ion-icon>
+          </ion-col>
+          <ion-col float-right text-right>
+            <h1>Jahr</h1>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
       <ion-grid>
         <ion-row>
           <ion-col col-4>Jahr {{punchYearVm?.year}}</ion-col>

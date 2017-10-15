@@ -60,8 +60,8 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     Punches = new WeekPunchesDto
                     {
                         User = user.Id,
-                        Week = _timeService.GetWeekNumber(dt),
-                        Year = dt.Year,
+                        Week = selectWeek,
+                        Year = selectYear,
                         DayPunches = new List<DayPunchesDto>()
                     }
                 };
@@ -70,8 +70,9 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     var dayPunch = new DayPunchesDto();
                     dayPunch.GetRowedDayPunches(dayPunches.OrderBy(dp => dp.TimeDec).ToArray());
                     dayPunch.Day = dayPunches.Key;
-                    dayPunch.Month = dt.Month;
-                    dayPunch.Year = dt.Year;
+                    var p0 = dayPunch.Punches.FirstOrDefault();
+                    dayPunch.Month = p0 != null ? p0.Enter != null ? p0.Enter.Time.Value.Month : p0.Leave != null ? p0.Leave.Time.Value.Month : dt.Month : dt.Month;
+                    dayPunch.Year = selectYear;
                     response.Punches.DayPunches.Add(dayPunch);
                 }
                 return response;

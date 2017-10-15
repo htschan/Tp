@@ -60,8 +60,8 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     Punches = new MonthPunchesDto
                     {
                         User = user.Id,
-                        Month = dt.Month,
-                        Year = dt.Year,
+                        Month = selectMonth,
+                        Year = selectedYear,
                         Punches = new List<DayPunchesDto>()
                     }
                 };

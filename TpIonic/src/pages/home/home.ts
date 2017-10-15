@@ -106,38 +106,100 @@ export class HomePage {
     }
   }
 
-  dayBackward() {
-    
+  getPreviousDay() {
+    this.punchService.getPreviousDay(this.punchDayVm).take(1).subscribe(response => {
+      this.punchDayVm = response;
+    })
   }
 
-  dayForward(){
+  getNextDay() {
+    this.punchService.getNextDay(this.punchDayVm).take(1).subscribe(response => {
+      this.punchDayVm = response;
+    })
+  }
 
+  nextDayAvailable(): boolean {
+    if (this.punchDayVm == null)
+      return false;
+    return this.punchService.nextDayAvailable(this.punchDayVm);
   }
 
   getToday() {
-    this.punchService.getDay(null, null, null).subscribe(response => {
+    this.punchService.getDay(null, null, null).take(1).subscribe(response => {
       this.punchDayVm = response;
     });
   }
 
+  getPreviousWeek() {
+    this.punchService.getPreviousWeek(this.punchWeekVm).take(1).subscribe(response => {
+      this.punchWeekVm = response;
+    })
+  }
+
+  getNextWeek() {
+    this.punchService.getNextWeek(this.punchWeekVm).take(1).subscribe(response => {
+      this.punchWeekVm = response;
+    })
+  }
+
+  nextWeekAvailable(): boolean {
+    if (this.punchWeekVm == null)
+      return false;
+    return this.punchService.nextWeekAvailable(this.punchWeekVm);
+  }
+
   getWeek() {
-    this.punchService.getWeek(null, null).subscribe(response =>
+    this.punchService.getWeek(null, null).take(1).subscribe(response =>
       this.punchWeekVm = response
     );
   }
 
+  getPreviousMonth() {
+    this.punchService.getPreviousMonth(this.punchMonthVm).take(1).subscribe(response => {
+      this.punchMonthVm = response;
+    })
+  }
+
+  getNextMonth() {
+    this.punchService.getNextMonth(this.punchMonthVm).take(1).subscribe(response => {
+      this.punchMonthVm = response;
+    })
+  }
+
+  nextMonthAvailable(): boolean {
+    if (this.punchMonthVm == null)
+      return false;
+    return this.punchService.nextMonthAvailable(this.punchMonthVm);
+  }
+
   getMonth() {
-    this.punchService.getMonth(null, null)
-      .subscribe(response =>
-        this.punchMonthVm = response
-      );
+    this.punchService.getMonth(null, null).take(1).subscribe(response =>
+      this.punchMonthVm = response
+    );
+  }
+
+  getPreviousYear() {
+    this.punchService.getPreviousYear(this.punchYearVm).take(1).subscribe(response => {
+      this.punchYearVm = response;
+    })
+  }
+
+  getNextYear() {
+    this.punchService.getNextYear(this.punchYearVm).take(1).subscribe(response => {
+      this.punchYearVm = response;
+    })
+  }
+
+  nextYearAvailable(): boolean {
+    if (this.punchYearVm == null)
+      return false;
+    return this.punchService.nextYearAvailable(this.punchYearVm);
   }
 
   getYear() {
-    this.punchService.getYear(null)
-      .subscribe(response =>
-        this.punchYearVm = response
-      );
+    this.punchService.getYear(null).take(1).subscribe(response =>
+      this.punchYearVm = response
+    );
   }
 
   handleError(err: string) {

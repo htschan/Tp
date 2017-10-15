@@ -2,6 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
+import * as moment from 'moment';
 import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto } from '../../services/api.g';
 
 @Injectable()
@@ -19,10 +20,28 @@ export class PunchService {
             });
     }
 
-    getToday(day: number | undefined, month: number | undefined, year: number | undefined): Observable<PunchDayVm> {
+    getDay(day: number | undefined, month: number | undefined, year: number | undefined): Observable<PunchDayVm> {
         return this.tpClient.getDay(day, month, year).map(dayResponse => {
             return new PunchDayVm(dayResponse.punches);
         });
+    }
+
+    getPreviousDay(currentDay: PunchDayVm): Observable<PunchDayVm> {
+        let d = currentDay.getPreviousDay();
+        return this.tpClient.getDay(d.getDate(), d.getMonth() + 1, d.getFullYear()).map(dayResponse => {
+            return new PunchDayVm(dayResponse.punches);
+        });
+    }
+
+    getNextDay(currentDay: PunchDayVm): Observable<PunchDayVm> {
+        let d = currentDay.getNextDay();
+        return this.tpClient.getDay(d.getDate(), d.getMonth() + 1, d.getFullYear()).map(dayResponse => {
+            return new PunchDayVm(dayResponse.punches);
+        });
+    }
+
+    nextDayAvailable(currentDay: PunchDayVm): boolean {
+        return moment().isAfter(currentDay.getDate(), 'day');
     }
 
     getWeek(week: number | undefined, year: number | undefined): Observable<PunchWeekVm> {
@@ -31,16 +50,70 @@ export class PunchService {
         });
     }
 
+    getPreviousWeek(currentWeek: PunchWeekVm): Observable<PunchWeekVm> {
+        let d = currentWeek.getPreviousWeek();
+        return this.tpClient.getWeek(moment(d).isoWeek(), d.getFullYear()).map(dayResponse => {
+            return new PunchWeekVm(dayResponse.punches);
+        });
+    }
+
+    getNextWeek(currentWeek: PunchWeekVm): Observable<PunchWeekVm> {
+        let d = currentWeek.getNextWeek();
+        return this.tpClient.getWeek(moment(d).isoWeek(), d.getFullYear()).map(dayResponse => {
+            return new PunchWeekVm(dayResponse.punches);
+        });
+    }
+
+    nextWeekAvailable(currentWeek: PunchWeekVm): boolean {
+        return moment().isAfter(currentWeek.getDate(), 'week');
+    }
+
     getMonth(month: number | undefined, year: number | undefined): Observable<PunchMonthVm> {
         return this.tpClient.getMonth(month, year).map(monthResponse => {
             return new PunchMonthVm(monthResponse.punches);
         });
     }
 
+    getPreviousMonth(currentMonth: PunchMonthVm): Observable<PunchMonthVm> {
+        let d = currentMonth.getPreviousMonth();
+        return this.tpClient.getMonth(d.getMonth() + 1, d.getFullYear()).map(monthResponse => {
+            return new PunchMonthVm(monthResponse.punches);
+        });
+    }
+
+    getNextMonth(currentMonth: PunchMonthVm): Observable<PunchMonthVm> {
+        let d = currentMonth.getNextMonth();
+        return this.tpClient.getMonth(d.getMonth() + 1, d.getFullYear()).map(monthResponse => {
+            return new PunchMonthVm(monthResponse.punches);
+        });
+    }
+
+    nextMonthAvailable(currentMonth: PunchMonthVm): boolean {
+        return moment().isAfter(currentMonth.getDate(), 'month');
+    }
+
     getYear(year: number | undefined): Observable<PunchYearVm> {
         return this.tpClient.getYear(year).map(yearResponse => {
             return new PunchYearVm(yearResponse.punches);
         });
+    }
+
+    getPreviousYear(currentYear: PunchYearVm): Observable<PunchYearVm> {
+        let d = currentYear.getPreviousYear();
+        return this.tpClient.getYear(d.getFullYear()).map(yearResponse => {
+            return new PunchYearVm(yearResponse.punches);
+        });
+    }
+
+    getNextYear(currentYear: PunchYearVm): Observable<PunchYearVm> {
+        let d = currentYear.getNextYear();
+        return this.tpClient.getYear(d.getFullYear()).map(yearResponse => {
+            return new PunchYearVm(yearResponse.punches);
+        });
+    }
+
+    nextYearAvailable(currentYear: PunchYearVm): boolean {
+        return moment().isAfter(currentYear.getDate(), 'year');
     }
 
     updatePunch(punchVm: PunchVm): Observable<PunchResponse> {
@@ -94,6 +167,7 @@ export enum EditResultEnum {
     Save,
     Delete
 }
+
 export class PunchRowVm {
     calcSum() {
         if (this.enter && this.leave)
@@ -124,6 +198,18 @@ export class PunchDayVm {
     punchRow?: PunchRowVm[] = [];
     daySum?: number;
     date?: Date | undefined;
+
+    getPreviousDay(): Date {
+        return moment(this.date).subtract(1, 'day').toDate();
+    }
+
+    getNextDay(): Date {
+        return moment(this.date).add(1, 'day').toDate();
+    }
+
+    getDate(): Date {
+        return this.date;
+    }
 }
 
 export class PunchWeekVm {
@@ -146,6 +232,21 @@ export class PunchWeekVm {
     weekSum: number = 0.0;
     week: number;
     year: number;
+
+    getPreviousWeek(): Date {
+        return moment(this.getDate()).subtract(1, 'week').toDate();
+    }
+
+    getNextWeek(): Date {
+        return moment(this.getDate()).add(1, 'week').toDate();
+    }
+
+    getDate(): Date {
+        let d = moment();
+        d.year(this.year);
+        d.isoWeek(this.week);
+        return d.toDate();
+    }
 }
 
 export class PunchMonthVm {
@@ -168,6 +269,21 @@ export class PunchMonthVm {
     monthSum: number = 0.0;
     month: number;
     year: number;
+
+    getPreviousMonth(): Date {
+        return moment(this.getDate()).subtract(1, 'month').toDate();
+    }
+
+    getNextMonth(): Date {
+        return moment(this.getDate()).add(1, 'month').toDate();
+    }
+
+    getDate(): Date {
+        let d = moment();
+        d.year(this.year);
+        d.month(this.month - 1);
+        return d.toDate();
+    }
 }
 
 export class PunchYearVm {
@@ -188,4 +304,18 @@ export class PunchYearVm {
     punchMonths?: PunchMonthVm[] = [];
     yearSum: number = 0.0;
     year: number;
+
+    getPreviousYear(): Date {
+        return moment(this.getDate()).subtract(1, 'year').toDate();
+    }
+
+    getNextYear(): Date {
+        return moment(this.getDate()).add(1, 'year').toDate();
+    }
+
+    getDate(): Date {
+        let d = moment();
+        d.year(this.year);
+        return d.toDate();
+    }
 }
