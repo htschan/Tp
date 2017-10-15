@@ -148,7 +148,7 @@ export class OverviewComponent implements OnInit {
   }
 
   getToday() {
-    this.punchService.getToday(undefined, undefined, undefined).subscribe(response => {
+    this.punchService.getDay(undefined, undefined, undefined).subscribe(response => {
       this.punchDayVm = response;
     });
   }
