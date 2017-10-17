@@ -70,8 +70,8 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     var dayPunch = new DayPunchesDto();
                     dayPunch.GetRowedDayPunches(dayPunches.OrderBy(dp => dp.TimeDec).ToArray());
                     dayPunch.Day = dayPunches.Key;
-                    dayPunch.Month = dt.Month;
-                    dayPunch.Year = dt.Year;
+                    dayPunch.Month = selectMonth;
+                    dayPunch.Year = selectedYear;
                     response.Punches.Punches.Add(dayPunch);
                 }
                 return response;

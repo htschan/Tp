@@ -29,7 +29,7 @@
         <mat-tab label="Woche">
           <mat-grid-list cols="3" rowHeight="3em">
             <mat-grid-tile colspan="1">
-              <input mdInput type="week" placeholder="Woche" [(ngModel)]="week" (change)="weekChanged()">
+              <input matInput type="week" placeholder="Woche" [(ngModel)]="week" (change)="weekChanged()">
             </mat-grid-tile>
             <mat-grid-tile>Kalenderwoche {{punchWeekVm?.week}}/{{punchWeekVm?.year}}</mat-grid-tile>
             <mat-grid-tile>Wochentotal {{punchWeekVm?.weekSum | number: "1.2-2"}}</mat-grid-tile>
@@ -47,7 +47,7 @@
         <mat-tab label="Monat">
           <mat-grid-list cols="3" rowHeight="3em">
             <mat-grid-tile colspan="1">
-              <mat-form-field>
+              <mat-form-field floatPlaceholder="never">
                 <mat-select placeholder="Monat" [(ngModel)]="month" (change)="monthChanged()">
                   <mat-option *ngFor="let month of months" [value]="month.monthNum">
                     {{ month.monthName }}
@@ -56,7 +56,7 @@
               </mat-form-field>
             </mat-grid-tile>
             <mat-grid-tile colspan="1">
-              <mat-form-field>
+              <mat-form-field floatPlaceholder="never">
                 <mat-select placeholder="Jahr" [(ngModel)]="year" (change)="monthChanged()">
                   <mat-option *ngFor="let year of years" [value]="year">
                     {{ year }}
@@ -78,7 +78,7 @@
         <mat-tab label="Jahr">
           <mat-grid-list cols="3" rowHeight="3em">
             <mat-grid-tile colspan="1">
-              <mat-form-field>
+              <mat-form-field floatPlaceholder="never">
                 <mat-select placeholder="Jahr" [(ngModel)]="year" (change)="yearChanged()">
                   <mat-option *ngFor="let year of years" [value]="year">
                     {{ year }}

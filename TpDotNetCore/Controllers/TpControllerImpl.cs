@@ -153,6 +153,36 @@ namespace TpDotNetCore.Controllers
             }
         }
 
+        public System.Threading.Tasks.Task<SwaggerResponse<UsersDto>> PuGetUsersAsync()
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                var entities = _appUserManager.PuGetUsers();
+                var userDtoList = _mapper.Map<IList<AppUser>, List<UserDto>>(entities);
+                var dto = new UsersDto { Users = userDtoList };
+                return Task.Run(() => new SwaggerResponse<UsersDto>(StatusCodes.Status200OK, headers, dto));
+            }
+            catch (Exception exception)
+            {
+                return HandleException<UsersDto>(exception, headers, new UsersDto());
+            }
+        }
+
+        public System.Threading.Tasks.Task<SwaggerResponse<MonthResponse>> PuGetMonthAsync(string userId, double? month, double? year)
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                var response = _monthPunchRepository.GetMonth(userId, month, year);
+                return Task.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
+            }
+            catch (Exception exception)
+            {
+                var response = new MonthResponse { Status = new OpResult { Success = false, Result = $"Failed to get month {month} punches" } };
+                return HandleException<MonthResponse>(exception, headers, response);
+            }
+        }
         public Task<SwaggerResponse<ConfirmResponse>> ConfirmRegisterAsync(string userid, string confirmToken)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
@@ -324,7 +354,7 @@ namespace TpDotNetCore.Controllers
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(SetStatusAdminDto setStatusAdminDto)
+        public Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(StatusAdminDto setStatusAdminDto)
         {
             throw new NotImplementedException();
         }

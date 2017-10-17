@@ -283,7 +283,7 @@ paths:
         - Administration
       responses:
         200:
-          description: Returns nothing
+          description: Returns users
           schema:
             $ref: '#/definitions/UsersDto'
         default:
@@ -300,13 +300,14 @@ paths:
         - Administration
       responses:
         200:
-          description: Returns nothing
+          description: Returns sessions
           schema:
             $ref: '#/definitions/SessionsDto'
         default:
           description: Unexpected error
           schema:
-            $ref: '#/definitions/OpResult'              
+            $ref: '#/definitions/OpResult'            
+###########                                 Normal User    ###########            
   /punches:
     get:
       description: |
@@ -537,15 +538,72 @@ paths:
           description: Unexpected error
           schema:
               $ref: '#/definitions/OpResult'
-  /punchModifyAdmin:
+###########                                 PowerUser    ###########            
+  /poweruser/users:
+    get:
+      description:
+        Get all normal users, i.e. users which do timepunching
+      summary: Get the list of users [Authorize(Policy = "RequireApiPowerRole")]
+      operationId: puGetUsers
+      tags:
+        - PowerUser
+      responses:
+        200:
+          description: Returns users
+          schema:
+            $ref: '#/definitions/UsersDto'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/OpResult'
+  /poweruser/punches/month:
+    get:
+      description: |
+        Get all punches of selected month and year for current user
+        If no month selector specified, return current month
+      summary: Retrieves all punches of current user of selected month
+      operationId: puGetMonth
+      produces:
+        - application/json
+      tags:
+        - PowerUser
+      parameters:
+        - name: userId
+          in: query
+          description: The user id 
+          required: True
+          type: string
+        - name: month
+          in: query
+          description: The month number selector [1 .. 12] 
+          required: False
+          type: number
+          format: integer
+        - name: year
+          in: query
+          description: The year number selector [2015 .. 2099]
+          required: False
+          type: number
+          format: integer
+      responses:
+        200:
+          description: A month punches object
+          schema:
+            $ref: '#/definitions/MonthResponse'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/OpResult'
+  
+  /poweruser/punchModify:
     post:
       description: | 
         Modifiziert einen Zeitstempel eines beliebigen Benutzers.
         Die Monatsabrechnung muss im Status *openAdmin* sein.
-      summary: Modifiziert einen Zeitstempel
+      summary: Modifiziert einen Zeitstempel [Authorize(Policy = "RequireApiPowerRole")]
       operationId: punchModifyAdmin
       tags:
-        - Punches
+        - PowerUser
       parameters:
         - name: modifyPunchAdminDto
           in: body
@@ -556,22 +614,22 @@ paths:
           description: Unexpected error
           schema:
               $ref: '#/definitions/PunchResponse'
-  /punchSetStatusAdmin:
+  /poweruser/punchSetStatus:
     post:
       description: |
         Setzt den Status der Monatsabrechnung eines Benutzers. Der Status kann folgende Werte einnehmen:
         - *open*
         - *openAdmin*
         - *closed*
-      summary: Setzt den Status der Monatsabrechung
+      summary: Setzt den Status der Monatsabrechung [Authorize(Policy = "RequireApiPowerRole")]
       operationId: punchSetStatusAdmin
       tags:
-        - Punches
+        - PowerUser
       parameters:
         - name: setStatusAdminDto
           in: body
           schema:
-            $ref: '#/definitions/SetStatusAdminDto'
+            $ref: '#/definitions/StatusAdminDto'
       responses:
         default:
           description: Unexpected error
@@ -767,13 +825,18 @@ definitions:
         format: float
       direction:
         type: boolean
-  SetStatusAdminDto:
+  StatusAdminDto:
     type: object
     properties:
       userid:
         type: string
       status:
         type: string
+        default: open
+        enum:
+        - open
+        - openAdmin
+        - closed
   UsersDto:
     type: object
     properties:
@@ -859,6 +922,8 @@ definitions:
       user:
         type: string
         description: Boid of user
+      state:
+        $ref: '#/definitions/StatusAdminDto'
       month:
         type: integer
         description: The month expressed as value between 1 and 12

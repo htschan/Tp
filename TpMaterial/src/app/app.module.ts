@@ -24,6 +24,8 @@ import { MainComponent } from './pages/main/main.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegistrationComponent } from './pages/registration/registration.component';
 import { OverviewComponent } from './pages/overview/overview.component';
+import { SysadminComponent } from './pages/sysadmin/sysadmin.component';
+import { TimeadminComponent } from './pages/timeadmin/timeadmin.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { LogoutComponent } from './pages/logout/logout.component';
 
@@ -38,7 +40,9 @@ import { LogoutComponent } from './pages/logout/logout.component';
     MainComponent,
     OverviewComponent,
     ProfileComponent,
-    LogoutComponent
+    LogoutComponent,
+    SysadminComponent, 
+    TimeadminComponent
   ],
   imports: [
     BrowserModule,

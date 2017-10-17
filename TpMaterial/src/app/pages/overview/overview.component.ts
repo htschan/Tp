@@ -20,7 +20,7 @@ export class OverviewComponent implements OnInit {
   punchWeekVm: PunchWeekVm;
   punchMonthVm: PunchMonthVm;
   punchYearVm: PunchYearVm;
-  years = [2015, 2016, 2017];
+  years = [];
   months = [];
   year;
   month;
@@ -34,6 +34,9 @@ export class OverviewComponent implements OnInit {
     this.year = dt.getFullYear();
     this.month = dt.getMonth();
     let pipe = new HtMonthNamePipe();
+    for (let i = 2015; i <= dt.getFullYear(); i++) {
+      this.years.push(i);
+    }
     for (let i = 1; i < 13; i++) {
       this.months.push({ monthNum: i, monthName: pipe.transform(i) })
     }
@@ -129,44 +132,44 @@ export class OverviewComponent implements OnInit {
   }
 
   yearChanged() {
-    this.punchService.getYear(this.year).subscribe(response =>
+    this.punchService.getYear(this.year).take(1).subscribe(response =>
       this.punchYearVm = response
     );
   }
 
   monthChanged() {
-    this.punchService.getMonth(this.month, this.year).subscribe(response =>
+    this.punchService.getMonth(this.month, this.year).take(1).subscribe(response =>
       this.punchMonthVm = response
     );
   }
 
   weekChanged() {
     let w = new HtWeekNumPipe();
-    this.punchService.getWeek(w.transform(this.week), this.year).subscribe(response =>
+    this.punchService.getWeek(w.transform(this.week), this.year).take(1).subscribe(response =>
       this.punchWeekVm = response
     );
   }
 
   getToday() {
-    this.punchService.getDay(undefined, undefined, undefined).subscribe(response => {
+    this.punchService.getDay(undefined, undefined, undefined).take(1).subscribe(response => {
       this.punchDayVm = response;
     });
   }
 
   getWeek() {
-    this.punchService.getWeek(undefined, undefined).subscribe(response => {
+    this.punchService.getWeek(undefined, undefined).take(1).subscribe(response => {
       this.punchWeekVm = response;
     });
   }
 
   getMonth() {
-    this.punchService.getMonth(undefined, undefined).subscribe(response =>
+    this.punchService.getMonth(undefined, undefined).take(1).subscribe(response =>
       this.punchMonthVm = response
     );
   }
 
   getYear() {
-    this.punchService.getYear(this.year).subscribe(response =>
+    this.punchService.getYear(this.year).take(1).subscribe(response =>
       this.punchYearVm = response
     );
   }

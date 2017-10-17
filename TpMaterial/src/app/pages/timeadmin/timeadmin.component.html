@@ -1,0 +1,58 @@
+<div>
+  <div fxLayout="column">
+    <div class="space"></div>
+    <div fxFlex="100%">
+      <div *ngIf="!hasRequiredRole">Erforderliche Benutzerrolle fehlt</div>
+    </div>
+    <mat-grid-list cols="3" rowHeight="3em" *ngIf="hasRequiredRole">
+      <mat-grid-tile colspan="1">
+        <mat-form-field floatPlaceholder="never">
+          <mat-select placeholder="Mitarbeiter" [(ngModel)]="selectedUserId" (change)="userChanged()">
+            <mat-option *ngFor="let user of usersVm?.users" [value]="user.id">
+              {{ user?.email }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="1">
+        <mat-form-field floatPlaceholder="never">
+          <mat-select placeholder="Monat" [(ngModel)]="month" (change)="monthChanged()">
+            <mat-option *ngFor="let month of months" [value]="month.monthNum">
+              {{ month.monthName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="1">
+        <mat-form-field floatPlaceholder="never">
+          <mat-select placeholder="Jahr" [(ngModel)]="year" (change)="monthChanged()">
+            <mat-option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile>Total {{punchMonthVm?.monthSum | number: "1.2-2"}} h</mat-grid-tile>
+      <mat-grid-tile>
+        <mat-radio-group [(ngModel)]="monthState" (change)="stateChanged()">
+          <mat-radio-button value="open">Edit Benutzer</mat-radio-button>
+          <mat-radio-button value="openAdmin">Edit Admin</mat-radio-button>
+          <mat-radio-button value="closed">Geschlossen</mat-radio-button>
+        </mat-radio-group>
+      </mat-grid-tile>
+    </mat-grid-list>
+    <mat-card>
+      <mat-card-content class="scroll-content">
+        <mat-grid-list cols="6" rowHeight="2em" *ngFor="let row of punchMonthVm?.punchDays">
+          <mat-grid-tile col-1>
+            <a href="">
+              <mat-icon color="accent">edit</mat-icon>
+            </a>
+          </mat-grid-tile>
+          <mat-grid-tile col-3>{{row?.date | date:"dd.MM.yyyy"}}</mat-grid-tile>
+          <mat-grid-tile col-3>{{row?.daySum | number: "1.2-2"}}</mat-grid-tile>
+        </mat-grid-list>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

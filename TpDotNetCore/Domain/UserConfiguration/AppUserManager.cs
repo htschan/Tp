@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
+using static TpDotNetCore.Helpers.Constants.Strings;
 
 namespace TpDotNetCore.Domain.UserConfiguration
 {
@@ -55,6 +56,20 @@ namespace TpDotNetCore.Domain.UserConfiguration
                 }
             }
             return _userManager.Users.ToList();
+        }
+
+        public IList<AppUser> PuGetUsers()
+        {
+            var users = new List<AppUser>();
+            foreach (var user in _userManager.Users)
+            {
+                var userRoles = _userManager.GetRolesAsync(user).Result;
+                if (userRoles.Contains(JwtClaims.ApiAccess))
+                {
+                    users.Add(user);
+                }
+            }
+            return users;
         }
 
         public IList<RefreshToken> GetSessions()

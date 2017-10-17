@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import * as moment from 'moment';
-import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto } from '../../services/api.g';
+import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto, StatusAdminDto } from '../../services/api.g';
 
 @Injectable()
 export class PunchService {
@@ -74,6 +74,12 @@ export class PunchService {
         });
     }
 
+    puGetMonth(userId: string, month: number | undefined, year: number | undefined): Observable<PunchMonthVm> {
+        return this.tpClient.puGetMonth(userId, month, year).map(monthResponse => {
+            return new PunchMonthVm(monthResponse.punches);
+        });
+    }
+
     getPreviousMonth(currentMonth: PunchMonthVm): Observable<PunchMonthVm> {
         let d = currentMonth.getPreviousMonth();
         return this.tpClient.getMonth(d.getMonth() + 1, d.getFullYear()).map(monthResponse => {
@@ -128,6 +134,10 @@ export class PunchService {
         let punchDto = new DeletePunchDto();
         punchDto.punchid = punchVm.id;
         return this.tpClient.punchDelete(punchDto);
+    }
+
+    setStatusAdmin(state: StatusAdminDto): Observable<PunchResponse> {
+        return this.tpClient.punchSetStatusAdmin(state);
     }
 }
 
@@ -263,12 +273,14 @@ export class PunchMonthVm {
         }
         this.month = dto.month;
         this.year = dto.year;
+        this.state = dto.state;
     }
 
     punchDays?: PunchDayVm[] = [];
     monthSum: number = 0.0;
     month: number;
     year: number;
+    state: StatusAdminDto;
 
     getPreviousMonth(): Date {
         return moment(this.getDate()).subtract(1, 'month').toDate();

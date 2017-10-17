@@ -4,16 +4,16 @@
       
           <section class="example-section">
             <mat-input-container class="example-margin">
-              <input mdInput type="number" placeholder="Value" [(ngModel)]="value">
+              <input matInput type="number" placeholder="Value" [(ngModel)]="value">
             </mat-input-container>
             <mat-input-container class="example-margin">
-              <input mdInput type="number" placeholder="Min value" [(ngModel)]="min">
+              <input matInput type="number" placeholder="Min value" [(ngModel)]="min">
             </mat-input-container>
             <mat-input-container class="example-margin">
-              <input mdInput type="number" placeholder="Max value" [(ngModel)]="max">
+              <input matInput type="number" placeholder="Max value" [(ngModel)]="max">
             </mat-input-container>
             <mat-input-container class="example-margin">
-              <input mdInput type="number" placeholder="Step size" [(ngModel)]="step">
+              <input matInput type="number" placeholder="Step size" [(ngModel)]="step">
             </mat-input-container>
           </section>
       
@@ -23,7 +23,7 @@
               Auto ticks
             </mat-checkbox>
             <mat-input-container class="example-margin" *ngIf="showTicks && !autoTicks">
-              <input mdInput type="number" placeholder="Tick interval" [(ngModel)]="tickInterval">
+              <input matInput type="number" placeholder="Tick interval" [(ngModel)]="tickInterval">
             </mat-input-container>
           </section>
       
@@ -58,4 +58,4 @@
           [vertical]="vertical">
       </mat-slider>
     </mat-card-content>
-  </mat-card>
+</mat-card>

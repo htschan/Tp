@@ -80,6 +80,7 @@ namespace TpDotNetCore
             {
                 options.AddPolicy("RequireApiUserRole", policy => policy.RequireClaim(ClaimTypes.Role, Constants.Strings.JwtClaims.ApiAccess));
                 options.AddPolicy("RequireApiAdminRole", policy => policy.RequireClaim(ClaimTypes.Role, Constants.Strings.JwtClaims.ApiAccessAdmin));
+                options.AddPolicy("RequireApiPowerRole", policy => policy.RequireClaim(ClaimTypes.Role, Constants.Strings.JwtClaims.ApiAccessPower));
             });
 
             services.AddIdentity<AppUser, IdentityRole>

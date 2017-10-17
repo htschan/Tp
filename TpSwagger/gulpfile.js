@@ -21,7 +21,7 @@ gulp.task('copyToTpMaterial', (cb) => {
 });
 
 gulp.task('generate', (cb) => {
-	runExe('..\\..\\NSwag\\src\\NSwag.Console\\bin\\Debug\\net46\\NSwag.exe run swagger.nswag', (err, stdout, stderr) =>{
+	runExe('..\\..\\NSwag\\src\\NSwag.Console\\bin\\Debug\\net461\\NSwag.exe run swagger.nswag', (err, stdout, stderr) =>{
 		console.log(stdout);
 		console.log(stderr);
 		cb(err);

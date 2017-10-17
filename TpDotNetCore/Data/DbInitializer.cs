@@ -62,13 +62,13 @@ namespace TpDotNetCore.Data
                 userDict.Add(i, userIdentity);
             }
 
-            var powerUser = new Controllers.RegisterDto { Firstname = "Power", Name = "Timepuncher", Email = "pwer@timepuncher.ch" };
+            var powerUser = new Controllers.RegisterDto { Firstname = "Power", Name = "Timepuncher", Email = "power@koch-it.ch" };
             var powerUserIdentity = _mapper.Map<AppUser>(powerUser);
             await _appUserManager.CreateUser(powerUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccess, JwtClaims.ApiAccessPower });
 
-            var adminUser = new Controllers.RegisterDto { Firstname = "Admin", Name = "Timepuncher", Email = "admin@timepuncher.ch" };
+            var adminUser = new Controllers.RegisterDto { Firstname = "Admin", Name = "Timepuncher", Email = "admin@koch-it.ch" };
             var adminUserIdentity = _mapper.Map<AppUser>(adminUser);
-            await _appUserManager.CreateUser(adminUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccess, JwtClaims.ApiAccessAdmin });
+            await _appUserManager.CreateUser(adminUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccessAdmin });
             
             _context.SaveChanges();
 

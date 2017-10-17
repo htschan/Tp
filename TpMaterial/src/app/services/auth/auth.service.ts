@@ -7,11 +7,11 @@ import { JwtHelper, tokenNotExpired } from 'angular2-jwt';
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { TpClientConfig } from '../../timepuncher-client-config';
-import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto } from '../../services/api.g';
+import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto, UsersDto, UserDto, RoleDto } from '../../services/api.g';
 
 const registerUrl: string = `${TpClientConfig.baserurl}api/v1/accounts`;
 
-export enum RoleEnum { UserRole, AdminRole }
+export enum RoleEnum { UserRole, AdminRole, PowerRole }
 
 @Injectable()
 export class AuthService {
@@ -62,6 +62,12 @@ export class AuthService {
             });
     }
 
+    public puGetUsers(): Observable<UsersVm> {
+        return this.tpClient.puGetUsers().map(usersResponse => {
+            return new UsersVm(usersResponse);
+        })
+    }
+
     public hasRole(role: RoleEnum): Promise<boolean> {
         return this.getToken()
             .then(token => {
@@ -69,6 +75,9 @@ export class AuthService {
                 switch (role) {
                     case RoleEnum.UserRole:
                         roleName = "api_access";
+                        break;
+                    case RoleEnum.PowerRole:
+                        roleName = "api_access_power";
                         break;
                     case RoleEnum.AdminRole:
                         roleName = "api_access_admin";
@@ -204,9 +213,9 @@ export class AuthService {
             let refreshTokenDto = new RefreshTokenDto();
             refreshTokenDto.init({ refresh_token: token });
             return this.tpClient.refreshtoken(refreshTokenDto)
-            .do(response => this.storeAuth(response))
-            .map(response => response !== null)
-            .toPromise()
+                .do(response => this.storeAuth(response))
+                .map(response => response !== null)
+                .toPromise()
         }).catch(error => {
             console.log(error);
             return Promise.reject("error");
@@ -222,5 +231,68 @@ export class AuthService {
         }
         // else
         //     return Promise.reject("storeAuth failed");
+    }
+}
+
+export class RoleVm {
+
+    name?: string | undefined;
+
+    constructor(dto: RoleDto) {
+        this.setRole(dto);
+    }
+
+    setRole(dto: RoleDto) {
+        this.name = dto.name;
+    }
+}
+
+export class UserVm {
+
+    /** Then user id */
+    id?: string | undefined;
+    /** The first name of user */
+    firstName?: string | undefined;
+    /** The last name of user */
+    lastName?: string | undefined;
+    /** The email of the user */
+    email?: string | undefined;
+    /** The confirmed status of the user registration */
+    emailConfirmed?: boolean | undefined;
+    /** The number of failed access attempts */
+    accessFailedCount?: number | undefined;
+    roleNames?: RoleVm[] | undefined;
+
+    constructor(dto: UserDto) {
+        this.setUser(dto);
+    }
+
+    setUser(dto: UserDto) {
+        this.id = dto.id;
+        this.firstName = dto.firstName;
+        this.lastName = dto.lastName;
+        this.email = dto.email;
+        this.emailConfirmed = dto.emailConfirmed;
+        this.accessFailedCount = dto.accessFailedCount;
+        this.roleNames = [];
+        for (let role of dto.roleNames) {
+            this.roleNames.push(new RoleVm(role))
+        }
+    }
+}
+
+export class UsersVm {
+
+    users?: UserVm[] | undefined;
+
+    constructor(dto: UsersDto) {
+        this.setUser(dto);
+    }
+
+    setUser(dto: UsersDto) {
+        this.users = [];
+        for (let user of dto.users) {
+            this.users.push(new UserVm(user))
+        }
     }
 }
