@@ -68,12 +68,14 @@ namespace TpDotNetCore
             services.AddTransient<AppUserManager>();
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IAppUserRepository, AppUserRepository>();
-            services.AddTransient<IPunchRepository, PunchRepository>();
+            services.AddTransient<IPunchRepository, _punchRepository>();
             services.AddTransient<IDayPunchRepository, DayPunchRepository>();
             services.AddTransient<IWeekPunchRepository, WeekPunchRepository>();
             services.AddTransient<IMonthPunchRepository, MonthPunchRepository>();
             services.AddTransient<IYearPunchRepository, YearPunchRepository>();
             services.AddTransient<IPunchService, PunchService>();
+            services.AddTransient<IPunchStateRepository, PunchStateRepository>();
+            services.AddTransient<IMonthStateRepository, MonthStateRepository>();
 
             // api user claim policy
             services.AddAuthorization(options =>

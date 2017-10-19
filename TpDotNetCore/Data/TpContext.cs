@@ -16,7 +16,6 @@ namespace TpDotNetCore.Data
         
         public DbSet<AppUser> AppUsers { get; set; }
 
-
         public DbSet<Punch> Punches { get; set; }
 
         public DbSet<DayPunch> DayPunches { get; set; }
@@ -26,6 +25,10 @@ namespace TpDotNetCore.Data
         public DbSet<MonthPunch> MonthPunches { get; set; }
 
         public DbSet<YearPunch> YearPunches { get; set; }
+
+        public DbSet<PunchState> PunchStates { get; set; }
+
+        public DbSet<MonthState> MonthStates { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

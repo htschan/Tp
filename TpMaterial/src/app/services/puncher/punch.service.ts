@@ -137,7 +137,7 @@ export class PunchService {
     }
 
     setStatusAdmin(state: StatusAdminDto): Observable<PunchResponse> {
-        return this.tpClient.punchSetStatusAdmin(state);
+        return this.tpClient.puSetMonthStatus(state);
     }
 }
 

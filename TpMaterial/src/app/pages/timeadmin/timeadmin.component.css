@@ -1,3 +1,12 @@
 .space {
     height: 20px;
 }
+
+.radio-group-layout {
+    display: inline-flex;
+    flex-direction: row;
+}
+
+.radio-button-layout{
+    margin-right: 10px;
+}

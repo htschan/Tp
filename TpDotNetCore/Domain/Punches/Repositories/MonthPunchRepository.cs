@@ -18,11 +18,11 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 
         public MonthPunchRepository(TpContext context,
                 ITimeService timeService,
-                IAppUserRepository appUserRepoistory)
+                IAppUserRepository appUserRepository)
         {
             _appDbContext = context;
             _timeService = timeService;
-            _appUserRepository = appUserRepoistory;
+            _appUserRepository = appUserRepository;
         }
 
         public void Delete(PunchDto entity)
@@ -33,6 +33,11 @@ namespace TpDotNetCore.Domain.Punches.Repositories
         public IList<PunchDto> GetAll()
         {
             throw new NotImplementedException();
+        }
+
+        public MonthPunch FindByMonth(int month)
+        {
+            return _appDbContext.MonthPunches.FirstOrDefault(d => d.Month == month);
         }
 
         public MonthResponse GetMonth(string userId, double? month, double? year)

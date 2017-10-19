@@ -6,19 +6,25 @@ using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.Punches;
 using TpDotNetCore.Helpers;
 using static TpDotNetCore.Helpers.Constants.Strings;
+using TpDotNetCore.Controllers;
+using TpDotNetCore.Domain.Punches.Repositories;
+using System.Diagnostics;
 
 namespace TpDotNetCore.Data
 {
     public class DbInitializer : IDisposable
     {
+        private const int START_YEAR = 2015;
         private readonly TpContext _context;
         private readonly AppUserManager _appUserManager;
         private readonly IMapper _mapper;
         private readonly ITimeService _timeService;
         private readonly Random _random;
+        private readonly IPunchStateRepository _punchStateRepository;
 
-        public DbInitializer(TpContext context, AppUserManager appUserManager, IMapper mapper, ITimeService timeService)
+        public DbInitializer(TpContext context, AppUserManager appUserManager, IMapper mapper, ITimeService timeService, IPunchStateRepository punchStateRepository)
         {
+            _punchStateRepository = punchStateRepository;
             _context = context;
             _appUserManager = appUserManager;
             _mapper = mapper;
@@ -41,10 +47,20 @@ namespace TpDotNetCore.Data
             var weekDict = new Dictionary<int, WeekPunch>();
             var monthDict = new Dictionary<int, MonthPunch>();
             var yearDict = new Dictionary<int, YearPunch>();
+            var stateDict = new Dictionary<StatusAdminDtoStatus, PunchState>();
 
             await _appUserManager.CreateRole(JwtClaims.ApiAccess);
             await _appUserManager.CreateRole(JwtClaims.ApiAccessPower);
             await _appUserManager.CreateRole(JwtClaims.ApiAccessAdmin);
+
+            // Create PunchStates
+            foreach (var val in Enum.GetValues(typeof(StatusAdminDtoStatus)))
+            {
+                string name = Enum.GetName(typeof(StatusAdminDtoStatus), val);
+                var punchState = new PunchState { State = name };
+                stateDict.Add((StatusAdminDtoStatus)val, punchState);
+                _punchStateRepository.Insert(punchState);
+            }
 
             // create some users
             var users = new[]
@@ -69,7 +85,7 @@ namespace TpDotNetCore.Data
             var adminUser = new Controllers.RegisterDto { Firstname = "Admin", Name = "Timepuncher", Email = "admin@koch-it.ch" };
             var adminUserIdentity = _mapper.Map<AppUser>(adminUser);
             await _appUserManager.CreateUser(adminUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccessAdmin });
-            
+
             _context.SaveChanges();
 
             // create the punch dimensions
@@ -91,7 +107,7 @@ namespace TpDotNetCore.Data
                 monthDict.Add(i, m);
                 _context.MonthPunches.Add(m);
             }
-            for (var i = 2015; i < 2035; i++)
+            for (var i = START_YEAR; i < 2035; i++)
             {
                 var y = new YearPunch { Year = i };
                 yearDict.Add(i, y);
@@ -99,7 +115,7 @@ namespace TpDotNetCore.Data
             }
 
             // create some punches for every user
-            for (var date = new DateTime(2015, 1, 1); date <= DateTime.Now - TimeSpan.FromDays(1); date += TimeSpan.FromDays(1))
+            for (var date = new DateTime(START_YEAR, 1, 1); date <= DateTime.Now - TimeSpan.FromDays(1); date += TimeSpan.FromDays(1))
             {
                 if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
                     continue;

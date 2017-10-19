@@ -4,7 +4,7 @@
     <div fxFlex="100%">
       <div *ngIf="!hasRequiredRole">Erforderliche Benutzerrolle fehlt</div>
     </div>
-    <mat-grid-list cols="3" rowHeight="3em" *ngIf="hasRequiredRole">
+    <mat-grid-list cols="4" rowHeight="3em" *ngIf="hasRequiredRole">
       <mat-grid-tile colspan="1">
         <mat-form-field floatPlaceholder="never">
           <mat-select placeholder="Mitarbeiter" [(ngModel)]="selectedUserId" (change)="userChanged()">
@@ -32,12 +32,15 @@
           </mat-select>
         </mat-form-field>
       </mat-grid-tile>
+      <mat-grid-tile colspan="1">
+        <mat-checkbox [(ngModel)]="viewYear" (change)="checkYearChanged()">Jahr</mat-checkbox>
+      </mat-grid-tile>
       <mat-grid-tile>Total {{punchMonthVm?.monthSum | number: "1.2-2"}} h</mat-grid-tile>
-      <mat-grid-tile>
-        <mat-radio-group [(ngModel)]="monthState" (change)="stateChanged()">
-          <mat-radio-button value="open">Edit Benutzer</mat-radio-button>
-          <mat-radio-button value="openAdmin">Edit Admin</mat-radio-button>
-          <mat-radio-button value="closed">Geschlossen</mat-radio-button>
+      <mat-grid-tile colspan="3">
+        <mat-radio-group [(ngModel)]="monthState" (change)="stateChanged()" class="radio-group-layout">
+          <mat-radio-button class="radio-button-layout" value="open">Edit Benutzer</mat-radio-button>
+          <mat-radio-button class="radio-button-layout" value="openAdmin">Edit Admin</mat-radio-button>
+          <mat-radio-button class="radio-button-layout" value="closed">Geschlossen</mat-radio-button>
         </mat-radio-group>
       </mat-grid-tile>
     </mat-grid-list>

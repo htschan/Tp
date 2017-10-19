@@ -35,6 +35,11 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             throw new NotImplementedException();
         }
 
+        public YearPunch FindByYear(int year)
+        {
+            return _appDbContext.YearPunches.FirstOrDefault(d => d.Year == year);
+        }
+
         public YearResponse GetYear(string userId, double? year)
         {
             try

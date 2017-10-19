@@ -160,12 +160,12 @@ export interface ITpClient {
      * Modifiziert einen Zeitstempel [Authorize(Policy = "RequireApiPowerRole")]
      * @return Unexpected error
      */
-    punchModifyAdmin(modifyPunchAdminDto: ModifyPunchAdminDto | null): Observable<PunchResponse>;
+    puModifyPunch(modifyPunchAdminDto: ModifyPunchAdminDto | null): Observable<PunchResponse>;
     /**
      * Setzt den Status der Monatsabrechung [Authorize(Policy = "RequireApiPowerRole")]
      * @return Unexpected error
      */
-    punchSetStatusAdmin(setStatusAdminDto: StatusAdminDto | null): Observable<PunchResponse>;
+    puSetMonthStatus(setStatusAdminDto: StatusAdminDto | null): Observable<PunchResponse>;
 }
 
 @Injectable()
@@ -1375,7 +1375,7 @@ export class TpClient implements ITpClient {
      * Modifiziert einen Zeitstempel [Authorize(Policy = "RequireApiPowerRole")]
      * @return Unexpected error
      */
-    punchModifyAdmin(modifyPunchAdminDto: ModifyPunchAdminDto | null): Observable<PunchResponse> {
+    puModifyPunch(modifyPunchAdminDto: ModifyPunchAdminDto | null): Observable<PunchResponse> {
         let url_ = this.baseUrl + "/poweruser/punchModify";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1391,11 +1391,11 @@ export class TpClient implements ITpClient {
         };
 
         return this.http.request(url_, options_).flatMap((response_) => {
-            return this.processPunchModifyAdmin(response_);
+            return this.processPuModifyPunch(response_);
         }).catch((response_: any) => {
             if (response_ instanceof Response) {
                 try {
-                    return this.processPunchModifyAdmin(response_);
+                    return this.processPuModifyPunch(response_);
                 } catch (e) {
                     return <Observable<PunchResponse>><any>Observable.throw(e);
                 }
@@ -1404,7 +1404,7 @@ export class TpClient implements ITpClient {
         });
     }
 
-    protected processPunchModifyAdmin(response: Response): Observable<PunchResponse> {
+    protected processPuModifyPunch(response: Response): Observable<PunchResponse> {
         const status = response.status; 
 
         let _headers: any = response.headers ? response.headers.toJSON() : {};
@@ -1421,8 +1421,8 @@ export class TpClient implements ITpClient {
      * Setzt den Status der Monatsabrechung [Authorize(Policy = "RequireApiPowerRole")]
      * @return Unexpected error
      */
-    punchSetStatusAdmin(setStatusAdminDto: StatusAdminDto | null): Observable<PunchResponse> {
-        let url_ = this.baseUrl + "/poweruser/punchSetStatus";
+    puSetMonthStatus(setStatusAdminDto: StatusAdminDto | null): Observable<PunchResponse> {
+        let url_ = this.baseUrl + "/poweruser/setMonthStatus";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(setStatusAdminDto);
@@ -1437,11 +1437,11 @@ export class TpClient implements ITpClient {
         };
 
         return this.http.request(url_, options_).flatMap((response_) => {
-            return this.processPunchSetStatusAdmin(response_);
+            return this.processPuSetMonthStatus(response_);
         }).catch((response_: any) => {
             if (response_ instanceof Response) {
                 try {
-                    return this.processPunchSetStatusAdmin(response_);
+                    return this.processPuSetMonthStatus(response_);
                 } catch (e) {
                     return <Observable<PunchResponse>><any>Observable.throw(e);
                 }
@@ -1450,7 +1450,7 @@ export class TpClient implements ITpClient {
         });
     }
 
-    protected processPunchSetStatusAdmin(response: Response): Observable<PunchResponse> {
+    protected processPuSetMonthStatus(response: Response): Observable<PunchResponse> {
         const status = response.status; 
 
         let _headers: any = response.headers ? response.headers.toJSON() : {};
@@ -2366,7 +2366,12 @@ export interface IModifyPunchAdminDto {
 
 export class StatusAdminDto implements IStatusAdminDto {
     userid?: string | undefined;
+    /** The month status */
     status?: StatusAdminDtoStatus | undefined = StatusAdminDtoStatus.Open;
+    /** The month expressed as value between 1 and 12 */
+    month?: number | undefined;
+    /** The year expressed as 1 to 9999 */
+    year?: number | undefined;
 
     constructor(data?: IStatusAdminDto) {
         if (data) {
@@ -2381,6 +2386,8 @@ export class StatusAdminDto implements IStatusAdminDto {
         if (data) {
             this.userid = data["userid"];
             this.status = data["status"] !== undefined ? data["status"] : StatusAdminDtoStatus.Open;
+            this.month = data["month"];
+            this.year = data["year"];
         }
     }
 
@@ -2394,13 +2401,20 @@ export class StatusAdminDto implements IStatusAdminDto {
         data = typeof data === 'object' ? data : {};
         data["userid"] = this.userid;
         data["status"] = this.status;
+        data["month"] = this.month;
+        data["year"] = this.year;
         return data; 
     }
 }
 
 export interface IStatusAdminDto {
     userid?: string | undefined;
+    /** The month status */
     status?: StatusAdminDtoStatus | undefined;
+    /** The month expressed as value between 1 and 12 */
+    month?: number | undefined;
+    /** The year expressed as 1 to 9999 */
+    year?: number | undefined;
 }
 
 export class UsersDto implements IUsersDto {

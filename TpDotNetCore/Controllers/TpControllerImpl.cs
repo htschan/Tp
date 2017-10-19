@@ -27,6 +27,7 @@ namespace TpDotNetCore.Controllers
         private readonly IMonthPunchRepository _monthPunchRepository;
         private readonly IWeekPunchRepository _weekPunchRepository;
         private readonly IDayPunchRepository _dayPunchRepository;
+        private readonly IMonthStateRepository _monthStateRepository;
         private readonly IPunchRepository _punchRepository;
         private readonly IPunchService _punchService;
 
@@ -41,6 +42,7 @@ namespace TpDotNetCore.Controllers
                 IMonthPunchRepository monthPunchRepository,
                 IWeekPunchRepository weekPunchRepository,
                 IDayPunchRepository dayPunchRepository,
+                IMonthStateRepository monthStateRepository,
                 IPunchService punchService)
         {
             _mapper = mapper;
@@ -53,6 +55,7 @@ namespace TpDotNetCore.Controllers
             _monthPunchRepository = monthPunchRepository;
             _weekPunchRepository = weekPunchRepository;
             _dayPunchRepository = dayPunchRepository;
+            _monthStateRepository = monthStateRepository;
             _punchRepository = punchRepository;
             _punchService = punchService;
 
@@ -174,7 +177,7 @@ namespace TpDotNetCore.Controllers
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
-                var response = _monthPunchRepository.GetMonth(userId, month, year);
+                var response = _punchService.GetMonth(userId, month, year);
                 return Task.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
@@ -277,7 +280,7 @@ namespace TpDotNetCore.Controllers
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _monthPunchRepository.GetMonth(userId, month, year);
+                var response = _punchService.GetMonth(userId, month, year);
                 return Task.FromResult(new SwaggerResponse<MonthResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
@@ -305,12 +308,12 @@ namespace TpDotNetCore.Controllers
 
         public Task<SwaggerResponse<DayResponse>> PunchInAsync()
         {
-            return Punch(true);
+            return PunchAsync(true);
         }
 
         public Task<SwaggerResponse<DayResponse>> PunchOutAsync()
         {
-            return Punch(false);
+            return PunchAsync(false);
         }
 
         public Task<SwaggerResponse<PunchResponse>> PunchModifyAsync(ModifyPunchDto modifyPunchDto)
@@ -349,19 +352,29 @@ namespace TpDotNetCore.Controllers
             }
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PunchModifyAdminAsync(ModifyPunchAdminDto modifyPunchAdminDto)
+        public Task<SwaggerResponse<PunchResponse>> PuModifyPunchAsync(ModifyPunchAdminDto modifyPunchAdminDto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(StatusAdminDto setStatusAdminDto)
+        public Task<SwaggerResponse<PunchResponse>> PuSetMonthStatusAsync(StatusAdminDto setStatusAdminDto)
         {
-            throw new NotImplementedException();
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                _punchService.SetMonthState(setStatusAdminDto.Userid, setStatusAdminDto.Month, setStatusAdminDto.Year, setStatusAdminDto.Status.Value);
+                return Task.FromResult(new SwaggerResponse<PunchResponse>(StatusCodes.Status200OK, headers, new PunchResponse { Status = new OpResult { Success = true } }));
+            }
+            catch (Exception exception)
+            {
+                var response = new PunchResponse { Status = new OpResult { Success = false, Result = $"Failed to delete punch. Exception: {exception.Message}" } };
+                return HandleException<PunchResponse>(exception, headers, response);
+            }
         }
 
         #region Other
 
-        private Task<SwaggerResponse<DayResponse>> Punch(bool direction)
+        private Task<SwaggerResponse<DayResponse>> PunchAsync(bool direction)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try

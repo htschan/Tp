@@ -10,13 +10,13 @@ using TpDotNetCore.Helpers;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
 {
-    public class PunchRepository : IPunchRepository
+    public class _punchRepository : IPunchRepository
     {
         private readonly TpContext _appDbContext;
         private readonly ITimeService _timeService;
         private readonly IAppUserRepository _appUserRepository;
 
-        public PunchRepository(TpContext context,
+        public _punchRepository(TpContext context,
                 ITimeService timeService,
                 IAppUserRepository appUserRepository)
         {

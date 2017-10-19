@@ -108,10 +108,10 @@ namespace TpDotNetCore.Controllers
         System.Threading.Tasks.Task<SwaggerResponse<MonthResponse>> PuGetMonthAsync(string userId, double? month, double? year);
         /// <summary>Modifiziert einen Zeitstempel [Authorize(Policy = "RequireApiPowerRole")]</summary>
         /// <returns>Unexpected error</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchModifyAdminAsync(ModifyPunchAdminDto modifyPunchAdminDto);
+        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PuModifyPunchAsync(ModifyPunchAdminDto modifyPunchAdminDto);
         /// <summary>Setzt den Status der Monatsabrechung [Authorize(Policy = "RequireApiPowerRole")]</summary>
         /// <returns>Unexpected error</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PunchSetStatusAdminAsync(StatusAdminDto setStatusAdminDto);
+        System.Threading.Tasks.Task<SwaggerResponse<PunchResponse>> PuSetMonthStatusAsync(StatusAdminDto setStatusAdminDto);
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "11.9.0.0")]
@@ -479,10 +479,10 @@ namespace TpDotNetCore.Controllers
         /// <returns>Unexpected error</returns>
         [Authorize(Policy = "RequireApiPowerRole")]
         [HttpPost, Route("poweruser/punchModify")]
-        public async System.Threading.Tasks.Task<IActionResult> PunchModifyAdmin([FromBody]ModifyPunchAdminDto modifyPunchAdminDto)
+        public async System.Threading.Tasks.Task<IActionResult> PuModifyPunch([FromBody]ModifyPunchAdminDto modifyPunchAdminDto)
         {
             if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
-            var result = await _implementation.PunchModifyAdminAsync(modifyPunchAdminDto);
+            var result = await _implementation.PuModifyPunchAsync(modifyPunchAdminDto);
     			foreach (var header in result.Headers)
     				ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
     			if (result.StatusCode == 200)
@@ -493,11 +493,11 @@ namespace TpDotNetCore.Controllers
         /// <summary>Setzt den Status der Monatsabrechung [Authorize(Policy = "RequireApiPowerRole")]</summary>
         /// <returns>Unexpected error</returns>
         [Authorize(Policy = "RequireApiPowerRole")]
-        [HttpPost, Route("poweruser/punchSetStatus")]
-        public async System.Threading.Tasks.Task<IActionResult> PunchSetStatusAdmin([FromBody]StatusAdminDto setStatusAdminDto)
+        [HttpPost, Route("poweruser/setMonthStatus")]
+        public async System.Threading.Tasks.Task<IActionResult> PuSetMonthStatus([FromBody]StatusAdminDto setStatusAdminDto)
         {
             if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
-            var result = await _implementation.PunchSetStatusAdminAsync(setStatusAdminDto);
+            var result = await _implementation.PuSetMonthStatusAsync(setStatusAdminDto);
     			foreach (var header in result.Headers)
     				ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
     			if (result.StatusCode == 200)
@@ -1736,6 +1736,8 @@ namespace TpDotNetCore.Controllers
     {
         private string _userid;
         private StatusAdminDtoStatus? _status = TpDotNetCore.Controllers.StatusAdminDtoStatus.Open;
+        private int? _month;
+        private int? _year;
     
         [Newtonsoft.Json.JsonProperty("userid", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Userid
@@ -1751,6 +1753,7 @@ namespace TpDotNetCore.Controllers
             }
         }
     
+        /// <summary>The month status</summary>
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public StatusAdminDtoStatus? Status
@@ -1761,6 +1764,36 @@ namespace TpDotNetCore.Controllers
                 if (_status != value)
                 {
                     _status = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The month expressed as value between 1 and 12</summary>
+        [Newtonsoft.Json.JsonProperty("month", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Month
+        {
+            get { return _month; }
+            set 
+            {
+                if (_month != value)
+                {
+                    _month = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The year expressed as 1 to 9999</summary>
+        [Newtonsoft.Json.JsonProperty("year", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Year
+        {
+            get { return _year; }
+            set 
+            {
+                if (_year != value)
+                {
+                    _year = value; 
                     RaisePropertyChanged();
                 }
             }

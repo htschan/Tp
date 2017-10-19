@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatIconRegistry, MatDialog } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 
-import { PunchService, PunchMonthVm } from '../../services/puncher/punch.service';
+import { PunchService, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
 import { AuthService, UsersVm, RoleEnum } from '../../services/auth/auth.service';
 import { HtMonthNamePipe } from '../../core/pipes/htmonthname.pipe';
 import { StatusAdminDtoStatus, StatusAdminDto } from '../../services/api.g';
@@ -14,10 +14,12 @@ import { StatusAdminDtoStatus, StatusAdminDto } from '../../services/api.g';
 })
 export class TimeadminComponent implements OnInit {
 
+  viewYear: boolean;
   usersVm: UsersVm;
   selectedUserId: string;
   hasRequiredRole: boolean;
   punchMonthVm: PunchMonthVm;
+  punchYearVm: PunchYearVm;
   years = [];
   months = [];
   year;
@@ -46,19 +48,27 @@ export class TimeadminComponent implements OnInit {
   }
 
   userChanged() {
-    this.punchService.puGetMonth(this.selectedUserId, this.month, this.year).take(1).subscribe(response =>
-      this.punchMonthVm = response
-    );
+    this.punchService.puGetMonth(this.selectedUserId, this.month, this.year).take(1).subscribe(response => {
+      this.punchMonthVm = response;
+      this.monthState = response.state.status;
+    });
   }
 
   monthChanged() {
     this.userChanged();
   }
 
+  checkYearChanged() {
+
+  }
+
   stateChanged() {
     let st = new StatusAdminDto();
     st.status = this.monthState;
     st.userid = this.selectedUserId;
-    this.punchService.setStatusAdmin(st);
+    st.month = this.month;
+    st.year = this.year;
+    this.punchService.setStatusAdmin(st).take(1).subscribe(response =>
+      console.log("response"));
   }
 }

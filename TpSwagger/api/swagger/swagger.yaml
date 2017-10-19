@@ -601,7 +601,7 @@ paths:
         Modifiziert einen Zeitstempel eines beliebigen Benutzers.
         Die Monatsabrechnung muss im Status *openAdmin* sein.
       summary: Modifiziert einen Zeitstempel [Authorize(Policy = "RequireApiPowerRole")]
-      operationId: punchModifyAdmin
+      operationId: puModifyPunch
       tags:
         - PowerUser
       parameters:
@@ -614,15 +614,15 @@ paths:
           description: Unexpected error
           schema:
               $ref: '#/definitions/PunchResponse'
-  /poweruser/punchSetStatus:
+  /poweruser/setMonthStatus:
     post:
       description: |
         Setzt den Status der Monatsabrechnung eines Benutzers. Der Status kann folgende Werte einnehmen:
-        - *open*
-        - *openAdmin*
-        - *closed*
+        - open
+        - openAdmin
+        - closed
       summary: Setzt den Status der Monatsabrechung [Authorize(Policy = "RequireApiPowerRole")]
-      operationId: punchSetStatusAdmin
+      operationId: puSetMonthStatus
       tags:
         - PowerUser
       parameters:
@@ -832,11 +832,18 @@ definitions:
         type: string
       status:
         type: string
+        description: The month status
         default: open
         enum:
         - open
         - openAdmin
         - closed
+      month:
+        type: integer
+        description: The month expressed as value between 1 and 12
+      year:
+        type: integer
+        description: The year expressed as 1 to 9999
   UsersDto:
     type: object
     properties:
