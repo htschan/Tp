@@ -94,7 +94,7 @@ export class AuthService {
     }
 
     public authenticated(): boolean {
-        return tokenNotExpired('id_token');
+        return tokenNotExpired('id_token', this.idToken);
     }
 
     public getToken(): Promise<string> {

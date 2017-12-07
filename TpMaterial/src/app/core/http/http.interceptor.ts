@@ -1,12 +1,15 @@
-import { Injectable, OpaqueToken } from "@angular/core";
+import { Injectable, Inject } from "@angular/core";
 import { ConnectionBackend, RequestOptions, Request, RequestOptionsArgs, Response, Http, Headers } from "@angular/http";
 import { Observable } from "rxjs/Rx";
 import { Storage } from '@ionic/storage';
+import { API_BASE_URL } from "../../services/api.g";
 
 @Injectable()
 export class InterceptedHttp extends Http {
-    constructor(backend: ConnectionBackend, defaultOptions: RequestOptions, private apiBaseUrl: OpaqueToken, private storage: Storage) {
+    apiBaseUrl: string;
+    constructor(backend: ConnectionBackend, defaultOptions: RequestOptions, @Inject(API_BASE_URL) apiBaseUrl: string, private storage: Storage) {
         super(backend, defaultOptions);
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {

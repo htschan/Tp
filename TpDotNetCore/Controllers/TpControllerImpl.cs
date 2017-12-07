@@ -213,12 +213,12 @@ namespace TpDotNetCore.Controllers
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<GetProfilesResponse>> GetProfilesAsync()
+        public Task<SwaggerResponse<ProfileResponseDto>> GetProfilesAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<GetProfileResponse>> GetMyProfileAsync()
+        public Task<SwaggerResponse<ProfileResponseDto>> GetMyProfileAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
@@ -229,10 +229,10 @@ namespace TpDotNetCore.Controllers
                 profile.UserName = _httpContextAccessor.HttpContext.User.Identity.Name;
             }
             var json = JsonConvert.SerializeObject(profile);
-            return Task.FromResult(new SwaggerResponse<GetProfileResponse>(StatusCodes.Status200OK, headers, new GetProfileResponse { Status = new OpResult { Success = true } }));
+            return Task.FromResult(new SwaggerResponse<ProfileResponseDto>(StatusCodes.Status200OK, headers, new ProfileResponseDto { Status = new OpResult { Success = true } }));
         }
 
-        public Task<SwaggerResponse<GetProfileResponse>> GetProfileAsync(string userid)
+        public Task<SwaggerResponse<ProfileResponseDto>> GetProfileAsync(string userid)
         {
             throw new NotImplementedException();
         }

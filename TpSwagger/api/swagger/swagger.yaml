@@ -42,7 +42,7 @@ paths:
         - name: credentials
           in: body
           required: true
-          description: Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
+          description: Credentials mit E-Mail und Passwort.
           schema:
             $ref: '#/definitions/CredentialDto'
       tags:
@@ -225,7 +225,7 @@ paths:
         200:
           description: Die Operation war erfolgreich.
           schema:
-            $ref: '#/definitions/GetProfilesResponse'
+            $ref: '#/definitions/ProfileResponseDto'
         default:
           description: Unerwarteter Fehler
           schema:
@@ -238,12 +238,12 @@ paths:
         Abfrage des eigenen Profils
       operationId: getMyProfile
       tags:
-        - Profile
+        - Authentication
       responses:
         200:
           description: Die Operation war erfolgreich.
           schema:
-            $ref: '#/definitions/GetProfileResponse'
+            $ref: '#/definitions/ProfileResponseDto'
         default:
           description: Unerwarteter Fehler
           schema:
@@ -267,7 +267,7 @@ paths:
         200:
           description: Die Operation war erfolgreich.
           schema:
-            $ref: '#/definitions/GetProfileResponse'
+            $ref: '#/definitions/ProfileResponseDto'
         default:
           description: Unerwarteter Fehler
           schema:
@@ -753,12 +753,7 @@ definitions:
     properties:
       status:
         $ref: '#/definitions/OpResult'
-  GetProfilesResponse:
-    type: object
-    properties:
-      status:
-        $ref: '#/definitions/OpResult'
-  GetProfileResponse:
+  ProfileResponseDto:
     type: object
     properties:
       status:
@@ -856,7 +851,7 @@ definitions:
     properties:
       id:
         type: string
-        description: Then user id
+        description: The user id
       firstName:
         type: string
         description: The first name of user

@@ -15,15 +15,15 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/catch';
 
 import { Observable } from 'rxjs/Observable';
-import { Injectable, Inject, Optional, OpaqueToken } from '@angular/core';
+import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { Http, Headers, ResponseContentType, Response } from '@angular/http';
 
-export const API_BASE_URL = new OpaqueToken('API_BASE_URL');
+export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface ITpClient {
     /**
      * Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]
-     * @credentials Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
+     * @credentials Credentials mit E-Mail und Passwort.
      * @return Returns nothing
      */
     authenticate(credentials: CredentialDto): Observable<AuthResponse>;
@@ -68,18 +68,18 @@ export interface ITpClient {
      * Abfrage aller Profile
      * @return Die Operation war erfolgreich.
      */
-    getProfiles(): Observable<GetProfilesResponse>;
+    getProfiles(): Observable<ProfileResponseDto>;
     /**
      * Abfrage des eigenen Profils
      * @return Die Operation war erfolgreich.
      */
-    getMyProfile(): Observable<GetProfileResponse>;
+    getMyProfile(): Observable<ProfileResponseDto>;
     /**
      * Abfrage eines Benutzerprofiles
      * @userid User Id
      * @return Die Operation war erfolgreich.
      */
-    getProfile(userid: string): Observable<GetProfileResponse>;
+    getProfile(userid: string): Observable<ProfileResponseDto>;
     /**
      * Get the list of users [Authorize(Policy = "RequireApiAdminRole")]
      * @return Returns users
@@ -181,7 +181,7 @@ export class TpClient implements ITpClient {
 
     /**
      * Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]
-     * @credentials Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.
+     * @credentials Credentials mit E-Mail und Passwort.
      * @return Returns nothing
      */
     authenticate(credentials: CredentialDto): Observable<AuthResponse> {
@@ -554,7 +554,7 @@ export class TpClient implements ITpClient {
      * Abfrage aller Profile
      * @return Die Operation war erfolgreich.
      */
-    getProfiles(): Observable<GetProfilesResponse> {
+    getProfiles(): Observable<ProfileResponseDto> {
         let url_ = this.baseUrl + "/profiles";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -573,14 +573,14 @@ export class TpClient implements ITpClient {
                 try {
                     return this.processGetProfiles(response_);
                 } catch (e) {
-                    return <Observable<GetProfilesResponse>><any>Observable.throw(e);
+                    return <Observable<ProfileResponseDto>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<GetProfilesResponse>><any>Observable.throw(response_);
+                return <Observable<ProfileResponseDto>><any>Observable.throw(response_);
         });
     }
 
-    protected processGetProfiles(response: Response): Observable<GetProfilesResponse> {
+    protected processGetProfiles(response: Response): Observable<ProfileResponseDto> {
         const status = response.status; 
 
         let _headers: any = response.headers ? response.headers.toJSON() : {};
@@ -588,7 +588,7 @@ export class TpClient implements ITpClient {
             const _responseText = response.text();
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? GetProfilesResponse.fromJS(resultData200) : new GetProfilesResponse();
+            result200 = resultData200 ? ProfileResponseDto.fromJS(resultData200) : new ProfileResponseDto();
             return Observable.of(result200);
         } else {
             const _responseText = response.text();
@@ -603,7 +603,7 @@ export class TpClient implements ITpClient {
      * Abfrage des eigenen Profils
      * @return Die Operation war erfolgreich.
      */
-    getMyProfile(): Observable<GetProfileResponse> {
+    getMyProfile(): Observable<ProfileResponseDto> {
         let url_ = this.baseUrl + "/profiles/myprofile";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -622,14 +622,14 @@ export class TpClient implements ITpClient {
                 try {
                     return this.processGetMyProfile(response_);
                 } catch (e) {
-                    return <Observable<GetProfileResponse>><any>Observable.throw(e);
+                    return <Observable<ProfileResponseDto>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<GetProfileResponse>><any>Observable.throw(response_);
+                return <Observable<ProfileResponseDto>><any>Observable.throw(response_);
         });
     }
 
-    protected processGetMyProfile(response: Response): Observable<GetProfileResponse> {
+    protected processGetMyProfile(response: Response): Observable<ProfileResponseDto> {
         const status = response.status; 
 
         let _headers: any = response.headers ? response.headers.toJSON() : {};
@@ -637,7 +637,7 @@ export class TpClient implements ITpClient {
             const _responseText = response.text();
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? GetProfileResponse.fromJS(resultData200) : new GetProfileResponse();
+            result200 = resultData200 ? ProfileResponseDto.fromJS(resultData200) : new ProfileResponseDto();
             return Observable.of(result200);
         } else {
             const _responseText = response.text();
@@ -653,7 +653,7 @@ export class TpClient implements ITpClient {
      * @userid User Id
      * @return Die Operation war erfolgreich.
      */
-    getProfile(userid: string): Observable<GetProfileResponse> {
+    getProfile(userid: string): Observable<ProfileResponseDto> {
         let url_ = this.baseUrl + "/profiles/{userid}";
         if (userid === undefined || userid === null)
             throw new Error("The parameter 'userid' must be defined.");
@@ -675,14 +675,14 @@ export class TpClient implements ITpClient {
                 try {
                     return this.processGetProfile(response_);
                 } catch (e) {
-                    return <Observable<GetProfileResponse>><any>Observable.throw(e);
+                    return <Observable<ProfileResponseDto>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<GetProfileResponse>><any>Observable.throw(response_);
+                return <Observable<ProfileResponseDto>><any>Observable.throw(response_);
         });
     }
 
-    protected processGetProfile(response: Response): Observable<GetProfileResponse> {
+    protected processGetProfile(response: Response): Observable<ProfileResponseDto> {
         const status = response.status; 
 
         let _headers: any = response.headers ? response.headers.toJSON() : {};
@@ -690,7 +690,7 @@ export class TpClient implements ITpClient {
             const _responseText = response.text();
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? GetProfileResponse.fromJS(resultData200) : new GetProfileResponse();
+            result200 = resultData200 ? ProfileResponseDto.fromJS(resultData200) : new ProfileResponseDto();
             return Observable.of(result200);
         } else {
             const _responseText = response.text();
@@ -1974,10 +1974,10 @@ export interface ISetPasswordResponse {
     status?: OpResult | undefined;
 }
 
-export class GetProfilesResponse implements IGetProfilesResponse {
+export class ProfileResponseDto implements IProfileResponseDto {
     status?: OpResult | undefined;
 
-    constructor(data?: IGetProfilesResponse) {
+    constructor(data?: IProfileResponseDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1992,8 +1992,8 @@ export class GetProfilesResponse implements IGetProfilesResponse {
         }
     }
 
-    static fromJS(data: any): GetProfilesResponse {
-        let result = new GetProfilesResponse();
+    static fromJS(data: any): ProfileResponseDto {
+        let result = new ProfileResponseDto();
         result.init(data);
         return result;
     }
@@ -2005,42 +2005,7 @@ export class GetProfilesResponse implements IGetProfilesResponse {
     }
 }
 
-export interface IGetProfilesResponse {
-    status?: OpResult | undefined;
-}
-
-export class GetProfileResponse implements IGetProfileResponse {
-    status?: OpResult | undefined;
-
-    constructor(data?: IGetProfileResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.status = data["status"] ? OpResult.fromJS(data["status"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): GetProfileResponse {
-        let result = new GetProfileResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["status"] = this.status ? this.status.toJSON() : <any>undefined;
-        return data; 
-    }
-}
-
-export interface IGetProfileResponse {
+export interface IProfileResponseDto {
     status?: OpResult | undefined;
 }
 
@@ -2461,7 +2426,7 @@ export interface IUsersDto {
 }
 
 export class UserDto implements IUserDto {
-    /** Then user id */
+    /** The user id */
     id?: string | undefined;
     /** The first name of user */
     firstName?: string | undefined;
@@ -2524,7 +2489,7 @@ export class UserDto implements IUserDto {
 }
 
 export interface IUserDto {
-    /** Then user id */
+    /** The user id */
     id?: string | undefined;
     /** The first name of user */
     firstName?: string | undefined;

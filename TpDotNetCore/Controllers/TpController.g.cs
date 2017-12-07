@@ -18,7 +18,7 @@ namespace TpDotNetCore.Controllers
     public interface ITpController
     {
         /// <summary>Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]</summary>
-        /// <param name="credentials">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
+        /// <param name="credentials">Credentials mit E-Mail und Passwort.</param>
         /// <returns>Returns nothing</returns>
         System.Threading.Tasks.Task<SwaggerResponse<AuthResponse>> AuthenticateAsync(CredentialDto credentials);
         /// <summary>Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]</summary>
@@ -48,14 +48,14 @@ namespace TpDotNetCore.Controllers
         System.Threading.Tasks.Task<SwaggerResponse<SetPasswordResponse>> SetPasswordAsync(SetPasswordParams setPasswordParams);
         /// <summary>Abfrage aller Profile</summary>
         /// <returns>Die Operation war erfolgreich.</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<GetProfilesResponse>> GetProfilesAsync();
+        System.Threading.Tasks.Task<SwaggerResponse<ProfileResponseDto>> GetProfilesAsync();
         /// <summary>Abfrage des eigenen Profils</summary>
         /// <returns>Die Operation war erfolgreich.</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<GetProfileResponse>> GetMyProfileAsync();
+        System.Threading.Tasks.Task<SwaggerResponse<ProfileResponseDto>> GetMyProfileAsync();
         /// <summary>Abfrage eines Benutzerprofiles</summary>
         /// <param name="userid">User Id</param>
         /// <returns>Die Operation war erfolgreich.</returns>
-        System.Threading.Tasks.Task<SwaggerResponse<GetProfileResponse>> GetProfileAsync(string userid);
+        System.Threading.Tasks.Task<SwaggerResponse<ProfileResponseDto>> GetProfileAsync(string userid);
         /// <summary>Get the list of users [Authorize(Policy = "RequireApiAdminRole")]</summary>
         /// <returns>Returns users</returns>
         System.Threading.Tasks.Task<SwaggerResponse<UsersDto>> AdminGetUsersAsync();
@@ -138,7 +138,7 @@ namespace TpDotNetCore.Controllers
             return new ObjectResult(authResponse) { StatusCode = 404 };
           }
         /// <summary>Sendet eine Authentifizierungsanfrage an den Server [AllowAnonymous]</summary>
-        /// <param name="credentials">Eine ASCII-Zeichenfolge mit mindestens einem Zeichen.</param>
+        /// <param name="credentials">Credentials mit E-Mail und Passwort.</param>
         /// <returns>Returns nothing</returns>
         [AllowAnonymous]
         [HttpPost, Route("authenticate")]
@@ -1192,7 +1192,7 @@ namespace TpDotNetCore.Controllers
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.7.3.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class GetProfilesResponse : System.ComponentModel.INotifyPropertyChanged
+    public partial class ProfileResponseDto : System.ComponentModel.INotifyPropertyChanged
     {
         private OpResult _status;
     
@@ -1217,48 +1217,9 @@ namespace TpDotNetCore.Controllers
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
         
-        public static GetProfilesResponse FromJson(string data)
+        public static ProfileResponseDto FromJson(string data)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<GetProfilesResponse>(data);
-        }
-    
-        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-        {
-            var handler = PropertyChanged;
-            if (handler != null) 
-                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.7.3.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class GetProfileResponse : System.ComponentModel.INotifyPropertyChanged
-    {
-        private OpResult _status;
-    
-        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public OpResult Status
-        {
-            get { return _status; }
-            set 
-            {
-                if (_status != value)
-                {
-                    _status = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-    
-        public string ToJson() 
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
-        
-        public static GetProfileResponse FromJson(string data)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<GetProfileResponse>(data);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ProfileResponseDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
@@ -1869,7 +1830,7 @@ namespace TpDotNetCore.Controllers
         private double? _accessFailedCount;
         private System.Collections.Generic.List<RoleDto> _roleNames;
     
-        /// <summary>Then user id</summary>
+        /// <summary>The user id</summary>
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Id
         {

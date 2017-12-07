@@ -18,7 +18,7 @@ export class AuthService {
 
     jwtHelper: JwtHelper = new JwtHelper();
     refreshSubscription: any;
-    userProfile: Object;
+    userProfile: ProfileVm;
     zoneImpl: NgZone;
     idToken: string;
     initialized = false;
@@ -52,10 +52,10 @@ export class AuthService {
             .catch(() => { return Promise.resolve(false); });
     }
 
-    public getMyProfile(): Observable<any> {
+    public getMyProfile(): Observable<ProfileVm> {
         return this.tpClient.getMyProfile()
             .map(data => {
-                return data.status
+                return new ProfileVm(data);
             })
             .do(profileVm => {
                 this.storage.set("profile", JSON.stringify(profileVm));
@@ -85,31 +85,31 @@ export class AuthService {
     }
 
     public authenticated(): boolean {
-        return tokenNotExpired('id_token');
+        return tokenNotExpired('id_token', this.idToken);
     }
 
     public getToken(): Promise<string> {
         return this.storage.get('id_token');
     }
 
-    public login(username: string, password: string): Observable<any> {
+    public login(username: string, password: string): Observable<AuthResponse> {
         if (username === null || password === null) {
             return Observable.throw("Bad credentials");
         }
         return this.tpClient.authenticate({ "username": username, "password": password, client_type: "web" } as CredentialDto)
             .do(data => {
                 this.storeAuth(data)
-                    .then(() =>
-                        this.startupTokenRefresh())
+                    .then(() => {
+                        this.startupTokenRefresh();
+                        this.getMyProfile().take(1).subscribe(data => {
+                            this.userProfile = data;
+                        });
+                    })
                     .catch(() => {
                         this.logout();
                         throw data;
                     });
-                // this.events.publish('user:login');
-                // return this.getMyProfile();
-            },
-            e => console.log("OnError " + e),
-            () => console.log("Authenticate complete"));
+            });
     }
 
     public register(credentials): Observable<Response> {
@@ -170,11 +170,13 @@ export class AuthService {
                     // Get the expiry time to generate
                     // a delay in milliseconds
                     let now: number = new Date().valueOf();
-                    let jwtExp: number = this.jwtHelper.decodeToken(token).exp;
+                    let decoded = this.jwtHelper.decodeToken(token);
+                    let jwtExp: number = decoded.exp;
                     let exp: Date = new Date(0);
                     exp.setUTCSeconds(jwtExp);
                     let delay: number = exp.valueOf() - now;
-
+                    this.events.publish('user:login', decoded.nameid, Date.now());
+                    
                     // Use the delay in a timer to
                     // run the refresh at the proper time
                     return Observable.timer(delay);
@@ -223,4 +225,24 @@ export class AuthService {
         // else
         //     return Promise.reject("storeAuth failed");
     }
+}
+
+export class ProfileVm {
+    constructor(dto: ProfileResponseDto) {
+        this.setProfile(dto);
+    }
+
+    setProfile(dto: ProfileResponseDto) {
+        this.id = dto.id;
+        this.pictureUrl = dto.pictureUrl;
+        this.email = dto.user.email;
+        this.firstName = dto.user.firstName;
+        this.lastName = dto.user.lastName;
+    }
+
+    id?: string;
+    pictureUrl?: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
 }
