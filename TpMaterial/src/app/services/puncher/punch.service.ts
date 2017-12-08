@@ -1,9 +1,10 @@
 // src/services/auth/auth.service.ts
 
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import * as moment from 'moment';
 import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto, StatusAdminDto } from '../../services/api.g';
+export const BUILD_INFO = new InjectionToken<string>('BUILD_INFO');
 
 @Injectable()
 export class PunchService {

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, VERSION, Inject } from '@angular/core';
+import { BUILD_INFO } from '../../services/puncher/punch.service';
 
 @Component({
   selector: 'app-profile',
@@ -17,8 +18,13 @@ export class ProfileComponent implements OnInit {
   thumbLabel = false;
   value = 0;
   vertical = false;
+  version: string;
+  buildInfo: string;
 
-  constructor() { }
+  constructor( @Inject(BUILD_INFO) buildInfo: string) {
+    this.version = VERSION.full;
+    this.buildInfo = buildInfo;
+  }
 
   ngOnInit() {
   }

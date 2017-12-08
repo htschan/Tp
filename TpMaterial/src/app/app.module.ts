@@ -18,7 +18,7 @@ import { AuthGuard } from './core/http/auth.guard';
 import { TpClient, API_BASE_URL } from './services/api.g';
 import { AuthService } from './services/auth/auth.service';
 import { AlertService } from './services/alert/alert.service';
-import { PunchService } from './services/puncher/punch.service';
+import { PunchService, BUILD_INFO } from './services/puncher/punch.service';
 import { MainRoutingModule } from './pages/main.rounting.module';
 import { MainComponent } from './pages/main/main.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -71,6 +71,10 @@ import { LogoutComponent } from './pages/logout/logout.component';
       provide: Http,
       useFactory: httpFactory,
       deps: [XHRBackend, RequestOptions, API_BASE_URL, Storage]
+    },
+    {
+      provide: BUILD_INFO,
+      useValue: TpClientConfig.bts
     },
   ],
   entryComponents: [DialogComponent, PunchEditComponent],
