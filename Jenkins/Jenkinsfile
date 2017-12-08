@@ -21,8 +21,8 @@ node {
     stage('prime'){
 		bat '''
 			@echo off
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timerpuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts"
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timerpuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpIonic/src/timepuncher-client-config.ts"
+			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts"
+			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpIonic/src/timepuncher-client-config.ts"
 			powershell -NoProfile -ExecutionPolicy Bypass -Command "& $env:WORKSPACE/Jenkins/ReplaceBuildTimestamp.ps1 -Workspace '%WORKSPACE%' -BuildTimestamp '%BUILD_TIMESTAMP%' -BuildNumber '%BUILD_NUMBER%'"
 		'''
         /*
