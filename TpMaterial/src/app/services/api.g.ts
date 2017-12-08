@@ -1975,6 +1975,11 @@ export interface ISetPasswordResponse {
 }
 
 export class ProfileResponseDto implements IProfileResponseDto {
+    /** The user profile id */
+    id?: string | undefined;
+    /** The profile picture url */
+    pictureUrl?: string | undefined;
+    user?: UserDto | undefined;
     status?: OpResult | undefined;
 
     constructor(data?: IProfileResponseDto) {
@@ -1988,6 +1993,9 @@ export class ProfileResponseDto implements IProfileResponseDto {
 
     init(data?: any) {
         if (data) {
+            this.id = data["id"];
+            this.pictureUrl = data["pictureUrl"];
+            this.user = data["user"] ? UserDto.fromJS(data["user"]) : <any>undefined;
             this.status = data["status"] ? OpResult.fromJS(data["status"]) : <any>undefined;
         }
     }
@@ -2000,12 +2008,20 @@ export class ProfileResponseDto implements IProfileResponseDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["pictureUrl"] = this.pictureUrl;
+        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
         data["status"] = this.status ? this.status.toJSON() : <any>undefined;
         return data; 
     }
 }
 
 export interface IProfileResponseDto {
+    /** The user profile id */
+    id?: string | undefined;
+    /** The profile picture url */
+    pictureUrl?: string | undefined;
+    user?: UserDto | undefined;
     status?: OpResult | undefined;
 }
 

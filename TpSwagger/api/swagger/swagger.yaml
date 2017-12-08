@@ -756,6 +756,14 @@ definitions:
   ProfileResponseDto:
     type: object
     properties:
+      id:
+        type: string
+        description: The user profile id
+      pictureUrl:
+        type: string
+        description: The profile picture url
+      user:
+        $ref: '#/definitions/UserDto'
       status:
         $ref: '#/definitions/OpResult'
   PunchResponse:

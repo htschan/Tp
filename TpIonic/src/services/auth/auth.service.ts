@@ -7,7 +7,7 @@ import { JwtHelper, tokenNotExpired } from 'angular2-jwt';
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { TpClientConfig } from '../../timepuncher-client-config';
-import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto } from '../../services/api.g';
+import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto, ProfileResponseDto } from '../../services/api.g';
 
 const registerUrl: string = `${TpClientConfig.baserurl}api/v1/accounts`;
 

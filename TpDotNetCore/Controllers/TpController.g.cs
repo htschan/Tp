@@ -1194,7 +1194,54 @@ namespace TpDotNetCore.Controllers
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.7.3.0 (Newtonsoft.Json v9.0.0.0)")]
     public partial class ProfileResponseDto : System.ComponentModel.INotifyPropertyChanged
     {
+        private string _id;
+        private string _pictureUrl;
+        private UserDto _user;
         private OpResult _status;
+    
+        /// <summary>The user profile id</summary>
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id
+        {
+            get { return _id; }
+            set 
+            {
+                if (_id != value)
+                {
+                    _id = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The profile picture url</summary>
+        [Newtonsoft.Json.JsonProperty("pictureUrl", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PictureUrl
+        {
+            get { return _pictureUrl; }
+            set 
+            {
+                if (_pictureUrl != value)
+                {
+                    _pictureUrl = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("user", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public UserDto User
+        {
+            get { return _user; }
+            set 
+            {
+                if (_user != value)
+                {
+                    _user = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
     
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public OpResult Status
