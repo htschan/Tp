@@ -11,8 +11,6 @@
 	BACKEND_SITE_LOCATION=<path to backend site directory>
 	IONIC_SITE_LOCATION=<path to ionic client site directory>
 	MATERIAL_SITE_LOCATION=<path to the material client site directory>
-	
-
 */
 
 node {
