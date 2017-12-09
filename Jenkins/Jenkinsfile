@@ -14,154 +14,167 @@
 */
 
 node {
-    stage('scmstage'){
-        git changelog: false, poll: false, url: '${THE_REPO}'    
-        
-    }
-    stage('prime'){
-		bat '''
-			@echo off
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts"
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpIonic/src/timepuncher-client-config.ts"
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "& $env:WORKSPACE/Jenkins/ReplaceBuildTimestamp.ps1 -Workspace '%WORKSPACE%' -BuildTimestamp '%BUILD_TIMESTAMP%' -BuildNumber '%BUILD_NUMBER%'"
-		'''
-        /*
-		def status0 = powershell(returnStatus: true, script: 'Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
-		if ( status0 == 0){
-			echo 'Copy config TpMaterial file ok'
+	try
+	{
+	
+		stage('scmstage'){
+			git changelog: false, poll: false, url: '${THE_REPO}'    
+			
 		}
-		else {
-			echo 'Copy config file TpMaterial failed'
-		}
-        def status1 = powershell(returnStatus: true, script: 'Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpIonic/src/timepuncher-client-config.ts')
-		if ( status1 == 0){
-			echo 'Copy config TpIonic file ok'
-		}
-		else {
-			echo 'Copy config TpIonic file failed'
-		}
-		*/
-    }
-    stage('install'){
-        dir('TpMaterial') {
-            bat 'npm install'
-        }
-        dir('TpDotNetCore') {
-            bat 'dotnet restore'
-        }
-        dir('TpIonic') {
-            bat 'npm install'
-        }
-    }
-    stage('build'){
-        dir('TpMaterial'){
-            bat 'ng build --prod'
-        }
-        dir('TpIonic'){
-            bat 'ionic build --prod'
-        }
-        dir('TpDotNetCore'){
-            bat 'dotnet build --configuration "Release"'
-        }
-    }
-	stage('deploy'){
-		/* TpDotNetCore */
-		bat '''
-			@echo off
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Stop-WebAppPool -Name 'TpDotNetCore'"
-		'''
-		/*
-        def status1 = powershell(returnStatus: true, script: 'Stop-WebAppPool -Name "TpDotNetCore"')
-		if ( status1 == 0){
-			echo 'TpDotNetCore AppPool stopped'
-		}
-		else {
-			echo 'Failed to stop TpDotNetCore AppPool'
-		}
-		*/
-		dir('TpDotNetCore'){
-			bat 'dotnet publish --configuration "Release" --output %BACKEND_SITE_LOCATION%'
-		}
-		bat '''
-			@echo off
-			powershell -NoProfile -ExecutionPolicy Bypass -Command "& Start-WebAppPool -Name 'TpDotNetCore'"
-		'''
-		/*
-        def status2 = powershell(returnStatus: true, script: 'Start-WebAppPool -Name "TpDotNetCore"')
-		if ( status2 == 0){
-			echo 'TpDotNetCore AppPool started'
-		}
-		else {
-			echo 'Failed to start TpDotNetCore AppPool'
-		}
-		*/
-		/* TpIonic */
-		dir('TpIonic'){
+		stage('prime'){
 			bat '''
 				@echo off
-				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Remove-Item -path $env:IONIC_SITE_LOCATION/*.* -recurse -include *.js,*.css"
+				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts"
+				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpIonic/src/timepuncher-client-config.ts"
+				powershell -NoProfile -ExecutionPolicy Bypass -Command "& $env:WORKSPACE/Jenkins/ReplaceBuildTimestamp.ps1 -Workspace '%WORKSPACE%' -BuildTimestamp '%BUILD_TIMESTAMP%' -BuildNumber '%BUILD_NUMBER%'"
 			'''
 			/*
-			def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:IONIC_SITE_LOCATION/*.* -recurse -include *.js,*.css')
-			if ( status3 == 0){
-				echo 'TpIonic site location cleanup done'
+			def status0 = powershell(returnStatus: true, script: 'Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpMaterial/src/app/timepuncher-client-config.ts')
+			if ( status0 == 0){
+				echo 'Copy config TpMaterial file ok'
 			}
 			else {
-				echo 'Failed to cleanup TpIonic site location'
+				echo 'Copy config file TpMaterial failed'
+			}
+			def status1 = powershell(returnStatus: true, script: 'Copy-Item $env:PROJECT_CONFIG/timepuncher-client-config-timepuncher.ch.ts $env:WORKSPACE/TpIonic/src/timepuncher-client-config.ts')
+			if ( status1 == 0){
+				echo 'Copy config TpIonic file ok'
+			}
+			else {
+				echo 'Copy config TpIonic file failed'
 			}
 			*/
 		}
-		dir('TpIonic'){
-			bat '(robocopy www %IONIC_SITE_LOCATION% /e /r:1 /unicode) ^& IF %ERRORLEVEL% LEQ 1 exit 0'
+		stage('install'){
+			dir('TpMaterial') {
+				bat 'npm install'
+			}
+			dir('TpDotNetCore') {
+				bat 'dotnet restore'
+			}
+			dir('TpIonic') {
+				bat 'npm install'
+			}
 		}
-		dir('TpIonic'){
+		stage('build'){
+			dir('TpMaterial'){
+				bat 'ng build --prod'
+			}
+			dir('TpIonic'){
+				bat 'ionic build --prod'
+			}
+			dir('TpDotNetCore'){
+				bat 'dotnet build --configuration "Release"'
+			}
+		}
+		stage('deploy'){
+			/* TpDotNetCore */
 			bat '''
 				@echo off
-				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item web.config $env:IONIC_SITE_LOCATION/web.config"
+				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Stop-WebAppPool -Name 'TpDotNetCore'"
 			'''
 			/*
-			def status4 = powershell(returnStatus: true, script: 'Copy-Item web.config $env:IONIC_SITE_LOCATION/web.config')
-			if ( status4 == 0){
-				echo 'Copy web.config TpIonic file ok'
+			def status1 = powershell(returnStatus: true, script: 'Stop-WebAppPool -Name "TpDotNetCore"')
+			if ( status1 == 0){
+				echo 'TpDotNetCore AppPool stopped'
 			}
 			else {
-				echo 'Copy web.config file TpIonic failed'
+				echo 'Failed to stop TpDotNetCore AppPool'
 			}
 			*/
-		}
-		/* TpMaterial */
-		dir('TpMaterial'){
+			dir('TpDotNetCore'){
+				bat 'dotnet publish --configuration "Release" --output %BACKEND_SITE_LOCATION%'
+			}
 			bat '''
 				@echo off
-				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Remove-Item -path $env:MATERIAL_SITE_LOCATION/*.* -recurse -include *.bundle.js,*.bundle.css"
+				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Start-WebAppPool -Name 'TpDotNetCore'"
 			'''
 			/*
-			def status5 = powershell(returnStatus: true, script: 'Remove-Item -path $env:MATERIAL_SITE_LOCATION/*.* -recurse -include *.bundle.js,*.bundle.css')
-			if ( status5 == 0){
-				echo 'TpMaterial site location cleanup done'
+			def status2 = powershell(returnStatus: true, script: 'Start-WebAppPool -Name "TpDotNetCore"')
+			if ( status2 == 0){
+				echo 'TpDotNetCore AppPool started'
 			}
 			else {
-				echo 'Failed to cleanup TpMaterial site location'
+				echo 'Failed to start TpDotNetCore AppPool'
 			}
 			*/
-		}
-		dir('TpMaterial'){
-			bat '(robocopy dist *.* %MATERIAL_SITE_LOCATION% /e /r:1 /unicode) ^& IF %ERRORLEVEL% LEQ 1 exit 0'
-		}
-		dir('TpMaterial'){
-			bat '''
-				@echo off
-				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item web.config $env:MATERIAL_SITE_LOCATION/web.config"
-			'''
-			/*
-			def status6 = powershell(returnStatus: true, script: 'Copy-Item web.config $env:MATERIAL_SITE_LOCATION/web.config')
-			if ( status6 == 0){
-				echo 'Copy web.config TpMaterial file ok'
+			/* TpIonic */
+			dir('TpIonic'){
+				bat '''
+					@echo off
+					powershell -NoProfile -ExecutionPolicy Bypass -Command "& Remove-Item -path $env:IONIC_SITE_LOCATION/*.* -recurse -include *.js,*.css"
+				'''
+				/*
+				def status3 = powershell(returnStatus: true, script: 'Remove-Item -path $env:IONIC_SITE_LOCATION/*.* -recurse -include *.js,*.css')
+				if ( status3 == 0){
+					echo 'TpIonic site location cleanup done'
+				}
+				else {
+					echo 'Failed to cleanup TpIonic site location'
+				}
+				*/
 			}
-			else {
-				echo 'Copy web.config file TpMaterial failed'
+			dir('TpIonic'){
+				bat '(robocopy www %IONIC_SITE_LOCATION% /e /r:1 /unicode) ^& IF %ERRORLEVEL% LEQ 1 exit 0'
 			}
-			*/
+			dir('TpIonic'){
+				bat '''
+					@echo off
+					powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item web.config $env:IONIC_SITE_LOCATION/web.config"
+				'''
+				/*
+				def status4 = powershell(returnStatus: true, script: 'Copy-Item web.config $env:IONIC_SITE_LOCATION/web.config')
+				if ( status4 == 0){
+					echo 'Copy web.config TpIonic file ok'
+				}
+				else {
+					echo 'Copy web.config file TpIonic failed'
+				}
+				*/
+			}
+			/* TpMaterial */
+			dir('TpMaterial'){
+				bat '''
+					@echo off
+					powershell -NoProfile -ExecutionPolicy Bypass -Command "& Remove-Item -path $env:MATERIAL_SITE_LOCATION/*.* -recurse -include *.bundle.js,*.bundle.css"
+				'''
+				/*
+				def status5 = powershell(returnStatus: true, script: 'Remove-Item -path $env:MATERIAL_SITE_LOCATION/*.* -recurse -include *.bundle.js,*.bundle.css')
+				if ( status5 == 0){
+					echo 'TpMaterial site location cleanup done'
+				}
+				else {
+					echo 'Failed to cleanup TpMaterial site location'
+				}
+				*/
+			}
+			dir('TpMaterial'){
+				bat '(robocopy dist *.* %MATERIAL_SITE_LOCATION% /e /r:1 /unicode) ^& IF %ERRORLEVEL% LEQ 1 exit 0'
+			}
+			dir('TpMaterial'){
+				bat '''
+					@echo off
+					powershell -NoProfile -ExecutionPolicy Bypass -Command "& Copy-Item web.config $env:MATERIAL_SITE_LOCATION/web.config"
+				'''
+				/*
+				def status6 = powershell(returnStatus: true, script: 'Copy-Item web.config $env:MATERIAL_SITE_LOCATION/web.config')
+				if ( status6 == 0){
+					echo 'Copy web.config TpMaterial file ok'
+				}
+				else {
+					echo 'Copy web.config file TpMaterial failed'
+				}
+				*/
+			}
 		}
+		def msg = "The job ${JOB_NAME} was successful! Build Number: ${BUILD_NUMBER}"
+		slackSend color: 'good', message: msg
 	}
+	catch (exc) {
+		def msg = "The job ${JOB_NAME} failed! Exception: ${exc}"
+		slackSend color: '#ff0000', message: msg
+	}
+	finally {
+		echo 'I finished'
+    }
 }
