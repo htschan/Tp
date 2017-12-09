@@ -133,10 +133,10 @@ node {
 		dir('TpMaterial'){
 			bat '''
 				@echo off
-				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Remove-Item -path c:/sites/TpMaterial/*.* -recurse -include *.bundle.js,*.bundle.css"
+				powershell -NoProfile -ExecutionPolicy Bypass -Command "& Remove-Item -path $env:MATERIAL_SITE_LOCATION/*.* -recurse -include *.bundle.js,*.bundle.css"
 			'''
 			/*
-			def status5 = powershell(returnStatus: true, script: 'Remove-Item -path c:/sites/TpMaterial/*.* -recurse -include *.bundle.js,*.bundle.css')
+			def status5 = powershell(returnStatus: true, script: 'Remove-Item -path $env:MATERIAL_SITE_LOCATION/*.* -recurse -include *.bundle.js,*.bundle.css')
 			if ( status5 == 0){
 				echo 'TpMaterial site location cleanup done'
 			}
