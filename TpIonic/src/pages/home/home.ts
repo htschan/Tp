@@ -1,14 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
-import { Events, Slides, ModalController, ToastController } from 'ionic-angular';
+import { Events, Slides, ModalController, ToastController, AlertController } from 'ionic-angular';
 import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
 import { PunchDto, OpResult } from '../../services/api.g';
 import { PunchEditModal } from '../punchedit/punchedit';
+import { NavGuard } from '../support/nav.guard';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
-export class HomePage {
+export class HomePage extends NavGuard {
   @ViewChild(Slides) slides: Slides;
   title: String = ' ';
   punchDayVm: PunchDayVm;
@@ -16,10 +18,14 @@ export class HomePage {
   punchMonthVm: PunchMonthVm;
   punchYearVm: PunchYearVm;
 
-  constructor(public events: Events,
-    private modalCtrl: ModalController,
-    private punchService: PunchService,
-    private toastController: ToastController) {
+  constructor(
+    public auth: AuthService,
+    public events: Events,
+    public modalCtrl: ModalController,
+    public alertCtrl: AlertController,
+    public punchService: PunchService,
+    public toastController: ToastController) {
+    super(auth, modalCtrl, alertCtrl);
     events.subscribe('title:updated', (data) => {
       if (data.menuState) {
         this.title = "Projects";
