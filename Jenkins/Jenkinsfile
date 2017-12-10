@@ -7,6 +7,7 @@
 	Required environment variables:
 	
 	THE_REPO=<git repository url>
+	THE_COMMON_REPO=<git submodule Common repository url>
 	PROJECT_CONFIG=<path to config data on build server>
 	BACKEND_SITE_LOCATION=<path to backend site directory>
 	IONIC_SITE_LOCATION=<path to ionic client site directory>
@@ -19,7 +20,9 @@ node {
 	
 		stage('scmstage'){
 			git changelog: false, poll: false, url: '${THE_REPO}'    
-			
+			dir('Common'){
+				git changelog: false, poll: false, url: '${THE_COMMON_REPO}'    
+			}
 		}
 		stage('prime'){
 			bat '''
