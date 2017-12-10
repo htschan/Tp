@@ -13,6 +13,7 @@ using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.Punches.Repositories;
 using TpDotNetCore.Domain.Punches;
 using TpDotNetCore.Domain;
+using Common.Communication;
 
 namespace TpDotNetCore.Controllers
 {
@@ -23,8 +24,11 @@ namespace TpDotNetCore.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly AppUserManager _appUserManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly TpMailConfigOptions _tpConfigOptions;
+        private readonly MailConfigOptions _mailConfigOptions;
+        private readonly SlackConfigOptions _slackConfigOptions;
         private readonly IPunchService _punchService;
+        private readonly ISendMail _mailClient;
+        private readonly ISlackClient _slackClient;
         private readonly IUnitOfWork _unitOfWork;
 
         public TpControllerImpl(IMapper mapper,
@@ -32,8 +36,11 @@ namespace TpDotNetCore.Controllers
                 UserManager<AppUser> userManager,
                 AppUserManager appUserManager,
                 IHttpContextAccessor httpContextAccessor,
-                IOptions<TpMailConfigOptions> optionsAccessor,
+                IOptions<MailConfigOptions> optionsAccessorMail,
+                IOptions<SlackConfigOptions> optionsAccessorSlack,
                 IPunchService punchService,
+                ISendMail mailClient,
+                ISlackClient slackClient,
                 IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
@@ -41,8 +48,11 @@ namespace TpDotNetCore.Controllers
             _userManager = userManager;
             _appUserManager = appUserManager;
             _httpContextAccessor = httpContextAccessor;
-            _tpConfigOptions = optionsAccessor.Value;
+            _mailConfigOptions = optionsAccessorMail.Value;
+            _slackConfigOptions = optionsAccessorSlack.Value;
             _punchService = punchService;
+            _mailClient = mailClient;
+            _slackClient = slackClient;
             _unitOfWork = unitOfWork;
 
             new JsonSerializerSettings
@@ -105,8 +115,13 @@ namespace TpDotNetCore.Controllers
                 return Task.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status400BadRequest, headers, null, result.ToString()));
 
             var confirmationToken = _userManager.GenerateEmailConfirmationTokenAsync(userIdentity).Result;
-            SendEmail(userIdentity.Id, confirmationToken);
-
+            var cnf = System.Text.Encodings.Web.UrlEncoder.Default.Encode(confirmationToken);
+            var to = new EmailAddress { Name = "Hans Tschan", Email = "hans.tschan@gmail.com" };
+            var mailPayload = new MailPayload { Subject = "Bestätigung Kontoeröffnung" };
+            mailPayload.From = new EmailAddress { Email = _mailConfigOptions.From };
+            mailPayload.Body = $"Das ist ihr Link zum Bestätigen - bitte klicken Sie <a href='http://localhost:5000/api/v1/confirm?cnf={cnf}&id={userIdentity.Id}'>hier</a>, um Ihre E-Mail Adresse zu bestätigen.";
+            _mailClient.SetOptions(_mailConfigOptions);
+            _mailClient.SendEmail(mailPayload);
             return Task.FromResult(new SwaggerResponse<RegisterResponse>(StatusCodes.Status201Created, headers, null, result.ToString()));
         }
 
@@ -218,6 +233,44 @@ namespace TpDotNetCore.Controllers
             {
                 var response = new ProfileResponseDto { Status = new OpResult { Success = false, Result = $"Failed to get profile" } };
                 return HandleException<ProfileResponseDto>(exception, headers, response);
+            }
+        }
+
+        public Task<SwaggerResponse<OpResult>> SendMailAsync(MailDto mailMessage)
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
+                var profile = _unitOfWork.AppProfiles.FindById(userId);
+                var to = new EmailAddress { Email = "hans.tschan@gmail.com" };
+                var from = new EmailAddress { Email = profile.Identity.Email };
+                var mailPayload = new MailPayload { Subject = mailMessage.Subject, Body = mailMessage.Body, From = from };
+                mailPayload.ToList.Add(from);
+                _mailClient.SetOptions(_mailConfigOptions);
+                _mailClient.SendEmail(mailPayload);
+                return Task.Run(() => new SwaggerResponse<OpResult>(StatusCodes.Status200OK, headers, new OpResult { Result = "2", Success = true }));
+            }
+            catch (Exception exception)
+            {
+                return HandleException<OpResult>(exception, headers);
+            }
+        }
+
+        public Task<SwaggerResponse<OpResult>> SendSlackAsync(MailDto slackMessage)
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>();
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
+                var profile = _unitOfWork.AppProfiles.FindById(userId);
+                _slackClient.SetConfig(_slackConfigOptions);
+                _slackClient.PostMessage($"From {profile.Identity.Email}: {slackMessage.Subject} {slackMessage.Body}");
+                return Task.Run(() => new SwaggerResponse<OpResult>(StatusCodes.Status200OK, headers, new OpResult { Result = "2", Success = true }));
+            }
+            catch (Exception exception)
+            {
+                return HandleException<OpResult>(exception, headers);
             }
         }
 
@@ -383,34 +436,6 @@ namespace TpDotNetCore.Controllers
                 return HandleException<DayResponse>(exception, headers, response);
             }
         }
-
-        private void SendEmail(string userId, string confirmationToken)
-        {
-            var host = _tpConfigOptions.Host;
-            var port = int.Parse(_tpConfigOptions.Port);
-            var user = _tpConfigOptions.User;
-            var password = _tpConfigOptions.Password;
-            var from = _tpConfigOptions.From;
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(from));
-            message.To.Add(new MailboxAddress("Hans Tschan", "hans.tschan@gmail.com"));
-            message.Subject = "Bestätigung Kontoeröffnung";
-            var bodyBuilder = new BodyBuilder();
-            var cnf = System.Text.Encodings.Web.UrlEncoder.Default.Encode(confirmationToken);
-            bodyBuilder.HtmlBody = $@"<p>Das ist ihr Link zum Bestätigen - bitte klicken Sie <a href='http://localhost:5000/api/v1/confirm?cnf={cnf}&id={userId}'>hier</a>, um Ihre E-Mail Adresse zu bestätigen.</p>";
-            message.Body = bodyBuilder.ToMessageBody();
-
-            using (var client = new SmtpClient())
-            {
-                client.Connect(host, port, false);
-                // Note: since we don't have an OAuth2 token, disable 	
-                // the XOAUTH2 authentication mechanism.     
-                client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(user, password);
-                client.Send(message);
-                client.Disconnect(true);
-            }
-        }
         #endregion
 
         private Task<SwaggerResponse<T>> HandleException<T>(Exception exception, Dictionary<string, IEnumerable<string>> headers, T response)
@@ -418,6 +443,12 @@ namespace TpDotNetCore.Controllers
             if (exception is RepositoryException)
                 return Task.FromResult(new SwaggerResponse<T>(((RepositoryException)exception).StatusCode, headers, response, exception.Message));
             return Task.FromResult(new SwaggerResponse<T>(StatusCodes.Status400BadRequest, headers, response, exception.Message));
+        }
+        private Task<SwaggerResponse<T>> HandleException<T>(Exception exception, Dictionary<string, IEnumerable<string>> headers)
+        {
+            if (exception is RepositoryException)
+                return Task.FromResult(new SwaggerResponse<T>(((RepositoryException)exception).StatusCode, headers, default(T), exception.Message));
+            return Task.FromResult(new SwaggerResponse<T>(StatusCodes.Status400BadRequest, headers, default(T), exception.Message));
         }
     }
 }

@@ -81,6 +81,18 @@ export interface ITpClient {
      */
     getProfile(userid: string): Observable<ProfileResponseDto>;
     /**
+     * Send email message to system administrator
+     * @mailMessage The mail content
+     * @return Unerwarteter Fehler
+     */
+    sendMail(mailMessage: MailDto): Observable<OpResult>;
+    /**
+     * Send slack message to system administrator
+     * @slackMessage The message content
+     * @return Unerwarteter Fehler
+     */
+    sendSlack(slackMessage: MailDto): Observable<OpResult>;
+    /**
      * Get the list of users [Authorize(Policy = "RequireApiAdminRole")]
      * @return Returns users
      */
@@ -698,6 +710,100 @@ export class TpClient implements ITpClient {
             let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result = resultData ? OpResult.fromJS(resultData) : new OpResult();
             return throwException("A server error occurred.", status, _responseText, _headers, result);
+        }
+    }
+
+    /**
+     * Send email message to system administrator
+     * @mailMessage The mail content
+     * @return Unerwarteter Fehler
+     */
+    sendMail(mailMessage: MailDto): Observable<OpResult> {
+        let url_ = this.baseUrl + "/sendMail";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(mailMessage);
+        
+        let options_ = {
+            body: content_,
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request(url_, options_).flatMap((response_) => {
+            return this.processSendMail(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof Response) {
+                try {
+                    return this.processSendMail(response_);
+                } catch (e) {
+                    return <Observable<OpResult>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<OpResult>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processSendMail(response: Response): Observable<OpResult> {
+        const status = response.status; 
+
+        let _headers: any = response.headers ? response.headers.toJSON() : {};
+        {
+            const _responseText = response.text();
+            let result: any = null;
+            let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result = resultData ? OpResult.fromJS(resultData) : new OpResult();
+            return Observable.of(result);
+        }
+    }
+
+    /**
+     * Send slack message to system administrator
+     * @slackMessage The message content
+     * @return Unerwarteter Fehler
+     */
+    sendSlack(slackMessage: MailDto): Observable<OpResult> {
+        let url_ = this.baseUrl + "/sendSlack";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(slackMessage);
+        
+        let options_ = {
+            body: content_,
+            method: "post",
+            headers: new Headers({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request(url_, options_).flatMap((response_) => {
+            return this.processSendSlack(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof Response) {
+                try {
+                    return this.processSendSlack(response_);
+                } catch (e) {
+                    return <Observable<OpResult>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<OpResult>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processSendSlack(response: Response): Observable<OpResult> {
+        const status = response.status; 
+
+        let _headers: any = response.headers ? response.headers.toJSON() : {};
+        {
+            const _responseText = response.text();
+            let result: any = null;
+            let resultData = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result = resultData ? OpResult.fromJS(resultData) : new OpResult();
+            return Observable.of(result);
         }
     }
 
@@ -2659,6 +2765,49 @@ export interface ISessionDto {
     created?: string | undefined;
     /** True if the session is stopped */
     isStop?: boolean | undefined;
+}
+
+export class MailDto implements IMailDto {
+    /** The mail subject */
+    subject?: string | undefined;
+    /** The body text */
+    body?: string | undefined;
+
+    constructor(data?: IMailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.subject = data["subject"];
+            this.body = data["body"];
+        }
+    }
+
+    static fromJS(data: any): MailDto {
+        let result = new MailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["subject"] = this.subject;
+        data["body"] = this.body;
+        return data; 
+    }
+}
+
+export interface IMailDto {
+    /** The mail subject */
+    subject?: string | undefined;
+    /** The body text */
+    body?: string | undefined;
 }
 
 export class YearPunchesDto implements IYearPunchesDto {

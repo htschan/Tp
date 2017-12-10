@@ -272,6 +272,46 @@ paths:
           description: Unerwarteter Fehler
           schema:
             $ref: '#/definitions/OpResult'
+  /sendMail:
+    post:
+      description:
+        Sends a message to the system administrator
+      summary: Send email message to system administrator
+      operationId: sendMail
+      parameters:
+        - name: mailMessage
+          in: body
+          required: true
+          description: The mail content
+          schema:
+            $ref: '#/definitions/MailDto'
+      tags:
+        - Other
+      responses:
+        default:
+          description: Unerwarteter Fehler
+          schema:
+            $ref: '#/definitions/OpResult'
+  /sendSlack:
+    post:
+      description:
+        Sends a slack message to the system administrator
+      summary: Send slack message to system administrator
+      operationId: sendSlack
+      parameters:
+        - name: slackMessage
+          in: body
+          required: true
+          description: The message content
+          schema:
+            $ref: '#/definitions/MailDto'
+      tags:
+        - Other
+      responses:
+        default:
+          description: Unerwarteter Fehler
+          schema:
+            $ref: '#/definitions/OpResult'	    
 ###########                                 Administration    ###########            
   /admin/users:
     get:
@@ -910,6 +950,15 @@ definitions:
       isStop:
         type: boolean
         description: True if the session is stopped
+  MailDto:
+    type: object
+    properties:
+      subject:
+        type: string
+        description: The mail subject
+      body:
+        type: string
+        description: The body text	
 ################################################################################
 #                                 Sub - Definitions                            #
 ################################################################################              

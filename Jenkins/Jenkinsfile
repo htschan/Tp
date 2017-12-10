@@ -167,11 +167,11 @@ node {
 				*/
 			}
 		}
-		def msg = "The job ${JOB_NAME} was successful! Build Number: ${BUILD_NUMBER}"
+		def msg = "The job *${JOB_NAME}* was successful! Build Number: ${BUILD_NUMBER}"
 		slackSend color: 'good', message: msg
 	}
 	catch (exc) {
-		def msg = "The job ${JOB_NAME} failed! Exception: ${exc}"
+		def msg = "The job *${JOB_NAME}* failed! Exception: ${exc}"
 		slackSend color: '#ff0000', message: msg
 	}
 	finally {

@@ -17,6 +17,7 @@ using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.Punches;
 using System.Security.Claims;
 using TpDotNetCore.Domain;
+using Common.Communication;
 
 namespace TpDotNetCore
 {
@@ -51,7 +52,7 @@ namespace TpDotNetCore
 
             services.AddOptions();
             // Register the IConfiguration instance which TpConfigOptions binds against.
-            services.Configure<TpMailConfigOptions>(Configuration.GetSection("TpMailConfigOptions"));
+            services.Configure<MailConfigOptions>(Configuration.GetSection("MailConfigOptions"));
 
             // Add framework services.
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -66,6 +67,8 @@ namespace TpDotNetCore
             services.AddTransient<AppUser>();
             services.AddTransient<IdentityRole>();
             services.AddTransient<AppUserManager>();
+            services.AddTransient<ISlackClient, SlackClient>();
+            services.AddTransient<ISendMail, SendMail>();
             services.AddTransient<IPunchService, PunchService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 

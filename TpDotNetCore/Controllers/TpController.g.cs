@@ -56,6 +56,14 @@ namespace TpDotNetCore.Controllers
         /// <param name="userid">User Id</param>
         /// <returns>Die Operation war erfolgreich.</returns>
         System.Threading.Tasks.Task<SwaggerResponse<ProfileResponseDto>> GetProfileAsync(string userid);
+        /// <summary>Send email message to system administrator</summary>
+        /// <param name="mailMessage">The mail content</param>
+        /// <returns>Unerwarteter Fehler</returns>
+        System.Threading.Tasks.Task<SwaggerResponse<OpResult>> SendMailAsync(MailDto mailMessage);
+        /// <summary>Send slack message to system administrator</summary>
+        /// <param name="slackMessage">The message content</param>
+        /// <returns>Unerwarteter Fehler</returns>
+        System.Threading.Tasks.Task<SwaggerResponse<OpResult>> SendSlackAsync(MailDto slackMessage);
         /// <summary>Get the list of users [Authorize(Policy = "RequireApiAdminRole")]</summary>
         /// <returns>Returns users</returns>
         System.Threading.Tasks.Task<SwaggerResponse<UsersDto>> AdminGetUsersAsync();
@@ -282,6 +290,36 @@ namespace TpDotNetCore.Controllers
         public async System.Threading.Tasks.Task<IActionResult> GetProfile([FromRoute]string userid)
         {
             var result = await _implementation.GetProfileAsync(userid);
+    			foreach (var header in result.Headers)
+    				ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+    			if (result.StatusCode == 200)
+    				return Ok(result.Result);
+    			else
+    				return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+    		}
+        /// <summary>Send email message to system administrator</summary>
+        /// <param name="mailMessage">The mail content</param>
+        /// <returns>Unerwarteter Fehler</returns>
+        [HttpPost, Route("sendMail")]
+        public async System.Threading.Tasks.Task<IActionResult> SendMail([FromBody]MailDto mailMessage)
+        {
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
+            var result = await _implementation.SendMailAsync(mailMessage);
+    			foreach (var header in result.Headers)
+    				ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+    			if (result.StatusCode == 200)
+    				return Ok(result.Result);
+    			else
+    				return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+    		}
+        /// <summary>Send slack message to system administrator</summary>
+        /// <param name="slackMessage">The message content</param>
+        /// <returns>Unerwarteter Fehler</returns>
+        [HttpPost, Route("sendSlack")]
+        public async System.Threading.Tasks.Task<IActionResult> SendSlack([FromBody]MailDto slackMessage)
+        {
+            if(!ModelState.IsValid) return HandleInvalidModelState(ModelState);
+            var result = await _implementation.SendSlackAsync(slackMessage);
     			foreach (var header in result.Headers)
     				ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
     			if (result.StatusCode == 200)
@@ -2174,6 +2212,62 @@ namespace TpDotNetCore.Controllers
         public static SessionDto FromJson(string data)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<SessionDto>(data);
+        }
+    
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.7.3.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class MailDto : System.ComponentModel.INotifyPropertyChanged
+    {
+        private string _subject;
+        private string _body;
+    
+        /// <summary>The mail subject</summary>
+        [Newtonsoft.Json.JsonProperty("subject", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Subject
+        {
+            get { return _subject; }
+            set 
+            {
+                if (_subject != value)
+                {
+                    _subject = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        /// <summary>The body text</summary>
+        [Newtonsoft.Json.JsonProperty("body", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Body
+        {
+            get { return _body; }
+            set 
+            {
+                if (_body != value)
+                {
+                    _body = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static MailDto FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<MailDto>(data);
         }
     
         protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
