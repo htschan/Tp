@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using TpDotNetCore.Controllers;
@@ -7,29 +6,16 @@ using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
+using TpDotNetCore.Repositories;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
 {
-    public class DayPunchRepository : IDayPunchRepository
+    public class DayPunchRepository : Repository<DayPunch, string>, IDayPunchRepository
     {
-        private readonly TpContext _appDbContext;
         private readonly IAppUserRepository _appUserRepository;
-
-        public DayPunchRepository(TpContext context,
-                IAppUserRepository appUserRepository)
+        public DayPunchRepository(TpContext context, IAppUserRepository appUserRepository) : base(context)
         {
-            _appDbContext = context;
             _appUserRepository = appUserRepository;
-        }
-
-        public void Delete(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<PunchDto> GetAll()
-        {
-            throw new NotImplementedException();
         }
 
         public DayResponse GetDay(string userId, double? day, double? month, double? year)
@@ -45,7 +31,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 var selectMonth = month.HasValue ? Convert.ToInt32(month) : dt.Month;
                 var selectYear = year.HasValue ? Convert.ToInt32(year) : dt.Year;
 
-                var punches = _appDbContext.Punches
+                var punches = Context.Punches
                     .Where(p => p.User.Id == user.Id)
                     .Where(p => p.DayPunch.Day == selectDay)
                     .Where(p => p.MonthPunch.Month == selectMonth)
@@ -72,16 +58,6 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetCurret day punches threw an exception: {exception.Message}", exception);
             }
-        }
-
-        public void Insert(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(PunchDto entity)
-        {
-            throw new NotImplementedException();
         }
     }
 }

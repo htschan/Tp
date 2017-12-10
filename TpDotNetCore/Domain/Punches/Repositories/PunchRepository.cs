@@ -7,54 +7,22 @@ using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Helpers;
+using TpDotNetCore.Repositories;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
 {
-    public class _punchRepository : IPunchRepository
+    public class PunchRepository : Repository<Punch, string>, IPunchRepository
     {
-        private readonly TpContext _appDbContext;
         private readonly ITimeService _timeService;
         private readonly IAppUserRepository _appUserRepository;
 
-        public _punchRepository(TpContext context,
+        public PunchRepository(TpContext context,
                 ITimeService timeService,
-                IAppUserRepository appUserRepository)
+                IAppUserRepository appUserRepository) : base(context)
         {
-            _appDbContext = context;
             _timeService = timeService;
             _appUserRepository = appUserRepository;
         }
-
-        public void Delete(Punch entity)
-        {
-            try
-            {
-                var punch = _appDbContext.Punches.AsNoTracking().SingleOrDefault(p => p.Id == entity.Id);
-                if (punch == null)
-                    throw new RepositoryException(StatusCodes.Status404NotFound, "Punch not found");
-                _appDbContext.Punches.Remove(entity);
-                _appDbContext.SaveChanges();
-            }
-            catch (RepositoryException)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                throw new RepositoryException(StatusCodes.Status400BadRequest, $"Delete Punch threw an exception: {exception.Message}", exception);
-            }
-        }
-
-        public IList<Punch> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Insert(Punch entity)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Punch(string userId, bool direction)
         {
             try
@@ -64,10 +32,10 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     throw new RepositoryException(StatusCodes.Status404NotFound, $"User {userId} not found");
 
                 var dt = DateTime.Now;
-                var day = _appDbContext.DayPunches.FirstOrDefault(d => d.Day == dt.Day);
-                var week = _appDbContext.WeekPunches.FirstOrDefault(d => d.Week == _timeService.GetWeekNumber(dt));
-                var month = _appDbContext.MonthPunches.FirstOrDefault(d => d.Month == dt.Month);
-                var year = _appDbContext.YearPunches.FirstOrDefault(d => d.Year == dt.Year);
+                var day = Context.DayPunches.FirstOrDefault(d => d.Day == dt.Day);
+                var week = Context.WeekPunches.FirstOrDefault(d => d.Week == _timeService.GetWeekNumber(dt));
+                var month = Context.MonthPunches.FirstOrDefault(d => d.Month == dt.Month);
+                var year = Context.YearPunches.FirstOrDefault(d => d.Year == dt.Year);
                 var punch = new Punch
                 {
                     PunchTime = dt,
@@ -81,8 +49,8 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                     Created = DateTime.Now,
                     Updated = DateTime.MinValue
                 };
-                _appDbContext.Punches.Add(punch);
-                _appDbContext.SaveChanges();
+                Context.Punches.Add(punch);
+                Context.SaveChanges();
             }
             catch (RepositoryException)
             {
@@ -94,29 +62,9 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             }
         }
 
-        public void Update(Punch entity)
-        {
-            try
-            {
-                var punch = _appDbContext.Punches.SingleOrDefault(p => p.Id == entity.Id);
-                if (punch == null)
-                    throw new RepositoryException(StatusCodes.Status404NotFound, "Punch not found");
-                _appDbContext.Punches.Update(entity);
-                _appDbContext.SaveChanges();
-            }
-            catch (RepositoryException)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                throw new RepositoryException(StatusCodes.Status400BadRequest, $"Update Punch threw an exception: {exception.Message}", exception);
-            }
-        }
-
         public Punch GetByUser(Punch punch, AppUser user)
         {
-            return _appDbContext.Punches.AsNoTracking().FirstOrDefault(u => u.Id == punch.Id && u.UserId == user.Id);
+            return Context.Punches.AsNoTracking().FirstOrDefault(u => u.Id == punch.Id && u.UserId == user.Id);
         }
     }
 }

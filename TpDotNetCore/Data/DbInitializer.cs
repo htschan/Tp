@@ -9,24 +9,24 @@ using static TpDotNetCore.Helpers.Constants.Strings;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Domain.Punches.Repositories;
 using System.Diagnostics;
+using TpDotNetCore.Domain;
 
 namespace TpDotNetCore.Data
 {
     public class DbInitializer : IDisposable
     {
         private const int START_YEAR = 2015;
-        private readonly TpContext _context;
         private readonly AppUserManager _appUserManager;
+        private readonly IUnitOfWork _unitOfWork;
+
         private readonly IMapper _mapper;
         private readonly ITimeService _timeService;
         private readonly Random _random;
-        private readonly IPunchStateRepository _punchStateRepository;
 
-        public DbInitializer(TpContext context, AppUserManager appUserManager, IMapper mapper, ITimeService timeService, IPunchStateRepository punchStateRepository)
+        public DbInitializer(AppUserManager appUserManager, IUnitOfWork unitOfWork, IMapper mapper, ITimeService timeService)
         {
-            _punchStateRepository = punchStateRepository;
-            _context = context;
             _appUserManager = appUserManager;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _timeService = timeService;
             _random = new Random((int)DateTime.Now.Ticks);
@@ -34,10 +34,10 @@ namespace TpDotNetCore.Data
 
         public async void Initialize()
         {
-            _context.Database.EnsureCreated();
+            _unitOfWork.ApplicationDataContext.Database.EnsureCreated();
 
             // Look for any users.
-            if (_context.AppUsers.Any())
+            if (_unitOfWork.ApplicationDataContext.AppUsers.Any())
             {
                 return;   // DB has been seeded
             }
@@ -59,7 +59,7 @@ namespace TpDotNetCore.Data
                 string name = Enum.GetName(typeof(StatusAdminDtoStatus), val);
                 var punchState = new PunchState { State = name };
                 stateDict.Add((StatusAdminDtoStatus)val, punchState);
-                _punchStateRepository.Insert(punchState);
+                _unitOfWork.PunchStates.Add(punchState);
             }
 
             // create some users
@@ -86,32 +86,30 @@ namespace TpDotNetCore.Data
             var adminUserIdentity = _mapper.Map<AppUser>(adminUser);
             await _appUserManager.CreateUser(adminUserIdentity, "axil311", new List<string> { JwtClaims.ApiAccessAdmin });
 
-            _context.SaveChanges();
-
             // create the punch dimensions
             for (var i = 1; i < 32; i++)
             {
                 var d = new DayPunch { Day = i };
                 dayDict.Add(i, d);
-                _context.DayPunches.Add(d);
+                _unitOfWork.DayPunches.Add(d);
             }
             for (var i = 1; i < 54; i++)
             {
                 var w = new WeekPunch { Week = i };
                 weekDict.Add(i, w);
-                _context.WeekPunches.Add(w);
+                _unitOfWork.WeekPunches.Add(w);
             }
             for (var i = 1; i < 13; i++)
             {
                 var m = new MonthPunch { Month = i };
                 monthDict.Add(i, m);
-                _context.MonthPunches.Add(m);
+                _unitOfWork.MonthPunches.Add(m);
             }
             for (var i = START_YEAR; i < 2035; i++)
             {
                 var y = new YearPunch { Year = i };
                 yearDict.Add(i, y);
-                _context.YearPunches.Add(y);
+                _unitOfWork.YearPunches.Add(y);
             }
 
             // create some punches for every user
@@ -143,12 +141,11 @@ namespace TpDotNetCore.Data
                             User = u.Value
                         };
                         dateTimePrev = timeInfo.dt;
-                        _context.Punches.Add(punch);
+                        _unitOfWork.Punches.Add(punch);
                     }
                 }
             }
-
-            _context.SaveChanges();
+            _unitOfWork.Complete();
         }
 
         private (DateTime dt, decimal dtDec, bool direction) GetPunchTime(DateTime dateTimePrevious, int year, int month, int day, int s)
@@ -199,7 +196,5 @@ namespace TpDotNetCore.Data
             // GC.SuppressFinalize(this);
         }
         #endregion
-
     }
-
 }

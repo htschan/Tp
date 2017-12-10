@@ -7,32 +7,21 @@ using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
+using TpDotNetCore.Repositories;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
 {
-    public class WeekPunchRepository : IWeekPunchRepository
+    public class WeekPunchRepository : Repository<WeekPunch, string>, IWeekPunchRepository
     {
-        private readonly TpContext _appDbContext;
         private readonly ITimeService _timeService;
         private readonly IAppUserRepository _appUserRepository;
 
         public WeekPunchRepository(TpContext context,
                 ITimeService timeService,
-                IAppUserRepository appUserRepoistory)
+                IAppUserRepository appUserRepoistory) : base(context)
         {
-            _appDbContext = context;
             _timeService = timeService;
             _appUserRepository = appUserRepoistory;
-        }
-
-        public void Delete(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<PunchDto> GetAll()
-        {
-            throw new NotImplementedException();
         }
 
         public WeekResponse GetWeek(string userId, double? week, double? year)
@@ -47,7 +36,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 var selectWeek = week.HasValue ? Convert.ToInt32(week) : _timeService.GetWeekNumber(dt);
                 var selectYear = year.HasValue ? Convert.ToInt32(year) : dt.Year;
 
-                var punches = _appDbContext.Punches
+                var punches = Context.Punches
                     .Where(p => p.User.Id == user.Id)
                     .Where(p => p.WeekPunch.Week == selectWeek)
                     .Where(p => p.YearPunch.Year == dt.Year)
@@ -85,16 +74,6 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetCurret week punches threw an exception: {exception.Message}", exception);
             }
-        }
-
-        public void Insert(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(PunchDto entity)
-        {
-            throw new NotImplementedException();
         }
     }
 }

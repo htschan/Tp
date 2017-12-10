@@ -7,37 +7,26 @@ using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
+using TpDotNetCore.Repositories;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
 {
-    public class YearPunchRepository : IYearPunchRepository
+    public class YearPunchRepository : Repository<YearPunch, string>, IYearPunchRepository
     {
-        private readonly TpContext _appDbContext;
         private readonly ITimeService _timeService;
         private readonly IAppUserRepository _appUserRepository;
 
         public YearPunchRepository(TpContext context,
                 ITimeService timeService,
-                IAppUserRepository appUserRepoistory)
+                IAppUserRepository appUserRepoistory) : base(context)
         {
-            _appDbContext = context;
             _timeService = timeService;
             _appUserRepository = appUserRepoistory;
         }
 
-        public void Delete(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<PunchDto> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
         public YearPunch FindByYear(int year)
         {
-            return _appDbContext.YearPunches.FirstOrDefault(d => d.Year == year);
+            return Context.YearPunches.FirstOrDefault(d => d.Year == year);
         }
 
         public YearResponse GetYear(string userId, double? year)
@@ -51,7 +40,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 var dt = DateTime.Now;
                 var selectYear = year.HasValue ? Convert.ToInt32(year) : dt.Year;
 
-                var groupedPunches = _appDbContext.Punches
+                var groupedPunches = Context.Punches
                     .Where(p => p.User.Id == user.Id)
                     .Where(p => p.YearPunch.Year == year)
                     .OrderBy(p => p.MonthPunch.Month)
@@ -97,16 +86,6 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetCurret year punches threw an exception: {exception.Message}", exception);
             }
-        }
-
-        public void Insert(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(PunchDto entity)
-        {
-            throw new NotImplementedException();
         }
     }
 }

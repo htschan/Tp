@@ -7,37 +7,26 @@ using TpDotNetCore.Data;
 using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using TpDotNetCore.Extensions;
 using TpDotNetCore.Helpers;
+using TpDotNetCore.Repositories;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
 {
-    public class MonthPunchRepository : IMonthPunchRepository
+    public class MonthPunchRepository : Repository<MonthPunch, string>, IMonthPunchRepository
     {
-        private readonly TpContext _appDbContext;
         private readonly ITimeService _timeService;
         private readonly IAppUserRepository _appUserRepository;
 
         public MonthPunchRepository(TpContext context,
                 ITimeService timeService,
-                IAppUserRepository appUserRepository)
+                IAppUserRepository appUserRepository) : base(context)
         {
-            _appDbContext = context;
             _timeService = timeService;
             _appUserRepository = appUserRepository;
         }
 
-        public void Delete(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<PunchDto> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
         public MonthPunch FindByMonth(int month)
         {
-            return _appDbContext.MonthPunches.FirstOrDefault(d => d.Month == month);
+            return Context.MonthPunches.FirstOrDefault(d => d.Month == month);
         }
 
         public MonthResponse GetMonth(string userId, double? month, double? year)
@@ -52,7 +41,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 var selectMonth = month.HasValue ? Convert.ToInt32(month) : dt.Month;
                 var selectedYear = year.HasValue ? Convert.ToInt32(year) : dt.Year;
 
-                var groupedPunches = _appDbContext.Punches
+                var groupedPunches = Context.Punches
                     .Where(p => p.User.Id == user.Id)
                     .Where(p => p.MonthPunch.Month == selectMonth)
                     .Where(p => p.YearPunch.Year == selectedYear)
@@ -89,16 +78,6 @@ namespace TpDotNetCore.Domain.Punches.Repositories
             {
                 throw new RepositoryException(StatusCodes.Status400BadRequest, $"GetCurret month punches threw an exception: {exception.Message}", exception);
             }
-        }
-
-        public void Insert(PunchDto entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(PunchDto entity)
-        {
-            throw new NotImplementedException();
         }
     }
 }

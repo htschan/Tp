@@ -14,10 +14,9 @@ using TpDotNetCore.Helpers;
 using TpDotNetCore.Auth;
 using TpDotNetCore.Controllers;
 using TpDotNetCore.Domain.UserConfiguration;
-using TpDotNetCore.Domain.UserConfiguration.Repositories;
-using TpDotNetCore.Domain.Punches.Repositories;
 using TpDotNetCore.Domain.Punches;
 using System.Security.Claims;
+using TpDotNetCore.Domain;
 
 namespace TpDotNetCore
 {
@@ -60,22 +59,15 @@ namespace TpDotNetCore
             services.AddTransient<DbInitializer>();
 
             services.AddTransient<IJwtFactory, JwtFactory>();
+
+            services.AddTransient<ITpController, TpControllerImpl>();
             services.AddSingleton<IHolidayService, HolidayService>();
             services.AddSingleton<ITimeService, TimeService>();
-            services.AddTransient<ITpController, TpControllerImpl>();
             services.AddTransient<AppUser>();
             services.AddTransient<IdentityRole>();
             services.AddTransient<AppUserManager>();
-            services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
-            services.AddTransient<IAppUserRepository, AppUserRepository>();
-            services.AddTransient<IPunchRepository, _punchRepository>();
-            services.AddTransient<IDayPunchRepository, DayPunchRepository>();
-            services.AddTransient<IWeekPunchRepository, WeekPunchRepository>();
-            services.AddTransient<IMonthPunchRepository, MonthPunchRepository>();
-            services.AddTransient<IYearPunchRepository, YearPunchRepository>();
             services.AddTransient<IPunchService, PunchService>();
-            services.AddTransient<IPunchStateRepository, PunchStateRepository>();
-            services.AddTransient<IMonthStateRepository, MonthStateRepository>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             // api user claim policy
             services.AddAuthorization(options =>

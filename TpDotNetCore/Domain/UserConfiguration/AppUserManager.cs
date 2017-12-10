@@ -13,15 +13,15 @@ namespace TpDotNetCore.Domain.UserConfiguration
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AppUserManager(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IRefreshTokenRepository refreshTokenRepository)
+        public AppUserManager(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
-            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public async Task CreateUser(AppUser appUser, string password, List<string> roles)
@@ -32,6 +32,9 @@ namespace TpDotNetCore.Domain.UserConfiguration
             {
                 await _userManager.AddToRoleAsync(appUser, role);
             }
+            var profile = new AppProfile { PictureUrl = "", Identity = appUser };
+            _unitOfWork.AppProfiles.Add(profile);
+            _unitOfWork.Complete();
         }
 
         public async Task CreateRole(string roleName)
@@ -74,7 +77,7 @@ namespace TpDotNetCore.Domain.UserConfiguration
 
         public IList<RefreshToken> GetSessions()
         {
-            var tokens = _refreshTokenRepository.GetAll();
+            var tokens = _unitOfWork.RefreshTokens.GetAll().ToList();
             foreach (var token in tokens)
             {
                 var user = _userManager.FindByIdAsync(token.ClientId).Result;

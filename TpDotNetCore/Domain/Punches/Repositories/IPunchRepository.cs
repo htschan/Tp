@@ -4,9 +4,9 @@ using TpDotNetCore.Repositories;
 
 namespace TpDotNetCore.Domain.Punches.Repositories
 {
-    public interface IPunchRepository : IRepository<Punch>
+    public interface IPunchRepository : IRepository<Punch, string>
     {
         Punch GetByUser(Punch punch, AppUser user);
-         void Punch(string userId, bool direction);
+        void Punch(string userId, bool direction);
     }
 }

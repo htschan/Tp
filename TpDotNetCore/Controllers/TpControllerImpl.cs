@@ -12,6 +12,7 @@ using MailKit.Net.Smtp;
 using TpDotNetCore.Domain.UserConfiguration;
 using TpDotNetCore.Domain.Punches.Repositories;
 using TpDotNetCore.Domain.Punches;
+using TpDotNetCore.Domain;
 
 namespace TpDotNetCore.Controllers
 {
@@ -23,13 +24,8 @@ namespace TpDotNetCore.Controllers
         private readonly AppUserManager _appUserManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly TpMailConfigOptions _tpConfigOptions;
-        private readonly IYearPunchRepository _yearPunchRepository;
-        private readonly IMonthPunchRepository _monthPunchRepository;
-        private readonly IWeekPunchRepository _weekPunchRepository;
-        private readonly IDayPunchRepository _dayPunchRepository;
-        private readonly IMonthStateRepository _monthStateRepository;
-        private readonly IPunchRepository _punchRepository;
         private readonly IPunchService _punchService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public TpControllerImpl(IMapper mapper,
                 AppUser appUser,
@@ -37,13 +33,8 @@ namespace TpDotNetCore.Controllers
                 AppUserManager appUserManager,
                 IHttpContextAccessor httpContextAccessor,
                 IOptions<TpMailConfigOptions> optionsAccessor,
-                IPunchRepository punchRepository,
-                IYearPunchRepository yearPunchRepository,
-                IMonthPunchRepository monthPunchRepository,
-                IWeekPunchRepository weekPunchRepository,
-                IDayPunchRepository dayPunchRepository,
-                IMonthStateRepository monthStateRepository,
-                IPunchService punchService)
+                IPunchService punchService,
+                IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _appUser = appUser;
@@ -51,13 +42,8 @@ namespace TpDotNetCore.Controllers
             _appUserManager = appUserManager;
             _httpContextAccessor = httpContextAccessor;
             _tpConfigOptions = optionsAccessor.Value;
-            _yearPunchRepository = yearPunchRepository;
-            _monthPunchRepository = monthPunchRepository;
-            _weekPunchRepository = weekPunchRepository;
-            _dayPunchRepository = dayPunchRepository;
-            _monthStateRepository = monthStateRepository;
-            _punchRepository = punchRepository;
             _punchService = punchService;
+            _unitOfWork = unitOfWork;
 
             new JsonSerializerSettings
             {
@@ -221,15 +207,18 @@ namespace TpDotNetCore.Controllers
         public Task<SwaggerResponse<ProfileResponseDto>> GetMyProfileAsync()
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-            var profile = _userManager.FindByEmailAsync(userId).Result;
-            if (profile == null)
+            try
             {
-                profile = new AppUser();
-                profile.UserName = _httpContextAccessor.HttpContext.User.Identity.Name;
+                var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
+                var profile = _unitOfWork.AppProfiles.FindById(userId);
+                var profileDto = _mapper.Map<AppProfile, ProfileResponseDto>(profile);
+                return Task.Run(() => new SwaggerResponse<ProfileResponseDto>(StatusCodes.Status200OK, headers, profileDto));
             }
-            var json = JsonConvert.SerializeObject(profile);
-            return Task.FromResult(new SwaggerResponse<ProfileResponseDto>(StatusCodes.Status200OK, headers, new ProfileResponseDto { Status = new OpResult { Success = true } }));
+            catch (Exception exception)
+            {
+                var response = new ProfileResponseDto { Status = new OpResult { Success = false, Result = $"Failed to get profile" } };
+                return HandleException<ProfileResponseDto>(exception, headers, response);
+            }
         }
 
         public Task<SwaggerResponse<ProfileResponseDto>> GetProfileAsync(string userid)
@@ -248,7 +237,7 @@ namespace TpDotNetCore.Controllers
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _dayPunchRepository.GetDay(userId, day, month, year);
+                var response = _unitOfWork.DayPunches.GetDay(userId, day, month, year);
                 return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
@@ -264,7 +253,7 @@ namespace TpDotNetCore.Controllers
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _weekPunchRepository.GetWeek(userId, week, year);
+                var response = _unitOfWork.WeekPunches.GetWeek(userId, week, year);
                 return Task.FromResult(new SwaggerResponse<WeekResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
@@ -296,7 +285,7 @@ namespace TpDotNetCore.Controllers
             try
             {
                 var userId = _httpContextAccessor.HttpContext.User.FindFirst(cl => cl.Type.Equals("id")).Value;
-                var response = _yearPunchRepository.GetYear(userId, year);
+                var response = _unitOfWork.YearPunches.GetYear(userId, year);
                 return Task.FromResult(new SwaggerResponse<YearResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)
@@ -384,8 +373,8 @@ namespace TpDotNetCore.Controllers
                 {
                     System.Console.WriteLine(cl.Subject.Name);
                 }
-                _punchRepository.Punch(userId, direction);
-                var response = _dayPunchRepository.GetDay(userId, null, null, null);
+                _unitOfWork.Punches.Punch(userId, direction);
+                var response = _unitOfWork.DayPunches.GetDay(userId, null, null, null);
                 return Task.FromResult(new SwaggerResponse<DayResponse>(StatusCodes.Status200OK, headers, response));
             }
             catch (Exception exception)

@@ -17,6 +17,9 @@ namespace TpDotNetCore.ViewModels.Mappings
             //     .ForMember(dest => dest.Punchid, opt => opt.MapFrom(src => src.Id));
 			CreateMap<AppUser, UserDto>()
                 .ReverseMap();
+            CreateMap<AppProfile, ProfileResponseDto>()
+                .ForMember(m => m.User, map => map.MapFrom(vm => vm.Identity))
+                .ReverseMap();
             CreateMap<string, RoleDto>()
                 .ForMember(s => s.Name, map => map.MapFrom(vm => vm))
                 .ReverseMap();

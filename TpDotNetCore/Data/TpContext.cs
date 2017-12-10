@@ -11,23 +11,16 @@ namespace TpDotNetCore.Data
         public TpContext() { }
 
         public TpContext(DbContextOptions options) : base(options) { }
-
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        
         public DbSet<AppUser> AppUsers { get; set; }
+        public DbSet<AppProfile> AppProfiles { get; set; }
 
         public DbSet<Punch> Punches { get; set; }
-
         public DbSet<DayPunch> DayPunches { get; set; }
-
         public DbSet<WeekPunch> WeekPunches { get; set; }
-
         public DbSet<MonthPunch> MonthPunches { get; set; }
-
         public DbSet<YearPunch> YearPunches { get; set; }
-
         public DbSet<PunchState> PunchStates { get; set; }
-
         public DbSet<MonthState> MonthStates { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

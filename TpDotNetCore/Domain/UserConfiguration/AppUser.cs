@@ -10,7 +10,6 @@ using TpDotNetCore.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using TpDotNetCore.Domain.UserConfiguration.Repositories;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TpDotNetCore.Domain.UserConfiguration
@@ -19,18 +18,18 @@ namespace TpDotNetCore.Domain.UserConfiguration
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtFactory _jwtFactory;
-        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly JwtIssuerOptions _jwtOptions;
 
         public AppUser() { }
         public AppUser(UserManager<AppUser> userManager,
-                    IJwtFactory jwtFactory,
-                    IOptions<JwtIssuerOptions> jwtOptions,
-                    IRefreshTokenRepository refreshTokenRepository)
+                IJwtFactory jwtFactory,
+                IOptions<JwtIssuerOptions> jwtOptions,
+                IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _jwtFactory = jwtFactory;
-            _refreshTokenRepository = refreshTokenRepository;
+            _unitOfWork = unitOfWork;
             _jwtOptions = jwtOptions.Value;
         }
         // Extended Properties
@@ -60,10 +59,8 @@ namespace TpDotNetCore.Domain.UserConfiguration
                 IsStop = 0,
                 Created = DateTime.Now
             };
-            if (!_refreshTokenRepository.AddToken(refreshTokenEntity))
-            {
-                throw new RepositoryException(909, "failed to store new refresh token");
-            }
+            _unitOfWork.RefreshTokens.AddToken(refreshTokenEntity);
+            _unitOfWork.Complete();
 
             // Serialize and return the response
             return (
@@ -82,7 +79,7 @@ namespace TpDotNetCore.Domain.UserConfiguration
             }
 
             var refreshToken = Guid.NewGuid().ToString().Replace("-", "");
-            var token = _refreshTokenRepository.GetToken(refreshtokenparameter.Refresh_token);
+            var token = _unitOfWork.RefreshTokens.GetToken(refreshtokenparameter.Refresh_token);
             if (token == null)
             {
                 throw new RepositoryException(905, "failed to refresh token");
@@ -93,7 +90,7 @@ namespace TpDotNetCore.Domain.UserConfiguration
             }
             token.IsStop = 1;
             // expire the old refresh token and add a new refresh token
-            var updateFlag = _refreshTokenRepository.ExpireToken(token);
+            _unitOfWork.RefreshTokens.ExpireToken(token);
 
             var identity = GetClaimsIdentity(token.ClientId).Result;
             if (identity.claimsIdentiy == null)
@@ -109,11 +106,8 @@ namespace TpDotNetCore.Domain.UserConfiguration
                 IsStop = 0,
                 Created = DateTime.Now
             };
-            var addFlag = _refreshTokenRepository.AddToken(refreshTokenEntity);
-            if (!addFlag || !updateFlag)
-            {
-                throw new RepositoryException(910, "failed to expire old token or to create a new token");
-            }
+            _unitOfWork.RefreshTokens.AddToken(refreshTokenEntity);
+            _unitOfWork.Complete();
 
             // Serialize and return the response
             return (
