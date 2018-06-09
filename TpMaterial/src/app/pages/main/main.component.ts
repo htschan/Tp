@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { ObservableMedia, MediaChange } from "@angular/flex-layout";
 import { MatSidenav } from '@angular/material';
-import { Observable } from "rxjs/Observable";
-import { Subscription } from "rxjs/Subscription";
+import { Observable ,  Subscription } from "rxjs";
 
 @Component({
   selector: 'app-main',

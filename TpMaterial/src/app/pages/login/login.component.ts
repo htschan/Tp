@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material';
 import { AlertService } from '../../services/alert/alert.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { AuthResponse } from "../../services/api.g";
-import { Subject } from "rxjs/Subject";
+import { Subject } from "rxjs";
 
 @Component({
     moduleId: module.id,
