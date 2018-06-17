@@ -7,9 +7,9 @@
         <mat-slide-toggle [checked]="dlgData.punchVm.direction">{{dlgData.punchVm?.direction ? "Kommen" : "Gehen"}}</mat-slide-toggle>
       </div>
       <div>
-        <mat-input-container>
+        <mat-form-field>
           <input matInput placeholder="Time (hh:mm)" [(ngModel)]="punchTime">
-        </mat-input-container>
+        </mat-form-field>
       </div>
       <div>
         <div>{{time}}</div>

@@ -75,7 +75,8 @@ https://goblincoding.com/2016/07/03/issuing-and-authenticating-jwt-tokens-in-asp
 # ASP.NET Core Security
 https://docs.microsoft.com/en-us/aspnet/core/security/
 
-
+# Securing ASP.NET Core 2.0 Applications with JWTs
+https://auth0.com/blog/securing-asp-dot-net-core-2-applications-with-jwts/
 
 # Configuration in ASP.NET Core
 

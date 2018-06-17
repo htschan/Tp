@@ -59,17 +59,6 @@ export class MyApp implements OnInit {
     public storage: Storage,
     private auth: AuthService) {
 
-    // Check if the user has already seen the tutorial
-    // this.storage.get('hasSeenTutorial')
-    //   .then((hasSeenTutorial) => {
-    //     if (hasSeenTutorial) {
-    //       this.rootPage = TabsPage;
-    //     } else {
-    //       this.rootPage = LoginPage;      ///    TutorialPage;
-    //     }
-    //     this.platformReady();
-    //   })
-
     // decide which menu items should be hidden by current login status stored in local storage
     this.auth.getAuthenticated().then((hasLoggedIn) => {
       this.enableMenu(hasLoggedIn === true);
@@ -118,10 +107,6 @@ export class MyApp implements OnInit {
       // Give the menu time to close before changing to logged out
       this.auth.logout();
     }
-  }
-
-  openTutorial() {
-    // this.nav.setRoot(TutorialPage);
   }
 
   listenToLoginEvents() {

@@ -123,7 +123,7 @@ export class PunchService {
         return moment().isAfter(currentYear.getDate(), 'year');
     }
 
-    updatePunch(punchVm: PunchVm): Observable<PunchResponse> {
+    updatePunch(punchVm: PunchVm): Observable<any> {
         let punchDto = new ModifyPunchDto();
         punchDto.punchid = punchVm.id;
         punchDto.direction = punchVm.direction;
@@ -131,13 +131,13 @@ export class PunchService {
         return this.tpClient.punchModify(punchDto);
     }
 
-    deletePunch(punchVm: PunchVm): Observable<OpResult> {
+    deletePunch(punchVm: PunchVm): Observable<any> {
         let punchDto = new DeletePunchDto();
         punchDto.punchid = punchVm.id;
         return this.tpClient.punchDelete(punchDto);
     }
 
-    setStatusAdmin(state: StatusAdminDto): Observable<PunchResponse> {
+    setStatusAdmin(state: StatusAdminDto): Observable<any> {
         return this.tpClient.puSetMonthStatus(state);
     }
 }

@@ -1,28 +1,37 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ErrorHandler } from '@angular/core';
-import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Storage } from '@ionic/storage';
+import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
-import { TpClientConfig } from '../timepuncher-client-config';
+import { JwtModule, JWT_OPTIONS } from '@auth0/angular-jwt';
+
 import { TpClient, API_BASE_URL } from '../services/api.g';
+import { TpClientConfig } from '../timepuncher-client-config';
+import { PunchService, BUILD_INFO } from '../services/puncher/punch.service';
 import { AuthService } from '../services/auth/auth.service';
-import { PunchService } from '../services/puncher/punch.service';
+import { PunchEditModal } from '../pages/punchedit/punchedit';
 import { SampleService } from '../services/sample.service';
-import { Http, XHRBackend, RequestOptions } from '@angular/http';
-import { httpFactory } from '../http/http.factory';
 import { MyApp } from './app.component';
 import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
-import { PunchEditModal } from '../pages/punchedit/punchedit';
 import { TabsPage } from '../pages/tabs/tabs';
 import { ProfilePage } from '../pages/profile/profile';
 import { LoginPage } from '../pages/login/login';
 import { RegisterPage } from '../pages/register/register';
 import { MonthNamePipe } from '../pipes/monthName.pipe';
 import { DayNamePipe } from '../pipes/dayName.pipe';
+
+export function jwtOptionsFactory(tokenService) {
+  return {
+    tokenGetter: () => {
+      return tokenService.getToken();
+    },
+    whitelistedDomains: ['localhost:5000','api.timepuncher.ch']
+  }
+}
 
 @NgModule({
   declarations: [
@@ -41,6 +50,7 @@ import { DayNamePipe } from '../pipes/dayName.pipe';
   imports: [
     BrowserModule,
     HttpModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(MyApp, {}, {
       links: [
@@ -57,8 +67,14 @@ import { DayNamePipe } from '../pipes/dayName.pipe';
     IonicStorageModule.forRoot({
       name: '__tpionic',
       driverOrder: ['indexeddb', 'sqlite', 'websql']
-    })
-  ],
+    }),
+    JwtModule.forRoot({
+      jwtOptionsProvider: {
+        provide: JWT_OPTIONS,
+        useFactory: jwtOptionsFactory,
+        deps: [AuthService]
+      }
+    })],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
@@ -80,13 +96,12 @@ import { DayNamePipe } from '../pipes/dayName.pipe';
       provide: API_BASE_URL,
       useValue: TpClientConfig.baserurl
     },
+    {
+      provide: BUILD_INFO,
+      useValue: TpClientConfig.bts
+    },
     TpClient,
     AuthService,
-    {
-      provide: Http,
-      useFactory: httpFactory,
-      deps: [XHRBackend, RequestOptions, API_BASE_URL, Storage]
-    },
     PunchService,
     SampleService
   ]

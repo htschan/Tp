@@ -42,7 +42,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
 
                 var groupedPunches = Context.Punches
                     .Where(p => p.User.Id == user.Id)
-                    .Where(p => p.YearPunch.Year == year)
+                    .Where(p => p.YearPunch.Year == selectYear)
                     .OrderBy(p => p.MonthPunch.Month)
                     .GroupBy(p => p.MonthPunch.Month)
                     .Select(p => new

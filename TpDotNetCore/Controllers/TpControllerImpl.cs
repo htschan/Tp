@@ -14,6 +14,7 @@ using TpDotNetCore.Domain.Punches.Repositories;
 using TpDotNetCore.Domain.Punches;
 using TpDotNetCore.Domain;
 using Common.Communication;
+using System.Collections.ObjectModel;
 
 namespace TpDotNetCore.Controllers
 {
@@ -236,7 +237,7 @@ namespace TpDotNetCore.Controllers
             }
         }
 
-        public Task<SwaggerResponse<OpResult>> SendMailAsync(MailDto mailMessage)
+        public Task<SwaggerResponse> SendMailAsync(MailDto mailMessage)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
@@ -249,15 +250,15 @@ namespace TpDotNetCore.Controllers
                 mailPayload.ToList.Add(from);
                 _mailClient.SetOptions(_mailConfigOptions);
                 _mailClient.SendEmail(mailPayload);
-                return Task.Run(() => new SwaggerResponse<OpResult>(StatusCodes.Status200OK, headers, new OpResult { Result = "2", Success = true }));
+                return Task.Run(() => new SwaggerResponse(StatusCodes.Status200OK, headers));
             }
             catch (Exception exception)
             {
-                return HandleException<OpResult>(exception, headers);
+                return HandleException(exception, headers);
             }
         }
 
-        public Task<SwaggerResponse<OpResult>> SendSlackAsync(MailDto slackMessage)
+        public Task<SwaggerResponse> SendSlackAsync(MailDto slackMessage)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
@@ -266,11 +267,11 @@ namespace TpDotNetCore.Controllers
                 var profile = _unitOfWork.AppProfiles.FindById(userId);
                 _slackClient.SetConfig(_slackConfigOptions);
                 _slackClient.PostMessage($"From {profile.Identity.Email}: {slackMessage.Subject} {slackMessage.Body}");
-                return Task.Run(() => new SwaggerResponse<OpResult>(StatusCodes.Status200OK, headers, new OpResult { Result = "2", Success = true }));
+                return Task.Run(() => new SwaggerResponse(StatusCodes.Status200OK, headers));
             }
             catch (Exception exception)
             {
-                return HandleException<OpResult>(exception, headers);
+                return HandleException(exception, headers);
             }
         }
 
@@ -279,7 +280,7 @@ namespace TpDotNetCore.Controllers
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<List<PunchDto>>> GetPunchesAsync()
+        public Task<SwaggerResponse<ObservableCollection<PunchDto>>> GetPunchesAsync()
         {
             throw new NotImplementedException();
         }
@@ -358,7 +359,7 @@ namespace TpDotNetCore.Controllers
             return PunchAsync(false);
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PunchModifyAsync(ModifyPunchDto modifyPunchDto)
+        public Task<SwaggerResponse> PunchModifyAsync(ModifyPunchDto modifyPunchDto)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
@@ -367,16 +368,16 @@ namespace TpDotNetCore.Controllers
                 var punchIdentity = _mapper.Map<Punch>(modifyPunchDto);
 
                 _punchService.UpdatePunch(punchIdentity, userId);
-                return Task.FromResult(new SwaggerResponse<PunchResponse>(StatusCodes.Status200OK, headers, new PunchResponse { Status = new OpResult { Success = true } }));
+                return Task.FromResult(new SwaggerResponse(StatusCodes.Status200OK, headers));
             }
             catch (Exception exception)
             {
                 var response = new PunchResponse { Status = new OpResult { Success = false, Result = $"Failed to delete punch. Exception: {exception.Message}" } };
-                return HandleException<PunchResponse>(exception, headers, response);
+                return HandleException(exception, headers);
             }
         }
 
-        public Task<SwaggerResponse<OpResult>> PunchDeleteAsync(DeletePunchDto deletePunchDto)
+        public Task<SwaggerResponse> PunchDeleteAsync(DeletePunchDto deletePunchDto)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
@@ -385,32 +386,32 @@ namespace TpDotNetCore.Controllers
                 var punchIdentity = _mapper.Map<Punch>(deletePunchDto);
 
                 _punchService.DeletePunch(punchIdentity, userId);
-                return Task.FromResult(new SwaggerResponse<OpResult>(StatusCodes.Status200OK, headers, new OpResult { Success = true }));
+                return Task.FromResult(new SwaggerResponse(StatusCodes.Status200OK, headers));
             }
             catch (Exception exception)
             {
                 var response = new OpResult { Success = false, Result = $"Failed to delete punch. Exception: {exception.Message}" };
-                return HandleException<OpResult>(exception, headers, response);
+                return HandleException(exception, headers);
             }
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PuModifyPunchAsync(ModifyPunchAdminDto modifyPunchAdminDto)
+        public Task<SwaggerResponse> PuModifyPunchAsync(ModifyPunchAdminDto modifyPunchAdminDto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SwaggerResponse<PunchResponse>> PuSetMonthStatusAsync(StatusAdminDto setStatusAdminDto)
+        public Task<SwaggerResponse> PuSetMonthStatusAsync(StatusAdminDto setStatusAdminDto)
         {
             var headers = new Dictionary<string, IEnumerable<string>>();
             try
             {
                 _punchService.SetMonthState(setStatusAdminDto.Userid, setStatusAdminDto.Month, setStatusAdminDto.Year, setStatusAdminDto.Status.Value);
-                return Task.FromResult(new SwaggerResponse<PunchResponse>(StatusCodes.Status200OK, headers, new PunchResponse { Status = new OpResult { Success = true } }));
+                return Task.FromResult(new SwaggerResponse(StatusCodes.Status200OK, headers));
             }
             catch (Exception exception)
             {
                 var response = new PunchResponse { Status = new OpResult { Success = false, Result = $"Failed to delete punch. Exception: {exception.Message}" } };
-                return HandleException<PunchResponse>(exception, headers, response);
+                return HandleException(exception, headers);
             }
         }
 
@@ -433,11 +434,17 @@ namespace TpDotNetCore.Controllers
             catch (Exception exception)
             {
                 var response = new DayResponse { Status = new OpResult { Success = false, Result = $"Failed to punch and get Today's punches. Exception: {exception.Message}" } };
-                return HandleException<DayResponse>(exception, headers, response);
+                return HandleException<DayResponse>(exception, headers);
             }
         }
         #endregion
 
+        private Task<SwaggerResponse> HandleException(Exception exception, Dictionary<string, IEnumerable<string>> headers)
+        {
+            if (exception is RepositoryException)
+                return Task.FromResult(new SwaggerResponse(((RepositoryException)exception).StatusCode, headers));
+            return Task.FromResult(new SwaggerResponse(StatusCodes.Status400BadRequest, headers));
+        }
         private Task<SwaggerResponse<T>> HandleException<T>(Exception exception, Dictionary<string, IEnumerable<string>> headers, T response)
         {
             if (exception is RepositoryException)

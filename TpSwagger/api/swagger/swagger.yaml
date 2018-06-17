@@ -52,10 +52,6 @@ paths:
           description: Returns nothing
           schema:
             $ref: '#/definitions/AuthResponse'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   /refreshtoken:
     post:
       description:
@@ -72,7 +68,7 @@ paths:
       tags:
         - Authentication
       responses:
-        default:
+        200:
           description: AuthResponse
           schema:
             $ref: '#/definitions/AuthResponse'
@@ -100,10 +96,6 @@ paths:
             Der Benutzer erhält eine E-Mail mit einem Bestätigungslink.
           schema:
             $ref: '#/definitions/RegisterResponse'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /confirm:
     get:
       description:
@@ -128,10 +120,6 @@ paths:
           description: Die Operation war erfolgreich.
           schema:
             $ref: '#/definitions/ConfirmResponse'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /recoverPassword:
     post:
       description:
@@ -155,10 +143,6 @@ paths:
             Der Benutzer erhält eine E-Mail mit einem Passwortresetcode.
           schema:
             $ref: '#/definitions/RecoverPasswordResponse'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /recoverUsername:
     post:
       description:
@@ -182,10 +166,6 @@ paths:
             Der Benutzer erhält eine E-Mail mit seinem Benutzernamen.
           schema:
             $ref: '#/definitions/RecoverUsernameResponse'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /setPassword:
     post:
       description:
@@ -208,10 +188,6 @@ paths:
           description: Die Operation war erfolgreich.
           schema:
             $ref: '#/definitions/SetPasswordResponse'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /profiles:
     get:
       description: |
@@ -226,10 +202,6 @@ paths:
           description: Die Operation war erfolgreich.
           schema:
             $ref: '#/definitions/ProfileResponseDto'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /profiles/myprofile:
     get:
       description: |
@@ -244,10 +216,6 @@ paths:
           description: Die Operation war erfolgreich.
           schema:
             $ref: '#/definitions/ProfileResponseDto'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /profiles/{userid}:
     get:
       description: |
@@ -268,10 +236,6 @@ paths:
           description: Die Operation war erfolgreich.
           schema:
             $ref: '#/definitions/ProfileResponseDto'
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
   /sendMail:
     post:
       description:
@@ -288,10 +252,8 @@ paths:
       tags:
         - Other
       responses:
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'
+        200:
+          description: Mail sent
   /sendSlack:
     post:
       description:
@@ -308,10 +270,8 @@ paths:
       tags:
         - Other
       responses:
-        default:
-          description: Unerwarteter Fehler
-          schema:
-            $ref: '#/definitions/OpResult'	    
+        200:
+          description: Slack sent
 ###########                                 Administration    ###########            
   /admin/users:
     get:
@@ -326,10 +286,6 @@ paths:
           description: Returns users
           schema:
             $ref: '#/definitions/UsersDto'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'            
   /admin/sessions:
     get:
       description:
@@ -343,10 +299,6 @@ paths:
           description: Returns sessions
           schema:
             $ref: '#/definitions/SessionsDto'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'            
 ###########                                 Normal User    ###########            
   /punches:
     get:
@@ -366,10 +318,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/PunchDto'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   /punches/day:
     get:
       description: |
@@ -405,10 +353,6 @@ paths:
           description: An day punches object
           schema:
             $ref: '#/definitions/DayResponse'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   /punches/week:
     get:
       description: |
@@ -438,10 +382,6 @@ paths:
           description: A week punches object
           schema:
             $ref: '#/definitions/WeekResponse'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   /punches/month:
     get:
       description: |
@@ -471,10 +411,6 @@ paths:
           description: A month punches object
           schema:
             $ref: '#/definitions/MonthResponse'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   /punches/year:
     get:
       description: |
@@ -498,10 +434,6 @@ paths:
           description: A year punches object
           schema:
             $ref: '#/definitions/YearResponse'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   /punches/punch/In:
     post:
       description: |
@@ -516,10 +448,6 @@ paths:
           description: Liefert die Tagesstempel zurück
           schema:
             $ref: '#/definitions/DayResponse'
-        default:
-          description: Unexpected error
-          schema:
-              $ref: '#/definitions/OpResult'
   /punches/punch/Out:
     post:
       description: |
@@ -534,10 +462,6 @@ paths:
           description: Liefert die Tagesstempel zurück
           schema:
             $ref: '#/definitions/DayResponse'
-        default:
-          description: Unexpected error
-          schema:
-              $ref: '#/definitions/PunchResponse'
   /punchModify:
     post:
       description: |
@@ -554,10 +478,8 @@ paths:
           schema:
             $ref: '#/definitions/ModifyPunchDto'
       responses:
-        default:
-          description: Unexpected error
-          schema:
-              $ref: '#/definitions/PunchResponse'
+        200:
+          description: Punch modified
   /punchDelete:
     delete:
       description: |
@@ -574,10 +496,8 @@ paths:
           schema:
             $ref: '#/definitions/DeletePunchDto'
       responses:
-        default:
-          description: Unexpected error
-          schema:
-              $ref: '#/definitions/OpResult'
+        200:
+          description: Punch deleted
 ###########                                 PowerUser    ###########            
   /poweruser/users:
     get:
@@ -592,10 +512,6 @@ paths:
           description: Returns users
           schema:
             $ref: '#/definitions/UsersDto'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   /poweruser/punches/month:
     get:
       description: |
@@ -630,10 +546,6 @@ paths:
           description: A month punches object
           schema:
             $ref: '#/definitions/MonthResponse'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/OpResult'
   
   /poweruser/punchModify:
     post:
@@ -650,10 +562,8 @@ paths:
           schema:
             $ref: '#/definitions/ModifyPunchAdminDto'
       responses:
-        default:
-          description: Unexpected error
-          schema:
-              $ref: '#/definitions/PunchResponse'
+        200:
+          description: Punch modified
   /poweruser/setMonthStatus:
     post:
       description: |
@@ -671,10 +581,8 @@ paths:
           schema:
             $ref: '#/definitions/StatusAdminDto'
       responses:
-        default:
-          description: Unexpected error
-          schema:
-              $ref: '#/definitions/PunchResponse'
+        200:
+          description: Month status set
       
 ################################################################################
 #                         Top - Level - Definitions                            #

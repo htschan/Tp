@@ -1,9 +1,10 @@
 // src/services/auth/auth.service.ts
 
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import * as moment from 'moment';
-import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto } from '../../services/api.g';
+import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, ModifyPunchDto, WeekPunchesDto, MonthPunchesDto, YearPunchesDto } from '../../services/api.g';
+export const BUILD_INFO = new InjectionToken<string>('BUILD_INFO');
 
 @Injectable()
 export class PunchService {
@@ -116,7 +117,7 @@ export class PunchService {
         return moment().isAfter(currentYear.getDate(), 'year');
     }
 
-    updatePunch(punchVm: PunchVm): Observable<PunchResponse> {
+    updatePunch(punchVm: PunchVm): Observable<void> {
         let punchDto = new ModifyPunchDto();
         punchDto.punchid = punchVm.id;
         punchDto.direction = punchVm.direction;
@@ -124,7 +125,7 @@ export class PunchService {
         return this.tpClient.punchModify(punchDto);
     }
 
-    deletePunch(punchVm: PunchVm): Observable<OpResult> {
+    deletePunch(punchVm: PunchVm): Observable<void> {
         let punchDto = new DeletePunchDto();
         punchDto.punchid = punchVm.id;
         return this.tpClient.punchDelete(punchDto);

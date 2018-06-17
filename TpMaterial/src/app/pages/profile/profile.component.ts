@@ -21,7 +21,7 @@ export class ProfileComponent implements OnInit {
   version: string;
   buildInfo: string;
 
-  constructor( @Inject(BUILD_INFO) buildInfo: string) {
+  constructor(@Inject(BUILD_INFO) buildInfo: string) {
     this.version = VERSION.full;
     this.buildInfo = buildInfo;
   }
