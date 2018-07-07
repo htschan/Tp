@@ -52,6 +52,7 @@
     "gulp-ssh": "^0.6.0",
     "gulp-util": "^3.0.8",
     "ionic": "^3.19.0",
+    "nswag": "^11.17.19",
     "run-sequence": "^2.2.0",
     "typescript": "2.4.2"
   },

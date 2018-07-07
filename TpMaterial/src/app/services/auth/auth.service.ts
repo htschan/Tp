@@ -3,27 +3,31 @@
 import { Headers, Http } from '@angular/http';
 import { Storage } from '@ionic/storage';
 // import { Events } from 'ionic-angular';
-import { JwtHelper, tokenNotExpired } from 'angular2-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { TpClientConfig } from '../../timepuncher-client-config';
-import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto, UsersDto, UserDto, RoleDto } from '../../services/api.g';
+import {
+    TpUserClient, TpProfileClient, TpPuClient, AuthResponse, CredentialDto,
+    RefreshTokenDto, UsersDto, UserDto, RoleDto
+} from '../../services/client-proxy';
 
-const registerUrl: string = `${TpClientConfig.baserurl}api/v1/accounts`;
+const registerUrl = `${TpClientConfig.baserurl}api/v1/accounts`;
 
 export enum RoleEnum { UserRole, AdminRole, PowerRole }
 
 @Injectable()
 export class AuthService {
 
-    jwtHelper: JwtHelper = new JwtHelper();
+    jwtHelper: JwtHelperService = new JwtHelperService();
     refreshSubscription: any;
     userProfile: Object;
     zoneImpl: NgZone;
     idToken: string;
     initialized = false;
 
-    constructor(private tpClient: TpClient, zone: NgZone/*, public events: Events*/, private http: Http, private storage: Storage) {
+    constructor(private tpClient: TpUserClient, private tpProfileClient: TpProfileClient, private tpPuClient: TpPuClient,
+        zone: NgZone/*, public events: Events*/, private http: Http, private storage: Storage) {
         this.zoneImpl = zone;
         storage.ready()
             // Check if there is a profile saved in storage
@@ -36,8 +40,9 @@ export class AuthService {
                     this.getNewJwt().then(() => {
                         this.initialized = true;
                         this.idToken = token;
-                        if (this.idToken)
+                        if (this.idToken) {
                             this.startupTokenRefresh();
+                        }
                     });
                 });
             });
@@ -47,54 +52,50 @@ export class AuthService {
         return this.getToken()
             .then(token => {
                 return token === null ? Promise.resolve(false)
-                    : this.initialized ? Promise.resolve(tokenNotExpired('id_token', token)) : this.getNewJwt();
+                    : this.initialized ? Promise.resolve(!this.jwtHelper.isTokenExpired(token)) : this.getNewJwt();
             })
-            .catch(() => { return Promise.resolve(false); });
+            .catch(() => Promise.resolve(false));
     }
 
     public getMyProfile(): Observable<any> {
-        return this.tpClient.getMyProfile()
+        return this.tpProfileClient.getProfiles()
             .map(data => {
-                return data.status
+                return data.status;
             })
             .do(profileVm => {
-                this.storage.set("profile", JSON.stringify(profileVm));
+                this.storage.set('profile', JSON.stringify(profileVm));
             });
     }
 
     public puGetUsers(): Observable<UsersVm> {
-        return this.tpClient.puGetUsers().map(usersResponse => {
+        return this.tpPuClient.getUsers().map(usersResponse => {
             return new UsersVm(usersResponse);
-        })
+        });
     }
 
     public hasRole(role: RoleEnum): Promise<boolean> {
         return this.getToken()
             .then(token => {
-                let roleName = "";
+                let roleName = '';
                 switch (role) {
                     case RoleEnum.UserRole:
-                        roleName = "api_access";
+                        roleName = 'api_access';
                         break;
                     case RoleEnum.PowerRole:
-                        roleName = "api_access_power";
+                        roleName = 'api_access_power';
                         break;
                     case RoleEnum.AdminRole:
-                        roleName = "api_access_admin";
+                        roleName = 'api_access_admin';
                         break;
                 }
-                let decodedToken = this.jwtHelper.decodeToken(token);
-                let roles = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+                const decodedToken = this.jwtHelper.decodeToken(token);
+                const roles = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
                 if (roles.indexOf(roleName) >= 0) {
                     return Promise.resolve(true);
                 }
                 return Promise.resolve(false);
             })
-            .catch(() => { return Promise.resolve(false); });
-    }
-
-    public authenticated(): boolean {
-        return tokenNotExpired('id_token', this.idToken);
+            .catch(() => Promise.resolve(false));
     }
 
     public getToken(): Promise<string> {
@@ -103,9 +104,9 @@ export class AuthService {
 
     public login(username: string, password: string): Observable<any> {
         if (username === null || password === null) {
-            return Observable.throw("Bad credentials");
+            return Observable.throw('Bad credentials');
         }
-        return this.tpClient.authenticate({ "username": username, "password": password, client_type: "web" } as CredentialDto)
+        return this.tpClient.authenticate({ 'username': username, 'password': password, client_type: 'web' } as CredentialDto)
             .do(data => {
                 this.storeAuth(data)
                     .then(() =>
@@ -117,21 +118,21 @@ export class AuthService {
                 // this.events.publish('user:login');
                 // return this.getMyProfile();
             },
-            e => console.log("OnError " + e),
-            () => console.log("Authenticate complete"));
+                e => console.log('OnError ' + e),
+                () => console.log('Authenticate complete'));
     }
 
     public register(credentials): Observable<Response> {
         if (credentials.email === null || credentials.password === null) {
-            return Observable.throw("Please insert credentials");
+            return Observable.throw('Please insert credentials');
         } else {
-            var headers = new Headers();
+            const headers = new Headers();
             headers.append('Content-Type', 'application/json');
             return this.http.post(registerUrl, '', { body: credentials, headers: headers })
                 .map(data => data.json())
                 .do(data => {
                     // this.events.publish('user:signup');
-                })
+                });
         }
     }
 
@@ -150,17 +151,17 @@ export class AuthService {
         // If the user is authenticated, use the token stream
         // provided by angular2-jwt and flatMap the token
 
-        let source = Observable.of(this.idToken).flatMap(
+        const source = Observable.of(this.idToken).flatMap(
             token => {
                 console.log('token here', token);
                 // The delay to generate in this case is the difference
                 // between the expiry time and the issued at time
-                let jwtIat = this.jwtHelper.decodeToken(token).iat;
-                let jwtExp = this.jwtHelper.decodeToken(token).exp;
-                let iat = new Date(0);
-                let exp = new Date(0);
+                const jwtIat = this.jwtHelper.decodeToken(token).iat;
+                const jwtExp = this.jwtHelper.decodeToken(token).exp;
+                const iat = new Date(0);
+                const exp = new Date(0);
 
-                let delay = (exp.setUTCSeconds(jwtExp) - iat.setUTCSeconds(jwtIat));
+                const delay = (exp.setUTCSeconds(jwtExp) - iat.setUTCSeconds(jwtIat));
 
                 return Observable.interval(delay);
             });
@@ -174,15 +175,15 @@ export class AuthService {
         // If the user is authenticated, use the token stream
         // provided by angular2-jwt and flatMap the token
         this.getAuthenticated().then(authenticated => {
-            let source = Observable.of(this.idToken).flatMap(
+            const source = Observable.of(this.idToken).flatMap(
                 token => {
                     // Get the expiry time to generate
                     // a delay in milliseconds
-                    let now: number = new Date().valueOf();
-                    let jwtExp: number = this.jwtHelper.decodeToken(token).exp;
-                    let exp: Date = new Date(0);
+                    const now: number = new Date().valueOf();
+                    const jwtExp: number = this.jwtHelper.decodeToken(token).exp;
+                    const exp: Date = new Date(0);
                     exp.setUTCSeconds(jwtExp);
-                    let delay: number = exp.valueOf() - now;
+                    const delay: number = exp.valueOf() - now;
 
                     // Use the delay in a timer to
                     // run the refresh at the proper time
@@ -196,7 +197,7 @@ export class AuthService {
                 this.getNewJwt();
                 this.scheduleRefresh();
             });
-        })
+        });
     }
 
     public unscheduleRefresh() {
@@ -210,15 +211,15 @@ export class AuthService {
         // Get a new JWT using the refresh token saved
         // in storage
         return this.storage.get('refresh_token').then(token => {
-            let refreshTokenDto = new RefreshTokenDto();
+            const refreshTokenDto = new RefreshTokenDto();
             refreshTokenDto.init({ refresh_token: token });
             return this.tpClient.refreshtoken(refreshTokenDto)
                 .do(response => this.storeAuth(response))
                 .map(response => response !== null)
-                .toPromise()
+                .toPromise();
         }).catch(error => {
             console.log(error);
-            return Promise.reject("error");
+            return Promise.reject('error');
         });
     }
 
@@ -275,8 +276,8 @@ export class UserVm {
         this.emailConfirmed = dto.emailConfirmed;
         this.accessFailedCount = dto.accessFailedCount;
         this.roleNames = [];
-        for (let role of dto.roleNames) {
-            this.roleNames.push(new RoleVm(role))
+        for (const role of dto.roleNames) {
+            this.roleNames.push(new RoleVm(role));
         }
     }
 }
@@ -291,8 +292,8 @@ export class UsersVm {
 
     setUser(dto: UsersDto) {
         this.users = [];
-        for (let user of dto.users) {
-            this.users.push(new UserVm(user))
+        for (const user of dto.users) {
+            this.users.push(new UserVm(user));
         }
     }
 }

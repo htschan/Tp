@@ -1,4 +1,4 @@
-import { SessionDto } from "../api.g";
+import { SessionDto } from '../client-proxy';
 
 export class SessionsVm {
   selected: boolean;

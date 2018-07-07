@@ -6,7 +6,10 @@ import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 import { IonicStorageModule } from '@ionic/storage';
 
-import { TpClient, API_BASE_URL } from './services/api.g';
+import {
+  TpAdminClient, TpOtherClient, TpUserClient, TpProfileClient,
+  TpPunchClient, TpPuClient, API_BASE_URL
+} from './services/client-proxy';
 import { TpClientConfig } from './timepuncher-client-config';
 import { PunchService, BUILD_INFO } from './services/puncher/punch.service';
 import { AuthGuard } from './services/auth/auth.guard';
@@ -75,7 +78,12 @@ export function jwtOptionsFactory(tokenService) {
     })],
   providers: [
     AuthGuard,
-    TpClient,
+    TpAdminClient,
+    TpOtherClient,
+    TpUserClient,
+    TpProfileClient,
+    TpPuClient,
+    TpPunchClient,
     AlertService,
     PunchService,
     AuthService,

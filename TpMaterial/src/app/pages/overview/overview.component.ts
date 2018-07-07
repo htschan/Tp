@@ -3,8 +3,11 @@ import { MatIconRegistry, MatDialog } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatTabChangeEvent } from '@angular/material';
 
-import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
-import { WeekPunchesDto, MonthPunchesDto, PunchDto, OpResult, YearPunchesDto } from '../../services/api.g';
+import {
+  PunchService, PunchDayVm, PunchWeekVm, PunchMonthVm, PunchYearVm,
+  PunchVm, EditResultEnum
+} from '../../services/puncher/punch.service';
+import { PunchDto, OpResult } from '../../services/client-proxy';
 import { HtMonthNamePipe } from '../../core/pipes/htmonthname.pipe';
 import { HtWeekNumPipe } from '../../core/pipes/htweeknum.pipe';
 import { PunchEditComponent } from '../../dialog/punchedit.component';
@@ -30,10 +33,10 @@ export class OverviewComponent implements OnInit {
 
   ngOnInit() {
     this.getToday();
-    let dt = new Date();
+    const dt = new Date();
     this.year = dt.getFullYear();
     this.month = dt.getMonth();
-    let pipe = new HtMonthNamePipe();
+    const pipe = new HtMonthNamePipe();
     for (let i = 2015; i <= dt.getFullYear(); i++) {
       this.years.push(i);
     }
@@ -48,7 +51,7 @@ export class OverviewComponent implements OnInit {
       .subscribe(response => {
         this.punchDayVm = response;
       },
-      error => console.log("errrrrrr"));
+        error => console.log('errrrrrr'));
   }
 
   leave() {
@@ -59,14 +62,14 @@ export class OverviewComponent implements OnInit {
   }
 
   addPunch() {
-    let dto = new PunchDto();
-    dto.init({ time: new Date(), timedec: 0.0, direction: false, created: new Date(), punchid: "" });
-    let punchVm = new PunchVm(dto);
+    const dto = new PunchDto();
+    dto.init({ time: new Date(), timedec: 0.0, direction: false, created: new Date(), punchid: '' });
+    const punchVm = new PunchVm(dto);
     this.dialog.open(PunchEditComponent, {
       height: '300px',
       width: '500px',
       data: {
-        punchVm: punchVm, title: "Neue Stempelung"
+        punchVm: punchVm, title: 'Neue Stempelung'
       }
     }).afterClosed()
       .filter(result => !!result)
@@ -87,7 +90,7 @@ export class OverviewComponent implements OnInit {
       width: '500px',
       data: {
         punchVm: punchVm,
-        title: "Stempelung editieren"
+        title: 'Stempelung editieren'
       }
     }).afterClosed()
       .filter(result => !!result)
@@ -95,18 +98,20 @@ export class OverviewComponent implements OnInit {
         switch (editPunchVm.editResult) {
           case EditResultEnum.Delete:
             this.punchService.deletePunch(editPunchVm).subscribe((response: OpResult) => {
-              if (response.success)
+              if (response.success) {
                 this.getToday();
-              else
+              } else {
                 this.handleError(response.result);
+              }
             });
             break;
           case EditResultEnum.Save:
             this.punchService.updatePunch(editPunchVm).subscribe((response: OpResult) => {
-              if (response.success)
+              if (response.success) {
                 this.getToday();
-              else
+              } else {
                 this.handleError(response.result);
+              }
             });
             break;
         }
@@ -114,7 +119,7 @@ export class OverviewComponent implements OnInit {
   }
 
   tabChanged(event: MatTabChangeEvent) {
-    console.log("tabChanged: " + event.index);
+    console.log('tabChanged: ' + event.index);
     switch (event.index) {
       case 0:
         this.getToday();
@@ -144,7 +149,7 @@ export class OverviewComponent implements OnInit {
   }
 
   weekChanged() {
-    let w = new HtWeekNumPipe();
+    const w = new HtWeekNumPipe();
     this.punchService.getWeek(w.transform(this.week), this.year).take(1).subscribe(response =>
       this.punchWeekVm = response
     );

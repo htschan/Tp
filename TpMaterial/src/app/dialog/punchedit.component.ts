@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { PunchVm, EditResultEnum } from "../services/puncher/punch.service";
+import { PunchVm, EditResultEnum } from '../services/puncher/punch.service';
+import * as moment from 'moment';
 
 @Component({
   templateUrl: 'punchedit.component.html'
@@ -11,11 +12,11 @@ export class PunchEditComponent {
   isDarkTheme = true;
   punchVm: PunchVm;
   title: string;
-  
+
   constructor(public dialogRef: MatDialogRef<PunchEditComponent>, @Inject(MAT_DIALOG_DATA) public dlgData: any) {
     this.punchVm = dlgData.punchVm;
     this.title = dlgData.title;
-    this.punchTime = this.punchVm.time.toLocaleTimeString();
+    this.punchTime = moment.utc(this.punchVm.time).local().format('HH:mm:ss');
     this.time = this.punchTime;
   }
 

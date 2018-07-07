@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs/Rx'
+import { Observable, Subject } from 'rxjs/Rx';
 
-import { TpClient, UsersDto, SessionsDto, OpResult } from '../api.g';
+import { TpAdminClient, UsersDto, SessionsDto, OpResult } from '../client-proxy';
 import { UsersVm } from './usersVm';
 import { SessionsVm } from './sessionsVm';
 
@@ -9,7 +9,7 @@ import { SessionsVm } from './sessionsVm';
 export class AdminService {
   public usersSubject: Subject<any>;
 
-  constructor(private tpClient: TpClient) {
+  constructor(private tpClient: TpAdminClient) {
     this.usersSubject = new Subject();
   }
 
@@ -17,7 +17,7 @@ export class AdminService {
   sessions: SessionsVm[];
 
   getUsers(): Observable<UsersVm[]> {
-    return this.tpClient.adminGetUsers()
+    return this.tpClient.getUsers()
       .map(this.mapToUsers)
       .do(data => {
         this.users = data;
@@ -27,7 +27,7 @@ export class AdminService {
   }
 
   getSessions(): Observable<SessionsVm[]> {
-    return this.tpClient.adminGetSessions()
+    return this.tpClient.getSessions()
       .map(this.mapToSessions)
       .do(data => {
         this.sessions = data;
@@ -37,10 +37,10 @@ export class AdminService {
   }
 
   private mapToUsers(rawUsers: UsersDto): Array<UsersVm> {
-    return rawUsers.users.map(it => new UsersVm(it))
+    return rawUsers.users.map(it => new UsersVm(it));
   }
 
   private mapToSessions(rawSessions: SessionsDto): Array<SessionsVm> {
-    return rawSessions.sessions.map(it => new SessionsVm(it))
+    return rawSessions.sessions.map(it => new SessionsVm(it));
   }
 }

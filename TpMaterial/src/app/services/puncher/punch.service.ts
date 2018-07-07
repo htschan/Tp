@@ -3,40 +3,41 @@
 import { Injectable, InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import * as moment from 'moment';
-import { TpClient, PunchDto, DayPunchesDto, DeletePunchDto, PunchResponse, ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto, StatusAdminDto } from '../../services/api.g';
+import { TpPunchClient, TpPuClient, PunchDto, DayPunchesDto, DeletePunchDto } from '../../services/client-proxy';
+import { ModifyPunchDto, OpResult, WeekPunchesDto, MonthPunchesDto, YearPunchesDto, StatusAdminDto } from '../../services/client-proxy';
 export const BUILD_INFO = new InjectionToken<string>('BUILD_INFO');
 
 @Injectable()
 export class PunchService {
 
-    constructor(private tpClient: TpClient) {
+    constructor(private tpClient: TpPunchClient, private tpPuClient: TpPuClient) {
     }
 
     punch(dir: string): Observable<PunchDayVm> {
-        return dir === "In" ? this.tpClient.punchIn().map(dayResponse => {
+        return dir === 'In' ? this.tpClient.punchIn().map(dayResponse => {
             return new PunchDayVm(dayResponse.punches);
         },
-            e => console.log("error punchin")) : this.tpClient.punchOut().map(dayResponse => {
+            e => console.log('error punchin')) : this.tpClient.punchOut().map(dayResponse => {
                 return new PunchDayVm(dayResponse.punches);
             });
     }
 
     getDay(day: number | undefined, month: number | undefined, year: number | undefined): Observable<PunchDayVm> {
-        return this.tpClient.getDay(day, month, year).map(dayResponse => {
+        return this.tpClient.getDayPunches(day, month, year).map(dayResponse => {
             return new PunchDayVm(dayResponse.punches);
         });
     }
 
     getPreviousDay(currentDay: PunchDayVm): Observable<PunchDayVm> {
-        let d = currentDay.getPreviousDay();
-        return this.tpClient.getDay(d.getDate(), d.getMonth() + 1, d.getFullYear()).map(dayResponse => {
+        const d = currentDay.getPreviousDay();
+        return this.tpClient.getDayPunches(d.getDate(), d.getMonth() + 1, d.getFullYear()).map(dayResponse => {
             return new PunchDayVm(dayResponse.punches);
         });
     }
 
     getNextDay(currentDay: PunchDayVm): Observable<PunchDayVm> {
-        let d = currentDay.getNextDay();
-        return this.tpClient.getDay(d.getDate(), d.getMonth() + 1, d.getFullYear()).map(dayResponse => {
+        const d = currentDay.getNextDay();
+        return this.tpClient.getDayPunches(d.getDate(), d.getMonth() + 1, d.getFullYear()).map(dayResponse => {
             return new PunchDayVm(dayResponse.punches);
         });
     }
@@ -46,21 +47,21 @@ export class PunchService {
     }
 
     getWeek(week: number | undefined, year: number | undefined): Observable<PunchWeekVm> {
-        return this.tpClient.getWeek(week, year).map(weekResponse => {
+        return this.tpClient.getWeekPunches(week, year).map(weekResponse => {
             return new PunchWeekVm(weekResponse.punches);
         });
     }
 
     getPreviousWeek(currentWeek: PunchWeekVm): Observable<PunchWeekVm> {
-        let d = currentWeek.getPreviousWeek();
-        return this.tpClient.getWeek(moment(d).isoWeek(), d.getFullYear()).map(dayResponse => {
+        const d = currentWeek.getPreviousWeek();
+        return this.tpClient.getWeekPunches(moment(d).isoWeek(), d.getFullYear()).map(dayResponse => {
             return new PunchWeekVm(dayResponse.punches);
         });
     }
 
     getNextWeek(currentWeek: PunchWeekVm): Observable<PunchWeekVm> {
-        let d = currentWeek.getNextWeek();
-        return this.tpClient.getWeek(moment(d).isoWeek(), d.getFullYear()).map(dayResponse => {
+        const d = currentWeek.getNextWeek();
+        return this.tpClient.getWeekPunches(moment(d).isoWeek(), d.getFullYear()).map(dayResponse => {
             return new PunchWeekVm(dayResponse.punches);
         });
     }
@@ -70,27 +71,27 @@ export class PunchService {
     }
 
     getMonth(month: number | undefined, year: number | undefined): Observable<PunchMonthVm> {
-        return this.tpClient.getMonth(month, year).map(monthResponse => {
+        return this.tpClient.getMonthPunches(month, year).map(monthResponse => {
             return new PunchMonthVm(monthResponse.punches);
         });
     }
 
     puGetMonth(userId: string, month: number | undefined, year: number | undefined): Observable<PunchMonthVm> {
-        return this.tpClient.puGetMonth(userId, month, year).map(monthResponse => {
+        return this.tpPuClient.getMonthPunches(userId, month, year).map(monthResponse => {
             return new PunchMonthVm(monthResponse.punches);
         });
     }
 
     getPreviousMonth(currentMonth: PunchMonthVm): Observable<PunchMonthVm> {
-        let d = currentMonth.getPreviousMonth();
-        return this.tpClient.getMonth(d.getMonth() + 1, d.getFullYear()).map(monthResponse => {
+        const d = currentMonth.getPreviousMonth();
+        return this.tpClient.getMonthPunches(d.getMonth() + 1, d.getFullYear()).map(monthResponse => {
             return new PunchMonthVm(monthResponse.punches);
         });
     }
 
     getNextMonth(currentMonth: PunchMonthVm): Observable<PunchMonthVm> {
-        let d = currentMonth.getNextMonth();
-        return this.tpClient.getMonth(d.getMonth() + 1, d.getFullYear()).map(monthResponse => {
+        const d = currentMonth.getNextMonth();
+        return this.tpClient.getMonthPunches(d.getMonth() + 1, d.getFullYear()).map(monthResponse => {
             return new PunchMonthVm(monthResponse.punches);
         });
     }
@@ -100,21 +101,21 @@ export class PunchService {
     }
 
     getYear(year: number | undefined): Observable<PunchYearVm> {
-        return this.tpClient.getYear(year).map(yearResponse => {
+        return this.tpClient.getYearPunches(year).map(yearResponse => {
             return new PunchYearVm(yearResponse.punches);
         });
     }
 
     getPreviousYear(currentYear: PunchYearVm): Observable<PunchYearVm> {
-        let d = currentYear.getPreviousYear();
-        return this.tpClient.getYear(d.getFullYear()).map(yearResponse => {
+        const d = currentYear.getPreviousYear();
+        return this.tpClient.getYearPunches(d.getFullYear()).map(yearResponse => {
             return new PunchYearVm(yearResponse.punches);
         });
     }
 
     getNextYear(currentYear: PunchYearVm): Observable<PunchYearVm> {
-        let d = currentYear.getNextYear();
-        return this.tpClient.getYear(d.getFullYear()).map(yearResponse => {
+        const d = currentYear.getNextYear();
+        return this.tpClient.getYearPunches(d.getFullYear()).map(yearResponse => {
             return new PunchYearVm(yearResponse.punches);
         });
     }
@@ -124,7 +125,7 @@ export class PunchService {
     }
 
     updatePunch(punchVm: PunchVm): Observable<any> {
-        let punchDto = new ModifyPunchDto();
+        const punchDto = new ModifyPunchDto();
         punchDto.punchid = punchVm.id;
         punchDto.direction = punchVm.direction;
         punchDto.timedec = punchVm.timedec;
@@ -132,13 +133,13 @@ export class PunchService {
     }
 
     deletePunch(punchVm: PunchVm): Observable<any> {
-        let punchDto = new DeletePunchDto();
+        const punchDto = new DeletePunchDto();
         punchDto.punchid = punchVm.id;
         return this.tpClient.punchDelete(punchDto);
     }
 
     setStatusAdmin(state: StatusAdminDto): Observable<any> {
-        return this.tpClient.puSetMonthStatus(state);
+        return this.tpPuClient.setMonthStatus(state);
     }
 }
 
@@ -153,12 +154,12 @@ export class PunchVm {
         this.directionEdit = punchDto.direction;
     }
     id: string;
-    time?: Date | undefined;
+    time?: moment.Moment | undefined;
     timedec?: number | undefined;
     /** True means enter work, False means leave work. */
     direction?: boolean | undefined;
 
-    timeEdit?: Date | undefined;
+    timeEdit?: moment.Moment | undefined;
     timedecEdit?: number | undefined;
     directionEdit?: boolean | undefined;
     editResult: EditResultEnum = EditResultEnum.Undefined;
@@ -180,24 +181,29 @@ export enum EditResultEnum {
 }
 
 export class PunchRowVm {
-    calcSum() {
-        if (this.enter && this.leave)
-            this.sum = this.leave.timedec - this.enter.timedec;
-    }
     enter?: PunchVm | undefined;
     leave?: PunchVm | undefined;
-    sum?: number = 0.0;
+    sum = 0.0;
+
+    calcSum() {
+        if (this.enter && this.leave) {
+            this.sum = this.leave.timedec - this.enter.timedec;
+        }
+    }
 }
 
 export class PunchDayVm {
+    punchRow?: PunchRowVm[] = [];
+    daySum?: number;
+    date?: Date | undefined;
 
     constructor(dto: DayPunchesDto) {
         this.setDayPunches(dto);
     }
 
     setDayPunches(dto: DayPunchesDto) {
-        for (let punch of dto.punches) {
-            let vm = new PunchRowVm();
+        for (const punch of dto.punches) {
+            const vm = new PunchRowVm();
             vm.enter = punch.enter ? new PunchVm(punch.enter) : null;
             vm.leave = punch.leave ? new PunchVm(punch.leave) : null;
             vm.sum = punch.rowTotal;
@@ -206,9 +212,6 @@ export class PunchDayVm {
         this.daySum = dto.daytotal;
         this.date = new Date(dto.year, dto.month - 1, dto.day);
     }
-    punchRow?: PunchRowVm[] = [];
-    daySum?: number;
-    date?: Date | undefined;
 
     getPreviousDay(): Date {
         return moment(this.date).subtract(1, 'day').toDate();
@@ -224,25 +227,25 @@ export class PunchDayVm {
 }
 
 export class PunchWeekVm {
+    punchDays?: PunchDayVm[] = [];
+    weekSum = 0.0;
+    week: number;
+    year: number;
+
 
     constructor(dto: DayPunchesDto) {
         this.setWeekPunches(dto);
     }
 
     setWeekPunches(dto: WeekPunchesDto) {
-        for (let dayPunchesDto of dto.dayPunches) {
-            let vm = new PunchDayVm(dayPunchesDto);
+        for (const dayPunchesDto of dto.dayPunches) {
+            const vm = new PunchDayVm(dayPunchesDto);
             this.weekSum += vm.daySum;
             this.punchDays.push(vm);
         }
         this.week = dto.week;
         this.year = dto.year;
     }
-
-    punchDays?: PunchDayVm[] = [];
-    weekSum: number = 0.0;
-    week: number;
-    year: number;
 
     getPreviousWeek(): Date {
         return moment(this.getDate()).subtract(1, 'week').toDate();
@@ -253,7 +256,7 @@ export class PunchWeekVm {
     }
 
     getDate(): Date {
-        let d = moment();
+        const d = moment();
         d.year(this.year);
         d.isoWeek(this.week);
         return d.toDate();
@@ -261,14 +264,20 @@ export class PunchWeekVm {
 }
 
 export class PunchMonthVm {
+    punchDays?: PunchDayVm[] = [];
+    monthSum = 0.0;
+    month: number;
+    year: number;
+    state: StatusAdminDto;
+
 
     constructor(dto: MonthPunchesDto) {
         this.setMonthPunches(dto);
     }
 
     setMonthPunches(dto: MonthPunchesDto) {
-        for (let dayPunchesDto of dto.punches) {
-            let vm = new PunchDayVm(dayPunchesDto);
+        for (const dayPunchesDto of dto.punches) {
+            const vm = new PunchDayVm(dayPunchesDto);
             this.monthSum += vm.daySum;
             this.punchDays.push(vm);
         }
@@ -276,12 +285,6 @@ export class PunchMonthVm {
         this.year = dto.year;
         this.state = dto.state;
     }
-
-    punchDays?: PunchDayVm[] = [];
-    monthSum: number = 0.0;
-    month: number;
-    year: number;
-    state: StatusAdminDto;
 
     getPreviousMonth(): Date {
         return moment(this.getDate()).subtract(1, 'month').toDate();
@@ -292,7 +295,7 @@ export class PunchMonthVm {
     }
 
     getDate(): Date {
-        let d = moment();
+        const d = moment();
         d.year(this.year);
         d.month(this.month - 1);
         return d.toDate();
@@ -300,23 +303,22 @@ export class PunchMonthVm {
 }
 
 export class PunchYearVm {
+    punchMonths?: PunchMonthVm[] = [];
+    yearSum = 0.0;
+    year: number;
 
     constructor(dto: YearPunchesDto) {
         this.setYearPunches(dto);
     }
 
     setYearPunches(dto: YearPunchesDto) {
-        for (let monthPunchesDto of dto.punches) {
-            let vm = new PunchMonthVm(monthPunchesDto);
+        for (const monthPunchesDto of dto.punches) {
+            const vm = new PunchMonthVm(monthPunchesDto);
             this.yearSum += vm.monthSum;
             this.punchMonths.push(vm);
         }
         this.year = dto.year;
     }
-
-    punchMonths?: PunchMonthVm[] = [];
-    yearSum: number = 0.0;
-    year: number;
 
     getPreviousYear(): Date {
         return moment(this.getDate()).subtract(1, 'year').toDate();
@@ -327,7 +329,7 @@ export class PunchYearVm {
     }
 
     getDate(): Date {
-        let d = moment();
+        const d = moment();
         d.year(this.year);
         return d.toDate();
     }

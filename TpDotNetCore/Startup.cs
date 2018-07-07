@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
-using Swashbuckle.AspNetCore.Swagger;
 using TpDotNetCore.Data;
 using TpDotNetCore.Helpers;
 using TpDotNetCore.Auth;
@@ -18,6 +17,10 @@ using TpDotNetCore.Domain.Punches;
 using System.Security.Claims;
 using TpDotNetCore.Domain;
 using Common.Communication;
+using NSwag.AspNetCore;
+using NSwag.SwaggerGeneration.Processors.Security;
+using NSwag;
+using NJsonSchema;
 
 namespace TpDotNetCore
 {
@@ -61,7 +64,12 @@ namespace TpDotNetCore
 
             services.AddTransient<IJwtFactory, JwtFactory>();
 
-            services.AddTransient<ITpController, TpControllerImpl>();
+            services.AddTransient<ITpUserController, TpUserControllerImpl>();
+            services.AddTransient<ITpProfileController, TpProfileControllerImpl>();
+            services.AddTransient<ITpAdminController, TpAdminControllerImpl>();
+            services.AddTransient<ITpPunchController, TpPunchControllerImpl>();
+            services.AddTransient<ITpPuController, TpPuControllerImpl>();
+            services.AddTransient<ITpOtherController, TpOtherControllerImpl>();
             services.AddSingleton<IHolidayService, HolidayService>();
             services.AddSingleton<ITimeService, TimeService>();
             services.AddTransient<AppUser>();
@@ -103,11 +111,7 @@ namespace TpDotNetCore
             // Add framework services.
             services.AddMvc();
 
-            // Register the Swagger generator, defining one or more Swagger documents
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info { Title = "Timepuncher", Version = "v1" });
-            });
+            services.AddSwagger(); // only needed for the UseSwaggger*WithApiExplorer() methods (below)
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -121,7 +125,7 @@ namespace TpDotNetCore
 
             app.UseRewriter(new RewriteOptions().Add(new Rewriter
             {
-                ExcludeLocalhost = false
+                ExcludeLocalhost = true
             }));
 
             dbInitializer.Initialize();
@@ -130,13 +134,50 @@ namespace TpDotNetCore
 
             app.UseMvc();
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
+            // API Explorer based (new)
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
+            // Swagger v2.0
+
+            app.UseSwaggerUiWithApiExplorer(s =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimePuncher API V1");
+                s.SwaggerRoute = "/swagger_new_ui/v1/swagger.json";
+                s.SwaggerUiRoute = "/swagger_new_ui";
+
+                s.GeneratorSettings.DocumentProcessors.Add(new SecurityDefinitionAppender("TEST_HEADER", new SwaggerSecurityScheme
+                {
+                    Type = SwaggerSecuritySchemeType.ApiKey,
+                    Name = "TEST_HEADER",
+                    In = SwaggerSecurityApiKeyLocation.Header,
+                    Description = "TEST_HEADER"
+                }));
+            });
+
+            app.UseSwaggerUi3WithApiExplorer(s =>
+            {
+                s.SwaggerRoute = "/swagger_new_ui3/v1/swagger.json";
+                s.SwaggerUiRoute = "/swagger_new_ui3";
+
+                s.GeneratorSettings.DocumentProcessors.Add(new SecurityDefinitionAppender("TEST_HEADER", new SwaggerSecurityScheme
+                {
+                    Type = SwaggerSecuritySchemeType.ApiKey,
+                    Name = "TEST_HEADER",
+                    In = SwaggerSecurityApiKeyLocation.Header,
+                    Description = "TEST_HEADER"
+                }));
+            });
+
+            app.UseSwaggerReDocWithApiExplorer(s =>
+            {
+                s.SwaggerRoute = "/swagger_new_redoc/v1/swagger.json";
+                s.SwaggerUiRoute = "/swagger_new_redoc";
+            });
+
+            // Swagger 3.0
+
+            app.UseSwaggerWithApiExplorer(s =>
+            {
+                s.GeneratorSettings.SchemaType = SchemaType.OpenApi3;
+                s.SwaggerRoute = "/swagger_new_v3/v1/swagger.json";
             });
         }
     }

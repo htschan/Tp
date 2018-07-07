@@ -4,8 +4,8 @@ import { MatSnackBar } from '@angular/material';
 
 import { AlertService } from '../../services/alert/alert.service';
 import { AuthService } from '../../services/auth/auth.service';
-import { AuthResponse } from "../../services/api.g";
-import { Subject } from "rxjs";
+import { AuthResponse } from '../../services/client-proxy';
+import { Subject } from 'rxjs';
 
 @Component({
     moduleId: module.id,
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
         this.alertService.getMessage().subscribe(message => {
             if (message) {
                 let ar: AuthResponse = message.text;
-                this.snackBar.open(ar.status.result, "error", { duration: 2000 });
+                this.snackBar.open(ar.status.result, 'error', { duration: 2000 });
             }
         })
     }

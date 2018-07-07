@@ -36,11 +36,19 @@ Open browser and point it to http://localhost:5000
 
 
 -----------------------------------
-Install Swashbuckle Swagger API documentation
+Install Swagger and SwaggerUI
 
-https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger
-https://github.com/domaindrivendev/Swashbuckle
+Provides Api Explorer and swagger.json generator capability
 
+https://github.com/RSuter/NSwag/wiki/Middlewares
+
+The URL's are:
+http://localhost:5000/swagger_new_ui/v1/swagger.json
+http://localhost:5000/swagger_new_ui
+http://localhost:5000/swagger_new_ui3/v1/swagger.json
+http://localhost:5000/swagger_new_ui3
+http://localhost:5000/swagger_new_redoc
+http://localhost:5000/swagger_new_redoc/v1/swagger.json
 
 
 -----------------------------------
@@ -67,10 +75,6 @@ Follow this article for User authentication with Angular and ASP.NET Core with R
 http://www.c-sharpcorner.com/article/handle-refresh-token-using-asp-net-core-2-0-and-json-web-token/
 https://blog.ionic.io/ionic-2-and-auth0/
 
-/* obsolete
-https://fullstackmark.com/post/10/user-authentication-with-angular-and-asp-net-core#create-new-users
-https://goblincoding.com/2016/07/03/issuing-and-authenticating-jwt-tokens-in-asp-net-core-webapi-part-i/
-/*
 
 # ASP.NET Core Security
 https://docs.microsoft.com/en-us/aspnet/core/security/

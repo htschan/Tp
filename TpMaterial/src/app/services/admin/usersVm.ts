@@ -1,4 +1,4 @@
-import { UserDto } from "../api.g";
+import { UserDto } from '../client-proxy';
 
 export class UsersVm {
   selected: boolean;
@@ -17,7 +17,7 @@ export class UsersVm {
     this.email = user.email;
     this.emailConfirmed = user.emailConfirmed;
     this.roles = "";
-    for (let roleName of user.roleNames) {
+    for (const roleName of user.roleNames) {
       this.roles += roleName.name + '; ';
     }
   }
