@@ -244,10 +244,6 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
-angular2-jwt@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/angular2-jwt/-/angular2-jwt-0.2.3.tgz#54efdda3ceedba85f6a37b165f22ac22b8adf021"
-
 ansi-cyan@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ansi-cyan/-/ansi-cyan-0.1.1.tgz#538ae528af8982f28ae30d86f2f17456d2609873"
@@ -2495,7 +2491,7 @@ ionic-plugin-keyboard@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/ionic-plugin-keyboard/-/ionic-plugin-keyboard-2.2.1.tgz#f2a9e169bbe9b5522400347c9fd6d3467ee3fa12"
 
-ionic@^3.19.0:
+ionic@3.20.0:
   version "3.20.0"
   resolved "https://registry.yarnpkg.com/ionic/-/ionic-3.20.0.tgz#3ea2b56d37f1efbb0dc5cdde781fa914207c10fa"
   dependencies:
@@ -3580,6 +3576,10 @@ npm-run-path@^2.0.0:
     console-control-strings "~1.1.0"
     gauge "~2.7.3"
     set-blocking "~2.0.0"
+
+nswag@^11.17.19:
+  version "11.17.19"
+  resolved "https://registry.yarnpkg.com/nswag/-/nswag-11.17.19.tgz#9b5dd6bee379feee30e84b9e1229faf8cba33c66"
 
 num2fraction@^1.2.2:
   version "1.2.2"

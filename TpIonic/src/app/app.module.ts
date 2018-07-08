@@ -7,7 +7,7 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 import { JwtModule, JWT_OPTIONS } from '@auth0/angular-jwt';
 
-import { TpClient, API_BASE_URL } from '../services/api.g';
+import { TpPunchClient, TpProfilesClient, TpUserClient, API_BASE_URL } from '../app/services/client-proxy';
 import { TpClientConfig } from '../timepuncher-client-config';
 import { PunchService, BUILD_INFO } from '../services/puncher/punch.service';
 import { AuthService } from '../services/auth/auth.service';
@@ -100,7 +100,9 @@ export function jwtOptionsFactory(tokenService) {
       provide: BUILD_INFO,
       useValue: TpClientConfig.bts
     },
-    TpClient,
+    TpPunchClient,
+    TpProfilesClient,
+    TpUserClient,
     AuthService,
     PunchService,
     SampleService

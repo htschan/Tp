@@ -3,7 +3,7 @@ import { Events, NavController, NavParams, AlertController, LoadingController, L
 import { RegisterPage } from '../register/register';
 import { TabsPage } from '../tabs/tabs';
 import { AuthService } from '../../services/auth/auth.service';
-import { AuthResponse } from "../../services/api.g";
+import { AuthResponse } from "../../app/services/client-proxy";
 
 @Component({
   selector: 'page-login',

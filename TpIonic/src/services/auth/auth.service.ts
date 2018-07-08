@@ -3,11 +3,11 @@
 import { Headers, Http } from '@angular/http';
 import { Storage } from '@ionic/storage';
 import { Events } from 'ionic-angular';
-import { JwtHelper, tokenNotExpired } from 'angular2-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { TpClientConfig } from '../../timepuncher-client-config';
-import { TpClient, AuthResponse, CredentialDto, RefreshTokenDto, ProfileResponseDto } from '../../services/api.g';
+import { TpUserClient, TpProfilesClient, AuthResponse, CredentialDto, RefreshTokenDto, ProfileResponseDto } from '../../app/services/client-proxy';
 
 const registerUrl: string = `${TpClientConfig.baserurl}api/v1/accounts`;
 
@@ -16,14 +16,15 @@ export enum RoleEnum { UserRole, AdminRole }
 @Injectable()
 export class AuthService {
 
-    jwtHelper: JwtHelper = new JwtHelper();
+    jwtHelper: JwtHelperService = new JwtHelperService();
     refreshSubscription: any;
     userProfile: ProfileVm;
     zoneImpl: NgZone;
     idToken: string;
     initialized = false;
 
-    constructor(private tpClient: TpClient, zone: NgZone, public events: Events, private http: Http, private storage: Storage) {
+    constructor(private tpClient: TpUserClient, private tpProfileClient: TpProfilesClient,
+        zone: NgZone, public events: Events, private http: Http, private storage: Storage) {
         this.zoneImpl = zone;
         storage.ready()
             // Check if there is a profile saved in storage
@@ -47,13 +48,13 @@ export class AuthService {
         return this.getToken()
             .then(token => {
                 return token === null ? Promise.resolve(false)
-                    : this.initialized ? Promise.resolve(tokenNotExpired('id_token', token)) : this.getNewJwt();
+                    : this.initialized ? Promise.resolve(!this.jwtHelper.isTokenExpired(token)) : this.getNewJwt();
             })
             .catch(() => { return Promise.resolve(false); });
     }
 
     public getMyProfile(): Observable<ProfileVm> {
-        return this.tpClient.getMyProfile()
+        return this.tpProfileClient.myprofile()
             .map(data => {
                 return new ProfileVm(data);
             })
@@ -82,10 +83,6 @@ export class AuthService {
                 return Promise.resolve(false);
             })
             .catch(() => { return Promise.resolve(false); });
-    }
-
-    public authenticated(): boolean {
-        return tokenNotExpired('id_token', this.idToken);
     }
 
     public getToken(): Promise<string> {
@@ -176,7 +173,7 @@ export class AuthService {
                     exp.setUTCSeconds(jwtExp);
                     let delay: number = exp.valueOf() - now;
                     this.events.publish('user:login', decoded.nameid, Date.now());
-                    
+
                     // Use the delay in a timer to
                     // run the refresh at the proper time
                     return Observable.timer(delay);

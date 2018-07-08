@@ -1630,9 +1630,9 @@ export class TpUserClient {
 
 export class WeatherForecast implements IWeatherForecast {
     dateFormatted?: string | undefined;
-    temperatureC!: number;
+    temperatureC: number;
     summary?: string | undefined;
-    temperatureF!: number;
+    temperatureF: number;
 
     constructor(data?: IWeatherForecast) {
         if (data) {

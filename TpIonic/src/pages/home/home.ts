@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Events, Slides, ModalController, ToastController, AlertController } from 'ionic-angular';
 import { PunchService, PunchDayVm, PunchVm, EditResultEnum, PunchWeekVm, PunchMonthVm, PunchYearVm } from '../../services/puncher/punch.service';
-import { PunchDto, OpResult } from '../../services/api.g';
+import { PunchDto } from '../../app/services/client-proxy';
 import { PunchEditModal } from '../punchedit/punchedit';
 import { NavGuard } from '../support/nav.guard';
 import { AuthService } from '../../services/auth/auth.service';
@@ -73,20 +73,20 @@ export class HomePage extends NavGuard {
     timeEditModal.onDidDismiss((editPunchVm: PunchVm) => {
       switch (editPunchVm.editResult) {
         case EditResultEnum.Delete:
-          this.punchService.deletePunch(editPunchVm).subscribe((response: OpResult) => {
-            if (response.success)
-              this.getToday();
-            else
-              this.handleError(response.result);
-          });
+          this.punchService.deletePunch(editPunchVm).subscribe(() => {
+            this.getToday();
+          },
+            error => {
+              this.handleError(error);
+            });
           break;
         case EditResultEnum.Save:
-          this.punchService.updatePunch(editPunchVm).subscribe((response: OpResult) => {
-            if (response.success)
-              this.getToday();
-            else
-              this.handleError(response.result);
-          });
+          this.punchService.updatePunch(editPunchVm).subscribe(() => {
+            this.getToday();
+          },
+            error => {
+              this.handleError(error);
+            });
           break;
       }
     })

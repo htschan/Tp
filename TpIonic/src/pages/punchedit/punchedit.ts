@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Platform, NavParams, ViewController } from 'ionic-angular';
 import { PunchVm, EditResultEnum } from "../../services/puncher/punch.service";
+import * as moment from 'moment';
 
 @Component({
     templateUrl: 'punchedit.html'
@@ -19,7 +20,7 @@ export class PunchEditModal {
     ) {
         this.punchVm = params.get('punchVm');
         this.title = params.get('title');
-        this.punchTime = this.punchVm.time.toLocaleTimeString();
+        this.punchTime = moment.utc(this.punchVm.time).local().format('HH:mm:ss');
         this.time = this.punchTime;
     }
 
