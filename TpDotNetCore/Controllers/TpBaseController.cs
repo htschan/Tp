@@ -23,5 +23,25 @@ namespace TpDotNetCore.Controllers
             var authResponse = new { Status = new { Success = false, Result = errors.TrimEnd(new[] { ';', ' ' }) } };
             return new ObjectResult(authResponse) { StatusCode = 404 };
         }
+
+        protected IActionResult ProcessResponse<T>(SwaggerResponse<T> result)
+        {
+            foreach (var header in result.Headers)
+                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+            if (result.StatusCode == 200)
+                return Ok(result.Result);
+            else
+                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+        }
+
+        protected IActionResult ProcessResponse(SwaggerResponse result)
+        {
+            foreach (var header in result.Headers)
+                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
+            if (result.StatusCode == 200)
+                return Ok();
+            else
+                return new ObjectResult(result.StatusCode) { StatusCode = result.StatusCode };
+        }
     }
 }

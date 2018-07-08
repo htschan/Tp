@@ -49,17 +49,10 @@ namespace TpDotNetCore.Controllers
         [Authorize(Policy = "RequireApiPowerRole")]
         [HttpGet, Route("getUsers")]
         [SwaggerResponse("200", typeof(UsersDto))]
-        [SwaggerOperationAttribute("puGetUsers")]
         public async Task<IActionResult> PuGetUsers()
         {
             var result = await _implementation.PuGetUsersAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<UsersDto>(result);
         }
 
         /// <summary>Retrieves all punches of current user of selected month</summary>
@@ -69,17 +62,10 @@ namespace TpDotNetCore.Controllers
         /// <returns>A month punches object</returns>
         [HttpGet, Route("getMonthPunches")]
         [SwaggerResponse("200", typeof(MonthResponse))]
-        [SwaggerOperationAttribute("puGetMonth")]
         public async Task<IActionResult> PuGetMonth(string userId, double? month, double? year)
         {
             var result = await _implementation.PuGetMonthAsync(userId, month, year).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<MonthResponse>(result);
         }
 
         /// <summary>Modifiziert einen Zeitstempel [Authorize(Policy = "RequireApiPowerRole")]</summary>
@@ -87,18 +73,11 @@ namespace TpDotNetCore.Controllers
         [Authorize(Policy = "RequireApiPowerRole")]
         [HttpPost, Route("punchModify")]
         [SwaggerResponse("200", typeof(void))]
-        [SwaggerOperationAttribute("puModifyPunch")]
         public async Task<IActionResult> PuModifyPunch([FromBody] ModifyPunchAdminDto modifyPunchAdminDto)
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PuModifyPunchAsync(modifyPunchAdminDto).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok();
-            else
-                return new ObjectResult(result.StatusCode) { StatusCode = result.StatusCode };
+            return ProcessResponse(result);
         }
 
         /// <summary>Setzt den Status der Monatsabrechung [Authorize(Policy = "RequireApiPowerRole")]</summary>
@@ -106,18 +85,11 @@ namespace TpDotNetCore.Controllers
         [Authorize(Policy = "RequireApiPowerRole")]
         [HttpPost, Route("setMonthStatus")]
         [SwaggerResponse("200", typeof(void))]
-        [SwaggerOperationAttribute("puSetMonthStatus")]
         public async Task<IActionResult> PuSetMonthStatus([FromBody] StatusAdminDto setStatusAdminDto)
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PuSetMonthStatusAsync(setStatusAdminDto).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok();
-            else
-                return new ObjectResult(result.StatusCode) { StatusCode = result.StatusCode };
+            return ProcessResponse(result);
         }
     }
 }

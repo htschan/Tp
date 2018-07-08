@@ -72,13 +72,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.AuthenticateAsync(credentials).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<AuthResponse>(result);
         }
 
         /// <summary>Sendet eine RefreshToken Abfrage an den Server [AllowAnonymous]</summary>
@@ -92,13 +86,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.RefreshtokenAsync(refreshtokenparameter).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<AuthResponse>(result);
         }
 
         /// <summary>Einen Benutzer registrieren [AllowAnonymous]</summary>
@@ -111,13 +99,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.RegisterUserAsync(registerDto).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<RegisterResponse>(result);
         }
 
         /// <summary>Eine Benutzerregistrierung bestätigen [AllowAnonymous]</summary>
@@ -130,13 +112,7 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> ConfirmRegister(string id, string cnf)
         {
             var result = await _implementation.ConfirmRegisterAsync(id, cnf).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<ConfirmResponse>(result);
         }
 
         /// <summary>Passwort wiederherstellen [AllowAnonymous]</summary>
@@ -149,13 +125,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.RecoverPasswordAsync(recoverPasswordParams).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<RecoverPasswordResponse>(result);
         }
 
         /// <summary>Abfrage des Usernamens [AllowAnonymous]</summary>
@@ -168,13 +138,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.RecoverUsernameAsync(recoverUsernameParams).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<RecoverUsernameResponse>(result);
         }
 
         /// <summary>Ein Benutzer setzt ein neues Passwort [AllowAnonymous]</summary>
@@ -187,13 +151,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.SetPasswordAsync(setPasswordParams).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<SetPasswordResponse>(result);
         }
     }
 }

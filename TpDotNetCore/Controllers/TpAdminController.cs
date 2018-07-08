@@ -38,17 +38,10 @@ namespace TpDotNetCore.Controllers
         [Authorize(Policy = "RequireApiAdminRole")]
         [HttpGet, Route("getUsers")]
         [SwaggerResponse("200", typeof(UsersDto))]
-        [SwaggerOperationAttribute("adminGetUsers")]
         public async Task<IActionResult> AdminGetUsers()
         {
             var result = await _implementation.AdminGetUsersAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<UsersDto>(result);
         }
 
         /// <summary>Get the list of sessions [Authorize(Policy = "RequireApiAdminRole")]</summary>
@@ -56,17 +49,10 @@ namespace TpDotNetCore.Controllers
         [Authorize(Policy = "RequireApiAdminRole")]
         [HttpGet, Route("getSessions")]
         [SwaggerResponse("200", typeof(SessionsDto))]
-        [SwaggerOperationAttribute("adminGetSessions")]
         public async Task<IActionResult> AdminGetSessions()
         {
             var result = await _implementation.AdminGetSessionsAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<SessionsDto>(result);
         }
     }
 }

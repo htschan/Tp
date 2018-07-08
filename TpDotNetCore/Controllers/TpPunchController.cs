@@ -11,6 +11,7 @@ using System.ComponentModel;
 using NSwag.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace TpDotNetCore.Controllers
 {
@@ -20,7 +21,7 @@ namespace TpDotNetCore.Controllers
     {
         /// <summary>Retrieves all punches of current user</summary>
         /// <returns>An array of products</returns>
-        Task<SwaggerResponse<System.Collections.ObjectModel.ObservableCollection<PunchDto>>> GetPunchesAsync();
+        Task<SwaggerResponse<ObservableCollection<PunchDto>>> GetPunchesAsync();
 
         /// <summary>Retrieves all punches of current user of selected day</summary>
         /// <param name="day">The day selector [1 .. 31]</param>
@@ -82,13 +83,7 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> GetPunches()
         {
             var result = await _implementation.GetPunchesAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<ObservableCollection<PunchDto>>(result);
         }
 
         /// <summary>Retrieves all punches of current user of selected day</summary>
@@ -101,13 +96,7 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> GetDay(double? day, double? month, double? year)
         {
             var result = await _implementation.GetDayAsync(day, month, year).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<DayResponse>(result);
         }
 
         /// <summary>Retrieves all punches of current user selected week</summary>
@@ -119,13 +108,7 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> GetWeek(double? week, double? year)
         {
             var result = await _implementation.GetWeekAsync(week, year).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<WeekResponse>(result);
         }
 
         /// <summary>Retrieves all punches of current user of selected month</summary>
@@ -137,13 +120,7 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> GetMonth(double? month, double? year)
         {
             var result = await _implementation.GetMonthAsync(month, year).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<MonthResponse>(result);
         }
 
         /// <summary>Retrieves all punches of current user of selected year</summary>
@@ -154,13 +131,7 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> GetYear(double? year)
         {
             var result = await _implementation.GetYearAsync(year).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<YearResponse>(result);
         }
 
         /// <summary>Erzeugt einen Zeitstempel</summary>
@@ -171,13 +142,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchInAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<DayResponse>(result);
         }
 
         /// <summary>Erzeugt einen Zeitstempel</summary>
@@ -188,13 +153,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchOutAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<DayResponse>(result);
         }
 
         /// <summary>Modifiziert einen Zeitstempel</summary>
@@ -205,13 +164,7 @@ namespace TpDotNetCore.Controllers
         {
             if (!ModelState.IsValid) return HandleInvalidModelState(ModelState);
             var result = await _implementation.PunchModifyAsync(modifyPunchDto).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok();
-            else
-                return new ObjectResult(result.StatusCode) { StatusCode = result.StatusCode };
+            return ProcessResponse(result);
         }
 
         /// <summary>Löscht einen Zeitstempel</summary>
@@ -221,13 +174,7 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> PunchDelete([FromBody] DeletePunchDto deletePunchDto)
         {
             var result = await _implementation.PunchDeleteAsync(deletePunchDto).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok();
-            else
-                return new ObjectResult(result.StatusCode) { StatusCode = result.StatusCode };
+            return ProcessResponse(result);
         }
     }
 }

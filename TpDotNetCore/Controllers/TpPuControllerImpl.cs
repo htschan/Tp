@@ -52,7 +52,7 @@ namespace TpDotNetCore.Controllers
             }
             catch (Exception exception)
             {
-                var response = new PunchResponse { Status = new OpResult { Success = false, Result = $"Failed to delete punch. Exception: {exception.Message}" } };
+                var response = new PunchResponse { Status = new OpResult { Success = false, Result = $"Failed to set month statzs. Exception: {exception.Message}" } };
                 return HandleException(exception, headers);
             }
         }

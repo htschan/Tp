@@ -46,48 +46,28 @@ namespace TpDotNetCore.Controllers
         public async Task<IActionResult> GetProfiles()
         {
             var result = await _implementation.GetProfilesAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<ProfileResponseDto>(result);
         }
 
         /// <summary>Abfrage des eigenen Profils</summary>
         /// <returns>Die Operation war erfolgreich.</returns>
-        [HttpGet, Route("profiles/myprofile")]
+        [HttpGet, Route("getMyProfile")]
         [SwaggerResponse("200", typeof(ProfileResponseDto))]
-        [SwaggerOperationAttribute("getMyProfile")]
         public async Task<IActionResult> GetMyProfile()
         {
             var result = await _implementation.GetMyProfileAsync().ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<ProfileResponseDto>(result);
         }
 
         /// <summary>Abfrage eines Benutzerprofiles</summary>
         /// <param name="userid">User Id</param>
         /// <returns>Die Operation war erfolgreich.</returns>
-        [HttpGet, Route("profiles/{userid}")]
+        [HttpGet, Route("getUserProfile/{userid}")]
         [SwaggerResponse("200", typeof(ProfileResponseDto))]
-        [SwaggerOperationAttribute("getProfile")]
         public async Task<IActionResult> GetProfile(string userid)
         {
             var result = await _implementation.GetProfileAsync(userid).ConfigureAwait(false);
-
-            foreach (var header in result.Headers)
-                ControllerContext.HttpContext.Response.Headers.Add(header.Key, header.Value.ToArray());
-            if (result.StatusCode == 200)
-                return Ok(result.Result);
-            else
-                return new ObjectResult(result.Result) { StatusCode = result.StatusCode };
+            return ProcessResponse<ProfileResponseDto>(result);
         }
     }
 }
