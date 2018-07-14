@@ -35,10 +35,10 @@ export class LoginComponent implements OnInit {
         this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
         this.alertService.getMessage().subscribe(message => {
             if (message) {
-                let ar: AuthResponse = message.text;
+                const ar: AuthResponse = message.text;
                 this.snackBar.open(ar.status.result, 'error', { duration: 2000 });
             }
-        })
+        });
     }
 
     login() {

@@ -39,7 +39,7 @@ namespace TpDotNetCore.Domain.Punches.Repositories
                 var punches = Context.Punches
                     .Where(p => p.User.Id == user.Id)
                     .Where(p => p.WeekPunch.Week == selectWeek)
-                    .Where(p => p.YearPunch.Year == dt.Year)
+                    .Where(p => p.YearPunch.Year == selectYear)
                     .GroupBy(p => p.DayPunch.Day)
                     .ToList();
 
