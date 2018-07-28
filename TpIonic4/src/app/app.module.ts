@@ -9,9 +9,11 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ComponentsModule } from './components/components.module';
+import { DayNamePipe } from './pipes/day-name.pipe';
+import { MonthNamePipe } from './pipes/month-name.pipe';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, DayNamePipe, MonthNamePipe],
   entryComponents: [],
   imports: [
     BrowserModule,

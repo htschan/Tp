@@ -1,5 +1,5 @@
 {
   "name": "TpIonic4",
-  "integrations": {},
+  "integrations": {"gulp"},
   "type": "angular"
 }
