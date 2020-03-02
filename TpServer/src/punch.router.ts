@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction } from "express";
 import { Connection, ConnectionManager } from "typeorm";
 import { Container, Service } from "typedi";
 import { OrmConnection } from "typeorm-typedi-extensions";
@@ -37,26 +37,26 @@ export class PunchRouter {
                 res.send(punches);
             })
             .catch(() => {
-                res.status(404).send({ message: 'Nothing found', status: res.status });
+                res.status(404).send({ message: "Nothing found", status: res.status });
             });
     }
 
     public async getToday(req: Request, res: Response, next: NextFunction) {
         let repository = cm.get().getRepository(User);
-        repository.createQueryBuilder('user')
+        repository.createQueryBuilder("user")
             .where("user.username = :username")
             .setParameters({ username: (<any>req).decoded.username })
             .getOne()
             .then(user => {
                 if (user) {
                     return punchDomain.getToday(user);
+                } else {
+                    Promise.reject({ message: "User not found", status: 404 });
                 }
-                else
-                    Promise.reject({ message: 'User not found', status: 404 });
             })
             .then(punches => {
                 let punchVms: PunchVms = new PunchVms(punches);
-                res.status(200).send({ message: 'Success', status: res.status, data: punchVms.xVms });
+                res.status(200).send({ message: "Success", status: res.status, data: punchVms.xVms });
             })
             .catch(errmsg => {
                 res.status(errmsg.status).send({ success: false, result: errmsg } as IOpResult);
@@ -65,20 +65,20 @@ export class PunchRouter {
 
     public async getThisWeek(req: Request, res: Response, next: NextFunction) {
         let repository = cm.get().getRepository(User);
-        repository.createQueryBuilder('user')
+        repository.createQueryBuilder("user")
             .where("user.username = :username")
             .setParameters({ username: (<any>req).decoded.username })
             .getOne()
             .then((user) => {
                 if (user) {
                     return punchDomain.getThisWeek(user);
+                } else {
+                    Promise.reject({ message: "User not found", status: 404 });
                 }
-                else
-                    Promise.reject({ message: 'User not found', status: 404 });
             })
             .then(punches => {
                 let punchVms: PunchVms = new PunchVms(punches);
-                res.status(200).send({ message: 'Success', status: res.status, data: punchVms.xVms });
+                res.status(200).send({ message: "Success", status: res.status, data: punchVms.xVms });
             })
             .catch((errmsg) => {
                 res.status(errmsg.status).send({ success: false, result: errmsg } as IOpResult);
@@ -87,20 +87,20 @@ export class PunchRouter {
 
     public async getThisMonth(req: Request, res: Response, next: NextFunction) {
         let repository = cm.get().getRepository(User);
-        repository.createQueryBuilder('user')
+        repository.createQueryBuilder("user")
             .where("user.username = :username")
             .setParameters({ username: (<any>req).decoded.username })
             .getOne()
             .then((user) => {
                 if (user) {
                     return punchDomain.getThisMonth(user);
+                } else {
+                    Promise.reject({ message: "User not found", status: 404 });
                 }
-                else
-                    Promise.reject({ message: 'User not found', status: 404 });
             })
             .then(punches => {
                 let punchVms: PunchVms = new PunchVms(punches);
-                res.status(200).send({ message: 'Success', status: res.status, data: punchVms.xVms });
+                res.status(200).send({ message: "Success", status: res.status, data: punchVms.xVms });
             })
             .catch((errmsg) => {
                 res.status(errmsg.status).send({ success: false, result: errmsg } as IOpResult);
@@ -109,20 +109,20 @@ export class PunchRouter {
 
     public async getThisYear(req: Request, res: Response, next: NextFunction) {
         let repository = cm.get().getRepository(User);
-        repository.createQueryBuilder('user')
+        repository.createQueryBuilder("user")
             .where("user.username = :username")
             .setParameters({ username: (<any>req).decoded.username })
             .getOne()
             .then((user) => {
                 if (user) {
                     return punchDomain.getThisYear(user);
+                } else {
+                    Promise.reject({ message: "User not found", status: 404 });
                 }
-                else
-                    Promise.reject({ message: 'User not found', status: 404 });
             })
             .then(punches => {
                 let punchVms: PunchVms = new PunchVms(punches);
-                res.status(200).send({ message: 'Success', status: res.status, data: punchVms.xVms });
+                res.status(200).send({ message: "Success", status: res.status, data: punchVms.xVms });
             })
             .catch((errmsg) => {
                 res.status(errmsg.status).send({ success: false, result: errmsg } as IOpResult);
@@ -135,10 +135,10 @@ export class PunchRouter {
         let punchRepository = cm.get().getRepository(Punch);
         punchRepository.findOne(punch => punch.id === id)
             .then(punch => {
-                res.status(200).send({ message: 'Success', status: res.status, punch });
+                res.status(200).send({ message: "Success", status: res.status, punch });
             })
             .catch((err) => {
-                res.status(404).send({ message: 'No punch found with the given id.', status: res.status });
+                res.status(404).send({ message: "No punch found with the given id.", status: res.status });
             });
     }
 
@@ -148,7 +148,7 @@ export class PunchRouter {
                 return punchDomain.getByUserMonthAndYear(params);
             })
             .then(punches => {
-                res.status(200).send({ message: 'Success', status: res.status, punches });
+                res.status(200).send({ message: "Success", status: res.status, punches });
             })
             .catch((errmsg) => {
                 res.status(errmsg.status).send(errmsg);
@@ -160,19 +160,20 @@ export class PunchRouter {
             .then((params: PunchPostParams) => {
                 let repository = cm.get().getRepository(User);
                 console.log(`punch user ${(<any>req).decoded.username} `);
-                return repository.createQueryBuilder('user')
+                return repository.createQueryBuilder("user")
                     .where("user.username = :username")
                     .setParameters({ username: (<any>req).decoded.username })
                     .getOne();
             })
             .then((user: User) => {
-                if (user)
+                if (user) {
                     return punchDomain.punch(user, req.params.dir.toLowerCase() === "in");
+                }
                 return Promise.reject({ status: 404, message: "user not found" });
             })
             .then((punches: Punch[]) => {
                 let punchVms: PunchVms = new PunchVms(punches);
-                res.status(200).send({ message: 'Success', status: res.status, data: punchVms.xVms });
+                res.status(200).send({ message: "Success", status: res.status, data: punchVms.xVms });
             })
             .catch((errmsg) => {
                 res.status(404).send({ success: false, result: errmsg } as IOpResult);
@@ -180,18 +181,18 @@ export class PunchRouter {
     }
 
     init() {
-        this.router.get('/', this.getAll);
-        this.router.get('/today', this.getToday);
-        this.router.get('/thisweek', this.getThisWeek);
-        this.router.get('/thismonth', this.getThisMonth);
-        this.router.get('/thisyear', this.getThisYear);
-        this.router.post('/punch/:dir', this.punch);
-        this.router.get('/:id', this.getOne);
-        this.router.get('/:id/:year/:month', this.getByUserMonthYear);
+        this.router.get("/", this.getAll);
+        this.router.get("/today", this.getToday);
+        this.router.get("/thisweek", this.getThisWeek);
+        this.router.get("/thismonth", this.getThisMonth);
+        this.router.get("/thisyear", this.getThisYear);
+        this.router.post("/punch/:dir", this.punch);
+        this.router.get("/:id", this.getOne);
+        this.router.get("/:id/:year/:month", this.getByUserMonthYear);
     }
 }
 
-// Create the PunchRouter, and export its configured Express.Router
+// create the PunchRouter, and export its configured Express.Router
 const routes = new PunchRouter();
 routes.init();
 

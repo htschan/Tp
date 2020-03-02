@@ -1,9 +1,9 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction } from "express";
 
-const Heroes = require('../assets/data');
+const Heroes = require("../assets/data");
 
 export class HeroRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the HeroRouter
@@ -26,15 +26,14 @@ export class HeroRouter {
         if (hero) {
             res.status(200)
                 .send({
-                    message: 'Success',
+                    message: "Success",
                     status: res.status,
                     hero
                 });
-        }
-        else {
+        } else {
             res.status(404)
                 .send({
-                    message: 'No hero found with the given id.',
+                    message: "No hero found with the given id.",
                     status: res.status
                 });
         }
@@ -44,14 +43,14 @@ export class HeroRouter {
      * endpoints.
      */
     init() {
-        this.router.get('/', this.getAll);
-        this.router.get('/:id', this.getOne);
-        this.router.post('/:id', this.getOne);
+        this.router.get("/", this.getAll);
+        this.router.get("/:id", this.getOne);
+        this.router.post("/:id", this.getOne);
     }
 
 }
 
-// Create the HeroRouter, and export its configured Express.Router
+// create the HeroRouter, and export its configured Express.Router
 const heroRoutes = new HeroRouter();
 heroRoutes.init();
 
